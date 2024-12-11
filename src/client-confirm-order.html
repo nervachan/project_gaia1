@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Order</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script> <!-- Include moment.js for date calculations -->
+    <style>
+        /* Ensure the image fits within the screen */
+        #confirm-product-image {
+            max-width: 100%; /* Ensures the image never exceeds the width of its container */
+            height: auto; /* Maintains the aspect ratio of the image */
+        }
+        /* Adjust the container for the product so it fits well on mobile */
+        .container {
+            max-width: 600px; /* Limits the container width */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <header>
+        <nav class="bg-gray-800">
+            <!-- Navigation Content -->
+        </nav>
+    </header>
+
+    <main class="container mx-auto mt-6">
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h2 class="text-xl font-semibold" id="confirm-product-title">Product Title</h2>
+            <img src="" alt="Product Image" class="rounded-lg w-full" id="confirm-product-image">
+            <p class="text-2xl text-red-600 mt-2" id="confirm-product-price">$100.00</p>
+            <p class="mt-4" id="confirm-product-description">This is a brief description of the product. It highlights key features and benefits.</p>
+
+            <div class="mt-6">
+                <label for="start-date" class="font-semibold">Select Start Date:</label>
+                <input type="date" id="start-date" class="mt-2 p-2 border border-gray-300 rounded" required>
+
+                <label for="end-date" class="font-semibold mt-4">Select End Date:</label>
+                <input type="date" id="end-date" class="mt-2 p-2 border border-gray-300 rounded" required>
+
+                <div class="mt-6">
+                    <p class="font-semibold">Please confirm your rental.</p>
+                    <button id="confirm-button" class="bg-blue-800 text-white py-2 px-4 rounded hover:bg-blue-900 mt-4">Confirm Rental</button>
+                    <button id="cancel-button" class="bg-gray-400 text-white py-2 px-4 rounded hover:bg-gray-500 mt-4">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for confirmation -->
+    <div id="modal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 class="text-xl font-semibold" id="modal-title">Confirm Rental Details</h3>
+            <p id="modal-rental-days"></p>
+            <p id="modal-total-price"></p>
+            <div class="mt-4">
+                <button id="modal-confirm" class="bg-blue-800 text-white py-2 px-4 rounded hover:bg-blue-900">Confirm</button>
+                <button id="modal-cancel" class="bg-gray-400 text-white py-2 px-4 rounded hover:bg-gray-500">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between">
+                <!-- Footer Content -->
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        window.onload = function () {
+            // Retrieve the item details from localStorage
+            const listingData = JSON.parse(localStorage.getItem('listingData'));
+
+            if (listingData) {
+                // Populate the confirmation page with item details
+                document.getElementById('confirm-product-title').innerText = listingData.title;
+                document.getElementById('confirm-product-price').innerText = `$${listingData.price}`;
+                document.getElementById('confirm-product-description').innerText = listingData.description;
+                document.getElementById('confirm-product-image').src = listingData.image;
+            } else {
+                // Handle the case where no listing data is found (e.g., redirect or show error)
+                window.location.href = '/index.html';
+            }
+        };
+
+        document.getElementById('confirm-button').addEventListener('click', function () {
+            // Get the selected start and end dates
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            if (!startDate || !endDate) {
+                alert("Please select both start and end dates.");
+                return;
+            }
+
+            const start = moment(startDate);
+            const end = moment(endDate);
+
+            // Calculate the rental duration in days
+            const rentalDays = end.diff(start, 'days');
+            if (rentalDays <= 0) {
+                alert("End date must be after the start date.");
+                return;
+            }
+
+            const listingData = JSON.parse(localStorage.getItem('listingData'));
+            const totalPrice = rentalDays * parseFloat(listingData.price);
+             // Store the rental details in rent history
+    const rentalDetails = {
+        title: listingData.title,
+        image: listingData.image,
+        startDate: startDate,
+        endDate: endDate,
+        rentalDays: rentalDays,
+        totalPrice: totalPrice.toFixed(2)
+    };
+
+    // Retrieve existing rent history or initialize an empty array
+    let rentHistory = JSON.parse(localStorage.getItem('rentHistory')) || [];
+
+    // Add the new rental to the rent history
+    rentHistory.push(rentalDetails);
+
+    // Save the updated rent history back to localStorage
+    localStorage.setItem('rentHistory', JSON.stringify(rentHistory));
+    
+            // Display rental details in modal
+            document.getElementById('modal-rental-days').innerText = `Rental Days: ${rentalDays} days`;
+            document.getElementById('modal-total-price').innerText = `Total Price: $${totalPrice.toFixed(2)}`;
+            document.getElementById('modal').classList.remove('hidden'); // Show the modal
+        });
+
+        // Handle modal confirm button click
+        document.getElementById('modal-confirm').addEventListener('click', function () {
+            alert("The rental shop has been notified!"); // Simulate notification
+            window.location.href = '/src/client-login.html';// Redirect to login page
+        });
+
+        // Handle modal cancel button click
+        document.getElementById('modal-cancel').addEventListener('click', function () {
+            document.getElementById('modal').classList.add('hidden'); // Hide the modal
+        });
+
+        // Handle cancel button click
+        document.getElementById('cancel-button').addEventListener('click', function () {
+            window.location.href = '/src/client-login.html'; // Redirect to the home page or previous page
+        });
+
+        
+    </script>
+
+</body>
+
+</html>

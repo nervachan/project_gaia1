@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project:Gaia</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.2/firebase-firestore.js"></script>
+    <script src="./firebase.js"></script> </head>
+    </head>
+<body class="h-screen flex items-center justify-center bg-blue-400" >
+
+<form class="bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl overflow-hidden border-4 border-blue-400 dark:border-blue-800 " id="login-form">
+  <div class="px-8 py-10 md:px-10">
+    <h2
+      class="text-4xl font-extrabold text-center text-zinc-800 dark:text-white"
+    >
+      Welcome Back!
+    </h2>
+    <p class="text-center text-zinc-600 dark:text-zinc-400 mt-3">
+      We missed you, sign in to continue.
+    </p>
+    <div class="mt-10">
+      <div class="relative">
+        <label
+          class="block mb-3 text-sm font-medium text-zinc-600 dark:text-zinc-200"
+          for="username"
+          >Username</label
+        >
+        <input
+          placeholder="Username"
+          class="block w-full px-4 py-3 mt-2 text-zinc-800 bg-white border-2 rounded-lg dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-opacity-50 focus:outline-none focus:ring focus:ring-blue-400"
+          name="username"
+          id="username"
+          type="text"
+        />
+      </div>
+      <div class="mt-6">
+        <label
+          class="block mb-3 text-sm font-medium text-zinc-600 dark:text-zinc-200"
+          for="password"
+          >Password</label
+        >
+        <input
+          placeholder="••••••••"
+          class="block w-full px-4 py-3 mt-2 text-zinc-800 bg-white border-2 rounded-lg dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-opacity-50 focus:outline-none focus:ring focus:ring-blue-400"
+          name="password"
+          id="password"
+          type="password"
+        />
+      </div>
+      <div class="mt-10">
+        <button
+          class="w-full px-4 py-3 tracking-wide text-white transition-colors duration-200 transform bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg hover:from-blue-700 hover:to-cyan-700 focus:outline-none focus:ring-4 focus:ring-blue-400 dark:focus:ring-blue-800"
+          type="submit" 
+        >
+          Let's Go
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="px-8 py-4 bg-blue-200 dark:bg-zinc-800">
+    <div class="text-sm text-blue-900 dark:text-blue-300 text-center">
+      Don't have an account?
+      <a class="font-medium underline" href="/src/register.html">Sign up</a>
+    </div>
+  </div>
+</form>
+
+<!--login handler -->
+<script>
+  document.getElementById('login-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Get user input values
+    const usernameInput = document.getElementById('username').value;
+    const passwordInput = document.getElementById('password').value;
+
+    // Retrieve stored credentials from localStorage
+    const storedUsername = localStorage.getItem('username');
+    const storedPassword = localStorage.getItem('password');
+
+    // Check if the entered credentials match the stored ones
+    if (usernameInput === storedUsername && passwordInput === storedPassword) {
+        // Successful login
+        alert('Login successful! Welcome back!');
+        // Redirect to the main page or dashboard
+        window.location.href = 'client-login.html'; 
+    } else {
+        // Failed login
+        const errorMessage = document.getElementById('error-message');
+        alert('Invalid username or password. Please try again.');
+    }
+});
+
+</script>
+</body>
+</html>
