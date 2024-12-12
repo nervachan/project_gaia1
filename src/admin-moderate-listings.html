@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project:Gaia Admin</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <script type="module">// Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
+        import { getFirestore, collection, query, where, getDocs,deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+        import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js";
+        
+        // Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
+  authDomain: "project-gaia1.firebaseapp.com",
+  projectId: "project-gaia1",
+  storageBucket: "project-gaia1.firebasestorage.app",
+  messagingSenderId: "832122601643",
+  appId: "1:832122601643:web:1ab91b347704174f52b7ee",
+  measurementId: "G-DX2L33NH4H"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Function to fetch and display listings
+async function displayListings() {
+    const listingsContainer = document.getElementById('listingsContainer');
+    listingsContainer.innerHTML = ''; // Clear the container
+
+    try {
+        const querySnapshot = await getDocs(collection(db, 'listed items'));
+        querySnapshot.forEach((doc) => {
+            const listingData = doc.data();
+            const listingId = doc.id;
+
+            // Create a div for each listing
+            const listingDiv = document.createElement('div');
+            listingDiv.className = 'listing';
+            listingDiv.innerHTML = `
+                <h3>${listingData.productName}</h3>
+                <p>${listingData.productDescription}</p>
+                <p>Category: ${listingData.category}</p>
+                <p>Condition: ${listingData.condition}</p>
+                <p>Rent Price: ${listingData.rentPrice}</p>
+                <p>Sell Price: ${listingData.sellPrice}</p>
+                <img src="${listingData.image}" alt="${listingData.productName}" style="max-width: 200px;"/>
+                <button class="remove-button" data-id="${listingId}">Force Remove</button>
+            `;
+
+            // Append the listing div to the container
+            listingsContainer.appendChild(listingDiv);
+        });
+
+        // Add event listeners to the remove buttons
+        const removeButtons = document.querySelectorAll('.remove-button');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const id = event.target.getAttribute('data-id');
+                await removeListing(id);
+            });
+        });
+
+    } catch (error) {
+        console.error("Error fetching listings: ", error);
+    }
+}
+
+// Function to remove a listing
+async function removeListing(id) {
+    try {
+        await deleteDoc(doc(db, 'listed items', id));
+        console.log("Listing removed successfully!");
+        displayListings(); // Refresh the listings after removal
+    } catch (error) {
+        console.error("Error removing listing: ", error);
+    }
+}
+
+// Call the function to display listings on page load
+displayListings();
+
+</script>
+</head>
+<body>
+    <header>
+        <nav class="bg-gray-800">
+            <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+                <div class="relative flex h-16 items-center justify-between">
+                    <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                        <!-- Mobile menu button-->
+                        <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                            <span class="absolute -inset-0.5"></span>
+                            <span class="sr-only">Open main menu</span>
+                            <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                            </svg>
+                            <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                        <div class="flex flex-shrink-0 items-center">
+                            <h3 class="text-gray-100">Admin Control Panel</h3>
+                        </div>
+                        <div class="hidden sm:ml-6 sm:block">
+                            <div class="flex space-x-4">
+                                <a href="/src/admin-cp.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Create Announcement</a>
+                                <a href="/src/admin-moderate-listings.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Moderate Listings</a>
+                                <a href="/src/admin-check-users.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Check User Accounts</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                        <button id="notification-btn" type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                            <span class="absolute -inset-1.5"></span>
+                            <span class="sr-only">View notifications</span>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                            </svg>
+                        </button>
+    
+                        <!-- Profile dropdown -->
+                        <div class="relative ml-3">
+                            <div>
+                                <a href="/src/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Mobile menu, show/hide based on menu state. -->
+            <div class="sm:hidden" id="mobile-menu">
+                <div class="space-y-1 px-2 pb-3 pt-2">
+                    <a href="/create-announcement.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Create Announcement</a>
+                    <a href="/moderate-listings.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Moderate Listings</a>
+                    <a href="/check-user-accounts.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Check User Accounts</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Div for dynamic content -->
+    <div id="listingsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+    </div>
+
+</body>
+</html>

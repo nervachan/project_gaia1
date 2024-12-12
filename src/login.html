@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project:Gaia</title>
     <link rel="stylesheet" href="/css/output.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.2/firebase-firestore.js"></script>
-    <script src="./firebase.js"></script> </head>
-    </head>
+    <script type="module" src="loginHandler.js"></script>
+   </head>
+    
 <body class="h-screen flex items-center justify-center bg-blue-400" >
 
 <form class="bg-white dark:bg-zinc-900 shadow-2xl rounded-2xl overflow-hidden border-4 border-blue-400 dark:border-blue-800 " id="login-form">
@@ -68,32 +67,5 @@
   </div>
 </form>
 
-<!--login handler -->
-<script>
-  document.getElementById('login-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission
-
-    // Get user input values
-    const usernameInput = document.getElementById('username').value;
-    const passwordInput = document.getElementById('password').value;
-
-    // Retrieve stored credentials from localStorage
-    const storedUsername = localStorage.getItem('username');
-    const storedPassword = localStorage.getItem('password');
-
-    // Check if the entered credentials match the stored ones
-    if (usernameInput === storedUsername && passwordInput === storedPassword) {
-        // Successful login
-        alert('Login successful! Welcome back!');
-        // Redirect to the main page or dashboard
-        window.location.href = 'client-login.html'; 
-    } else {
-        // Failed login
-        const errorMessage = document.getElementById('error-message');
-        alert('Invalid username or password. Please try again.');
-    }
-});
-
-</script>
 </body>
 </html>
