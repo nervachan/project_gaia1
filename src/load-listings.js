@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs ,getDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -22,6 +22,55 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
+
+
+async function showListingDetails(listingId) {
+    const modal = document.getElementById('listing-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalContent = document.getElementById('modal-content');
+
+    try {
+        // Fetch the document from Firestore
+        const listingDoc = (doc(db, 'listed items', listingId));
+        const listingSnapshot = await getDoc(listingDoc);
+
+        if (listingSnapshot.exists()) {
+            const listing = listingSnapshot.data();
+            modalTitle.innerText = listing.productName;
+            modalContent.innerHTML = `
+                <p>${listing.productDescription}</p>
+                <p><strong>Category:</strong> ${listing.category}</p>
+                <p><strong>Condition:</strong> ${listing.condition}</p>
+                ${listing.image ? `<img src="${listing.image}" alt="${listing.productName}" class="w-full h-full object-cover rounded-md mt-4">` : ''}
+                ${listing.rentPrice ? `<p><strong>Rent Price:</strong> $${listing.rentPrice}</p>` : ''}
+                ${listing.sellPrice ? `<p><strong>Selling Price:</strong> $${listing.sellPrice}</p>` : ''}
+            `;
+            modal.classList.remove('hidden'); // Show the modal
+            
+        } else {
+            console.error("No listing found with the provided ID.");
+        }
+    } catch (error) {
+        console.error("Error fetching listing details: ", error);
+    }
+
+}
+// Event delegation for closing the modal
+document.body.addEventListener('click', (event) => {
+    if (event.target.id === 'close-modal') {
+        const modal = document.getElementById('listing-modal');
+        modal.classList.add('hidden'); // Hide the modal
+    }
+});
+// Add event listeners to all view details buttons
+const viewDetailsButtons = document.querySelectorAll('.view-details');
+viewDetailsButtons.forEach(button => {
+    button.addEventListener('click', (event) => {
+        const listingId = event.target.getAttribute('data-id');
+        showListingDetails(listingId); // Show the modal with listing details
+    });
+});
+
 
 // Function to load and display listings from Firestore
 async function loadListings() {
@@ -52,21 +101,30 @@ async function loadListings() {
                 <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
                 ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listing.rentPrice}</p>` : ''}
                 ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: $${listing.sellPrice}</p>` : ''}
-                <button class="view-details mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" id="view-details">View Details</button>
+                <button class="view-details mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" data-id="${doc.id}">View Details</button>
             `;
 
             listingsContainer.appendChild(listingElement);
+        });
+
+       // Add event listeners to all view details buttons
+    const viewDetailsButtons = document.querySelectorAll('.view-details');
+    viewDetailsButtons.forEach(button => {
+    button.addEventListener('click', (event) => {
+        const listingId = event.target.getAttribute('data-id');
+        showListingDetails(listingId); // Call the function to show the modal with listing details
+    });
 });
+
+
+
+
     } catch (error) {
         console.error("Error fetching listings: ", error);
     }
-    const viewDetailsButton = document.getElementById(`view-details`);
-        viewDetailsButton.addEventListener('click', () => {
-            // Redirect to listing-page.html with the index or a unique identifier as a query parameter
-            window.location.href = `/src/listing-page.html`;
-          });
 }
 
 // Load listings when the page is loaded
 window.onload = loadListings;
+
 

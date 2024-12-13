@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" /> 
   <script src="/src/Filter.js"></script>
   <script type="module" src="/src/load-listings.js"></script>
+  
 
     
 
@@ -202,7 +203,15 @@
           </div>
       </div>
   </footer>
-  
+
+  <!-- View Detils Modal Structure -->
+<div id="listing-modal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+      <h3 id="modal-title" class="text-xl font-semibold text-gray-800 mb-4"></h3>
+      <div id="modal-content" class="text-gray-600 mb-4"></div>
+      <button id="close-modal" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Close</button>
+  </div>
+</div>
  
 
 <!-- MODAL FOR NOTIFICATION-->
