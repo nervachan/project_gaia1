@@ -52,22 +52,21 @@ async function loadListings() {
                 <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
                 ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listing.rentPrice}</p>` : ''}
                 ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: $${listing.sellPrice}</p>` : ''}
-                <button class="view-details mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">View Details</button>
+                <button class="view-details mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" id="view-details">View Details</button>
             `;
 
             listingsContainer.appendChild(listingElement);
-
-            // Add event listener for 'View Details' button
-            const viewDetailsButton = listingElement.querySelector('.view-details');
-            viewDetailsButton.addEventListener('click', () => {
-                // Redirect to listing-page.html with the document ID as a query parameter
-                window.location.href = `/src/listing-page.html?id=${doc.id}`;
-            });
-        });
+});
     } catch (error) {
         console.error("Error fetching listings: ", error);
     }
+    const viewDetailsButton = document.getElementById(`view-details`);
+        viewDetailsButton.addEventListener('click', () => {
+            // Redirect to listing-page.html with the index or a unique identifier as a query parameter
+            window.location.href = `/src/listing-page.html`;
+          });
 }
 
 // Load listings when the page is loaded
 window.onload = loadListings;
+

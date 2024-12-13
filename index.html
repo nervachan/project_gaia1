@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" /> 
   <script src="/src/Filter.js"></script>
+  <script type="module" src="/src/load-listings.js"></script>
 
     
 
@@ -202,48 +203,7 @@
       </div>
   </footer>
   
- <script>
-    // Function to load and display listings from localStorage
-    function loadListings() {
-        const listingsContainer = document.getElementById('listing-container');
-        const listings = JSON.parse(localStorage.getItem('listings')) || [];
-
-        // Clear the container before adding new listings
-        listingsContainer.innerHTML = '';
-
-        // Loop through the listings and add them to the page
-        listings.forEach(listing => {
-            const listingElement = document.createElement('div');
-            listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
-
-            // If the listing has an image, display it
-            const image = listing.image ? `<img src="${listing.image}" alt="${listing.productName}" class="w-full h-48 object-cover rounded-md">` : '';
-            
-            listingElement.innerHTML = `
-                ${image}
-                <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
-                <p class="text-gray-600 mt-2">${listing.productDescription}</p>
-                <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
-                <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
-                ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listing.rentPrice}</p>` : ''}
-                ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: $${listing.sellPrice}</p>` : ''}
-                <button id="view-details" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">View Details</button>
-            `;
-
-            listingsContainer.appendChild(listingElement);
-
-            // Add event listener for 'View Details' button
-        const viewDetailsButton = document.getElementById(`view-details`);
-        viewDetailsButton.addEventListener('click', () => {
-            // Redirect to listing-page.html with the index or a unique identifier as a query parameter
-            window.location.href = `/src/listing-page.html`;
-          });
-        });
-    }
-
-    // Load listings when the page is loaded
-    window.onload = loadListings;
-</script> 
+ 
 
 <!-- MODAL FOR NOTIFICATION-->
 <script>
@@ -258,7 +218,5 @@
       window.location.href = 'src/listing-page.html'
     });
 </script>
-<!-- FIREBASE SCRIPT -->
-<script type="module" src="main.js"></script>
 </body>
 </html>

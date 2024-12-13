@@ -128,7 +128,31 @@
                 </div>
             </div>
         
-
+<!-- Modal form to edit the listing -->
+<div id="edit-listing-modal" class="fixed top-0 left-0 w-full h-full bg-gray-500 bg-opacity-75 flex justify-center items-center hidden">
+  <div class="bg-white rounded-lg shadow-lg p-4 w-1/2">
+      <h2 class="text-2xl font-bold mb-4">Edit Listing</h2>
+      <form id="edit-listing-form">
+          <div class="mb-4">
+              <label for="productName" class="block text-gray-700 text-sm font-bold mb-2">Product Name:</label>
+              <input type="text" id="productName" name="productName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+          </div>
+          <div class="mb-4">
+            <select id="category" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="" disabled selected>Select category</option>
+              <option value="for men">For Men</option>
+              <option value="for women">For Women</option>
+              <option value="for children (male)">For Child(Male)</option>
+              <option value="for children (female)">For Child(Female)</option>
+              <!-- Add more options as needed -->
+          </select>
+        </div>
+          
+          
+          <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save Changes</button>
+      </form>
+  </div>
+</div>
 
 
             <!-- <script>

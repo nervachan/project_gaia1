@@ -141,7 +141,7 @@
                 </div>
             </div>
         
-            <script>
+            <!-- <script>
                 // Example data for inactive listings
                 const inactiveListings = [
                     {
@@ -218,11 +218,95 @@
         
                 // Call the function to render inactive listings
                 renderInactiveListings(inactiveListings);
-            </script>
+            </script> -->
   </div>
 
     </div>
+
+
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
+  authDomain: "project-gaia1.firebaseapp.com",
+  projectId: "project-gaia1",
+  storageBucket: "project-gaia1.firebasestorage.app",
+  messagingSenderId: "832122601643",
+  appId: "1:832122601643:web:1ab91b347704174f52b7ee",
+  measurementId: "G-DX2L33NH4H"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
+// Function to render inactive listings
+async function renderInactiveListings() {
+    const inactiveListingsContainer = document.getElementById('inactiveListings');
+    inactiveListingsContainer.innerHTML = ''; // Clear previous listings
+
+    const querySnapshot = await getDocs(collection(db, "inactive listings"));
+    querySnapshot.forEach((doc) => {
+        const listing = doc.data();
+
+        const listingCard = document.createElement('div');
+        listingCard.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'overflow-hidden', 'text-center');
+
+        listingCard.innerHTML = `
+            <img src="${listing.image}" alt="Item Image" class="w-full h-48 object-cover">
+            <div class="p-4">
+                <h3 class="text-xl font-semibold text-gray-800">${listing.productName}</h3>
+                <button class="mt-4 py-2 px-6 bg-red-600 text-white rounded-full text-sm hover:bg-red-700" onclick="showModal('${doc.id}')">
+                    Relist Item
+                </button>
+            </div>
+        `;
+
+        inactiveListingsContainer.appendChild(listingCard);
+    });
+}
+
+// Function to show the modal
+function showModal(listingId) {
+    const modal = document.getElementById('modal');
+    modal.classList.remove('hidden');  // Display the modal
+    const confirmButton = document.getElementById('confirmButton');
+    const cancelButton = document.getElementById('cancelButton');
+
+    // Handle the relist confirmation
+    confirmButton.onclick = async function() {
+        await db.collection("inactive listings").doc(listingId).update({
+            status: "active"
+        });
+        alert('Item has been relisted!');
+        renderInactiveListings();
+        closeModal();
+    };
+
+    // Handle modal close (Cancel button)
+    cancelButton.onclick = closeModal;
+
+    function closeModal() {
+        modal.classList.add('hidden');  // Hide the modal
+    }
+}
+
+// Call the function to render inactive listings
+renderInactiveListings();
+                
+    </script>
 </body>
 </html>
 
-<!-- buttons not showing-->
+<!-- buttons not

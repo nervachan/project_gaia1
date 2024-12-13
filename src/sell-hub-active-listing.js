@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-import { getFirestore, collection, query, where, getDocs, doc, deleteDoc, setDoc  } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, doc, deleteDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -52,11 +52,17 @@ async function renderActiveListings() {
                     <p class="text-lg font-medium text-gray-600">${listing.condition}</p>
                     ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listing.rentPrice}</p>` : ''}
                     ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: $${listing.sellPrice}</p>` : ''}
-                    <a href="#" class="inline-block mt-4 py-2 px-6 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 deactivate-btn" data-id="${doc.id}" data-listing='${JSON.stringify(listing)}'>
-                        Deactivate Listing
-                    </a>
+                    <div class="flex justify-between mt-4">
+                        <a href="#" class="inline-block py-2 px-6 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 deactivate-btn" data-id="${doc.id}" data-listing='${JSON.stringify(listing)}'>
+                            Deactivate Listing
+                        </a>
+                        <button class="inline-block py-2 px-6 bg-orange-600 text-white rounded-full text-sm hover:bg-orange-700 edit-btn" data-id="${doc.id}" data-listing='${JSON.stringify(listing)}'>
+                            Edit Listing
+                        </button>
+                    </div>
                 </div>
             `;
+
 
             activeListingsContainer.appendChild(listingCard);
         });
@@ -66,10 +72,58 @@ async function renderActiveListings() {
         deactivateButtons.forEach(button => {
             button.addEventListener('click', handleDeactivate);
         });
+
+        const editButtons = document.querySelectorAll('.edit-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', handleEdit);
+        });
+
     } catch (error) {
         console.error("Error fetching listings: ", error);
         activeListingsContainer.innerHTML = '<p class="text-red-500">Error loading listings.</p>';
     }
+}
+// Function to handle editing a listing
+async function handleEdit(event) {
+    event.preventDefault();
+    const listingId = event.target.getAttribute('data-id');
+    const listingData = JSON.parse(event.target.getAttribute('data-listing'));
+
+    // Show the modal form
+    const modal = document.getElementById('edit-listing-modal');
+    modal.classList.remove('hidden');
+
+    // Populate the form fields with the listing data
+    const productNameInput = document.getElementById('productName');
+    const categoryInput = document.getElementById('category');
+    // Add more fields here
+    productNameInput.value = listingData.productName;
+    categoryInput.value = listingData.category;
+    // Add more fields here
+
+    // Add an event listener to the form submit button
+    const form = document.getElementById('edit-listing-form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        // Get the updated listing data from the form fields
+        const updatedListingData = {
+            productName: productNameInput.value,
+            category: categoryInput.value,
+            // Add more fields here
+        };
+
+        // Update the listing in the database
+        try {
+            await updateDoc(doc(db, 'listed items', listingId), updatedListingData);
+            console.log('Listing updated successfully!');
+        } catch (error) {
+            console.error('Error updating listing:', error);
+        }
+
+        // Hide the modal form
+        modal.classList.add('hidden');
+        
+    });
 }
 
 // Function to handle deactivating a listing
