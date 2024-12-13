@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listing Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div id="listing-details" class="bg-white p-6 rounded-lg shadow-md w-96"></div>
+
+    <script>
+      // Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
+import { getFirestore, collection, query, where, getDocs,addDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js";
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
+  authDomain: "project-gaia1.firebaseapp.com",
+  projectId: "project-gaia1",
+  storageBucket: "project-gaia1.firebasestorage.app",
+  messagingSenderId: "832122601643",
+  appId: "1:832122601643:web:1ab91b347704174f52b7ee",
+  measurementId: "G-DX2L33NH4H"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+        // Function to load and display listing details from Firestore
+        function loadListingDetails() {
+            const listingDetailsContainer = document.getElementById('listing-details');
+            const urlParams = new URLSearchParams(window.location.search);
+            const listingId = urlParams.get('id');
+
+            if (listingId === null) {
+                listingDetailsContainer.innerHTML = 'No listing ID provided.';
+                return;
+            }
+
+            db.collection("listed items").doc(listingId).get().then((doc) => {
+                if (doc.exists()) {
+                    const listing = doc.data();
+
+                    // Create the listing details element
+                    const listingDetailsElement = document.createElement('div');
+                    listingDetailsElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
+
+                    // If the listing has an image, display it
+                    const image = listing.image ? `<img src="${listing.image}" alt="${listing.productName}" class="w-full h-48 object-cover rounded-md">` : '';
+
+                    listingDetailsElement.innerHTML = `
+                        ${image}
+                        <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
+                        <p class="text-gray-600 mt-2">${listing.productDescription}</p>
+                        <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
+                        <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
+                        ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listing.rentPrice}</p>` : ''}
+                        ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: $${listing.sellPrice}</p>` : ''}
+                    `;
+
+                    listingDetailsContainer.appendChild(listingDetailsElement);
+                } else {
+                    listingDetailsContainer.innerHTML = 'Listing not found.';
+                }
+            }).catch((error) => {
+                console.error("Error getting listing details:", error);
+            });
+        }
+
+        // Load listing details when the page is loaded
+        window.onload = loadListingDetails;
+    </script>
+</body>
+</html>
