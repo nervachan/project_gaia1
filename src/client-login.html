@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="/css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <script src="/src/Filter.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script type="module" src="load-listings.js"></script>
 
     
@@ -176,8 +178,49 @@
           </div>
       </div>
   </footer>
-  
 
+  <div id="listing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg">
+        <h2 id="modal-title" class="text-xl font-bold"></h2>
+        <div id="modal-content"></div>
+        <button id="close-modal" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Close</button>
+    </div>
+</div>
+
+<!--RENT Modal Structure -->
+<div id="rentModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+      <div class="flex justify-between items-center">
+          <h5 class="text-xl font-semibold" id="rentModalLabel">Rental Information</h5>
+          <button id="close-rent" class="text-gray-500 hover:text-gray-700">&times;</button>
+      </div>
+      <form id="rentalForm" class="mt-4">
+          <div class="mb-4">
+              <label for="userName" class="block text-sm font-medium text-gray-700">Name</label>
+              <input type="text" id="userName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required>
+          </div>
+          <div class="mb-4">
+              <label for="rentalPrice" class="block text-sm font-medium text-gray-700">Price per Day</label>
+              <input type="text" id="rentalPrice" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" readonly>
+          </div>
+          <div class="mb-4">
+              <label for="rentalStartDate" class="block text-sm font-medium text-gray-700">Start Date</label>
+              <input type="text" id="rentalStartDate" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required>
+          </div>
+          <div class="mb-4">
+              <label for="rentalEndDate" class="block text-sm font-medium text-gray-700">End Date</label>
+              <input type="text" id="rentalEndDate" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required>
+          </div>
+          <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Total Price</label>
+              <p id="totalPrice" class="text-lg font-semibold">₱0.00</p>
+          </div>
+          <div class="flex justify-end">
+              <button type="submit"  class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Submit Rental</button>
+          </div>
+      </form>
+  </div>
+</div>
   <!-- signed-in name script -->
 <!-- <script>
   // Retrieve the username from localStorage
