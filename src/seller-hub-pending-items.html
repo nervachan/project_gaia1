@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/css/output.css">
+    <script type="module" src="load-pending-items.js"></script>
 </head>
 <body class="bg-gray-100">
     <header>
@@ -77,20 +78,6 @@
 
                 <!-- Rented Items List -->
                 <div id="rentedItemsList">
-                    <!-- Example of rented item entry -->
-                    <div class="flex bg-white p-4 mb-4 rounded-lg shadow-md">
-                        <img src="https://via.placeholder.com/120" alt="Item Image" class="w-30 h-30 object-cover rounded-lg mr-4">
-                        <div class="flex-grow flex flex-col justify-between">
-                            <div class="font-semibold text-xl text-gray-800">Wedding Gown</div>
-                            <div class="text-sm text-gray-600">Rented by: goldroom01</div>
-                            <div class="font-medium text-blue-600">200</div>
-                            <div class="text-sm text-red-600">Return Date: 2024-12-16</div>
-                            <div class="flex mt-4 space-x-4">
-                                <a href="/src/listing-page.html" class="inline-block py-2 px-4 bg-blue-600 text-white rounded-md">View Listing</a>
-                                <button onclick="openReturnModal()" class="inline-block py-2 px-4 bg-green-600 text-white rounded-md">Mark as Returned</button>
-                            </div>
-                        </div>
-                    </div>
                     <!-- More items will be inserted here dynamically -->
                 </div>
             </div>
@@ -109,75 +96,6 @@
         </div>
     </div>
 
-    <script>
-        // Example data for rented items
-        const rentedItems = [
-            {
-                imageUrl: "https://via.placeholder.com/120",
-                title: "Mountain Province Gown",
-                rentedBy: "goldroom01",
-                price:"" ,
-                returnDate: ""
-            },
-            {
-                imageUrl: "https://via.placeholder.com/120",
-                title: "Leather Jacket",
-                rentedBy: "Jane Smith",
-                price: 30,
-                returnDate: "2024-12-05"
-            },
-            {
-                imageUrl: "https://via.placeholder.com/120",
-                title: "Vintage Watch",
-                rentedBy: "Alice Johnson",
-                price: 100,
-                returnDate: "2024-12-10"
-            }
-        ];
-
-        // Function to dynamically render rented items list
-        function renderRentedItems(items) {
-            const rentedItemsList = document.getElementById('rentedItemsList');
-            rentedItemsList.innerHTML = ''; // Clear previous items
-
-            items.forEach(item => {
-                const rentedItemDiv = document.createElement('div');
-                rentedItemDiv.classList.add('flex', 'bg-white', 'p-4', 'mb-4', 'rounded-lg', 'shadow-md');
-
-                rentedItemDiv.innerHTML = `
-                    <img src="${item.imageUrl}" alt="Item Image" class="w-30 h-30 object-cover rounded-lg mr-4">
-                    <div class="flex-grow flex flex-col justify-between">
-                        <div class="font-semibold text-xl text-gray-800">${item.title}</div>
-                        <div class="text-sm text-gray-600">Rented by: ${item.rentedBy}</div>
-                        <div class="font-medium text-blue-600">$${item.price}</div>
-                        <div class="text-sm text-red-600">Return Date: ${item.returnDate}</div>
-                        <div class="flex mt-4 space-x-4">
-                            <a href="/src/listing-page.html" class="inline-block py-2 px-4 bg-blue-600 text-white rounded-md">View Listing</a>
-                            <button onclick="openReturnModal()" class="inline-block py-2 px-4 bg-green-600 text-white rounded-md">Mark as Returned</button>
-                        </div>
-                    </div>
-                `;
-
-                rentedItemsList.appendChild(rentedItemDiv);
-            });
-        }
-
-        // Call the function to render items
-        renderRentedItems(rentedItems);
-
-        // Modal functions
-        function openReturnModal() {
-            document.getElementById('returnModal').classList.remove('hidden');
-        }
-
-        function closeReturnModal() {
-            document.getElementById('returnModal').classList.add('hidden');
-        }
-
-        function confirmReturn() {
-            alert("Item marked as returned.");
-            closeReturnModal();
-        }
-    </script>
+    
 </body>
 </html>
