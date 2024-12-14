@@ -38,7 +38,6 @@ const db = getFirestore(app);
     querySnapshot.forEach((doc) => {
         const userData = doc.data();
         if (userData.password === password) {
-            console.log("Login successful!");
             alert("Login successful!");
             window.location.href = 'client-login.html';
             
