@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!-- Coding By CodingNepal - www.codingnepalweb.com -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>AI OUTFIT RECOMMENDATION</title>
+  <link rel="stylesheet" href="ai.css">
+  <script src="ai.js" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="hidden  sm:block bg-gray-800">
+        <div class="flex space-x-4">
+          <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+          <a href="/src/client-login.html" class="rounded-md  hover:bg-gray-700  px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+          <a href="/src/become-lender.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Become a lender</a>
+          <a href="/src/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Seller Hub</a>
+          <a href="/src/History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+          <a href="/src/watch-list.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch List</a>
+          <a href="/src/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+
+        </div>
+      </div>
+  <section class="image-generator">
+    <div class="content">
+      <h1>TRY OUR AI OUTFIT RECCOMENDATOR</h1>
+      <p>Convert your text into an ideal outfit.</p>
+      <form action="#" class="generate-form">
+        <input class="prompt-input" type="text" placeholder="Describe what you want to see" required>
+        <div class="controls">
+          <select class="img-quantity">
+            <option value="1">1 Image</option>
+            <option value="2">2 Images</option>
+            <option value="3">3 Images</option>
+            <option value="4" selected>4 Images</option>
+          </select>
+          <button type="submit" class="generate-btn">Generate</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  <section class="image-gallery">
+    <div class="img-card"><img src="images/img-1.jpg" alt="image"></div>
+    <div class="img-card"><img src="images/img-2.jpg" alt="image"></div>
+    <div class="img-card"><img src="images/img-3.jpg" alt="image"></div>
+    <div class="img-card"><img src="images/img-4.jpg" alt="image"></div>
+  </section>
+</body>
+</html>
