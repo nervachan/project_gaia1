@@ -36,12 +36,15 @@ document.getElementById('login-form').addEventListener('submit', function(event)
     Promise.all([getDocs(buyerQuery), getDocs(sellerQuery)])
         .then(([buyerSnapshot, sellerSnapshot]) => {
             let userDoc;
+            let userType = null; // To store user type (buyer/seller)
 
             // Check if the user exists in either collection
             if (!buyerSnapshot.empty) {
                 userDoc = buyerSnapshot.docs[0];
+                userType = "buyer"; // User is a buyer
             } else if (!sellerSnapshot.empty) {
                 userDoc = sellerSnapshot.docs[0];
+                userType = "seller"; // User is a seller
             }
 
             // If no user is found, throw an error
@@ -52,12 +55,20 @@ document.getElementById('login-form').addEventListener('submit', function(event)
             const email = userDoc.data().email;
 
             // Sign in with email and password
-            return signInWithEmailAndPassword(auth, email, password);
-        })
-        .then((userCredential) => {
-            // Signed in
-            console.log('User signed in:', userCredential.user);
-            alert('Sign-in successful!');
+            return signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    console.log('User signed in:', userCredential.user);
+
+                    // Redirect based on user type (buyer or seller)
+                    if (userType === "buyer") {
+                        window.location.href = 'client-login.html'; // Redirect to buyer login page
+                    } else if (userType === "seller") {
+                        window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
+                    }
+
+                    alert('Sign-in successful!');
+                });
         })
         .catch((error) => {
             console.error('Error during sign-in:', error.message);
