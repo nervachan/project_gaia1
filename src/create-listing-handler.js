@@ -1,14 +1,10 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-import { getFirestore, collection, query, where, getDocs,addDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js";
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
   authDomain: "project-gaia1.firebaseapp.com",
@@ -23,7 +19,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
+const auth = getAuth(app);
 
 // Get references to the form, modal, and buttons
 document.addEventListener('DOMContentLoaded', () => {
@@ -52,91 +48,102 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmationModal.classList.add('hidden');
     });
 
-// If the user confirms, submit the form and store the data in Firestore
-confirmButton.addEventListener('click', async function() {
-    // Prepare the listing data
-    const listingData = {
-        productName: productName.value,
-        productDescription: productDescription.value,
-        category: category.value,
-        condition: condition.value,
-        rentPrice: rentPrice.value,
-        sellPrice: sellPrice.value,
-        isActive: true // Assuming you want to set the listing as active
-    };
+    // If the user confirms, submit the form and store the data in Firestore
+    confirmButton.addEventListener('click', async function() {
+        // Get the current logged-in user
+        const user = auth.currentUser;
 
-    // Convert the image file to base64 if selected
-    const imageFile = photos.files[0];
-    if (imageFile) {
-        const reader = new FileReader();
-        reader.onloadend = async function() {
-            const img = new Image();
-            img.src = reader.result;
+        if (!user) {
+            alert('You need to be logged in to create a listing.');
+            return;
+        }
 
-            img.onload = async function() {
-                // Create a canvas to downscale the image
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+        const userId = user.uid; // Get the logged-in user's UID
 
-                // Set the desired width and height for the downscaled image
-                const maxWidth = 800; // Set your desired max width
-                const maxHeight = 800; // Set your desired max height
-                let width = img.width;
-                let height = img.height;
-
-                // Calculate the new dimensions while maintaining the aspect ratio
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height *= maxWidth / width;
-                        width = maxWidth;
-                    }
-                } else {
-                    if (height > maxHeight) {
-                        width *= maxHeight / height;
-                        height = maxHeight;
-                    }
-                }
-
-                // Resize the canvas to the new dimensions
-                canvas.width = width;
-                canvas.height = height;
-
-                // Draw the image onto the canvas
-                ctx.drawImage(img, 0, 0, width, height);
-
-                // Convert the canvas to a base64 string
-                const downscaledImage = canvas.toDataURL('image/jpeg'); // You can change the format if needed
-                listingData.image = downscaledImage; // Store the downscaled image
-
-                // Now add the new listing to Firestore
-                try {
-                    await addDoc(collection(db, 'listed items'), listingData);
-                    console.log("Listing added successfully!");
-
-                    // Hide the modal and redirect to seller hub page
-                    confirmationModal.classList.add('hidden');
-                    window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
-                } catch (error) {
-                    console.error("Error adding document: ", error);
-                }
-            };
+        // Prepare the listing data
+        const listingData = {
+            productName: productName.value,
+            productDescription: productDescription.value,
+            category: category.value,
+            condition: condition.value,
+            rentPrice: rentPrice.value,
+            sellPrice: sellPrice.value,
+            isActive: true, // Assuming you want to set the listing as active
+            userId: userId // Add the user's ID to the listing data
         };
 
-        // Read the image file as base64
-        reader.readAsDataURL(imageFile);
-    } else {
-        // If no image is selected, proceed without it
-        try {
-            // Add the new listing to Firestore
-            await addDoc(collection(db, 'listed items'), listingData);
-            console.log("Listing added successfully!");
+        // Convert the image file to base64 if selected
+        const imageFile = photos.files[0];
+        if (imageFile) {
+            const reader = new FileReader();
+            reader.onloadend = async function() {
+                const img = new Image();
+                img.src = reader.result;
 
-            // Hide the modal and redirect to seller hub page
-            confirmationModal.classList.add('hidden');
-            window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
-        } catch (error) {
-            console.error("Error adding document: ", error);
+                img.onload = async function() {
+                    // Create a canvas to downscale the image
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    // Set the desired width and height for the downscaled image
+                    const maxWidth = 800; // Set your desired max width
+                    const maxHeight = 800; // Set your desired max height
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Calculate the new dimensions while maintaining the aspect ratio
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+
+                    // Resize the canvas to the new dimensions
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    // Draw the image onto the canvas
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convert the canvas to a base64 string
+                    const downscaledImage = canvas.toDataURL('image/jpeg'); // You can change the format if needed
+                    listingData.image = downscaledImage; // Store the downscaled image
+
+                    // Now add the new listing to Firestore
+                    try {
+                        await addDoc(collection(db, 'listed_items'), listingData);
+                        console.log("Listing added successfully!");
+
+                        // Hide the modal and redirect to seller hub page
+                        confirmationModal.classList.add('hidden');
+                        window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
+                    } catch (error) {
+                        console.error("Error adding document: ", error);
+                    }
+                };
+            };
+
+            // Read the image file as base64
+            reader.readAsDataURL(imageFile);
+        } else {
+            // If no image is selected, proceed without it
+            try {
+                // Add the new listing to Firestore
+                await addDoc(collection(db, 'listed_items'), listingData);
+                console.log("Listing added successfully!");
+
+                // Hide the modal and redirect to seller hub page
+                confirmationModal.classList.add('hidden');
+                window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
+            } catch (error) {
+                console.error("Error adding document: ", error);
+            }
         }
-    }
-});
+    });
 });
