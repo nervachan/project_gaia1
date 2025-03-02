@@ -1,8 +1,7 @@
-// Import the necessary Firestore functions from the modular SDK
+// Firebase Firestore & Auth imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
+import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -17,11 +16,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const db = getFirestore();
+const auth = getAuth();
 
-// Function to handle login
+// Login handler
 document.getElementById('login-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -35,8 +33,8 @@ document.getElementById('login-form').addEventListener('submit', function(event)
     // Execute both queries simultaneously
     Promise.all([getDocs(buyerQuery), getDocs(sellerQuery)])
         .then(([buyerSnapshot, sellerSnapshot]) => {
-            let userDoc;
-            let userType = null; // To store user type (buyer/seller)
+            let userDoc = null;
+            let userType = null; // Declare the userType variable here
 
             // Check if the user exists in either collection
             if (!buyerSnapshot.empty) {
@@ -54,21 +52,28 @@ document.getElementById('login-form').addEventListener('submit', function(event)
 
             const email = userDoc.data().email;
 
-            // Sign in with email and password
-            return signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Signed in
-                    console.log('User signed in:', userCredential.user);
+            // Set persistence to LOCAL before signing in
+            return setPersistence(auth, browserLocalPersistence)
+              .then(() => {
+                // Sign in with email and password
+                return signInWithEmailAndPassword(auth, email, password);
+              })
+              .then((userCredential) => {
+                  console.log('User signed in:', userCredential.user);
 
-                    // Redirect based on user type (buyer or seller)
-                    if (userType === "buyer") {
-                        window.location.href = 'client-login.html'; // Redirect to buyer login page
-                    } else if (userType === "seller") {
-                        window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
-                    }
+                  // Redirect based on user type (buyer or seller)
+                  if (userType === "buyer") {
+                    window.location.href = 'client-login.html'; // Redirect to buyer login page
+                  } else if (userType === "seller") {
+                    window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
+                  }
 
-                    alert('Sign-in successful!');
-                });
+                  alert('Sign-in successful!');
+              })
+              .catch((error) => {
+                  console.error('Error during sign-in:', error.message);
+                  alert('Sign-in failed: ' + error.message);
+              });
         })
         .catch((error) => {
             console.error('Error during sign-in:', error.message);

@@ -1,6 +1,7 @@
 // Import Firebase libraries and initialize Firestore
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs, } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Firebase configuration and initialization
 const firebaseConfig = {
@@ -13,12 +14,12 @@ const firebaseConfig = {
     measurementId: "G-DX2L33NH4H"
 };
 
-// Function to fetch data from Firestore and dynamically create rented items list
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-
-
+// Function to fetch image from another collection
 async function fetchImageFromOtherCollection(collectionName, documentId, imageField) {
     try {
         const docRef = doc(db, collectionName, documentId);
@@ -37,56 +38,117 @@ async function fetchImageFromOtherCollection(collectionName, documentId, imageFi
     }
 }
 
-// Function to fetch and display pending listings
-async function fetchPendingListings() {
-    const pendingListingsContainer = document.getElementById("rentedItemsList");
-    pendingListingsContainer.innerHTML = "<p>Loading...</p>";
+// Function to update item status (picked up, returned, or relisted)
+async function updateItemStatus(itemId, status) {
+    const itemRef = doc(db, "pending-items", itemId);
+    try {
+        await updateDoc(itemRef, {
+            status: status // Updating the status based on the argument passed
+        });
+        alert(`Item marked as ${status}!`);
+        fetchUserPendingItems(); // Refresh the list
+    } catch (error) {
+        console.error(`Error marking item as ${status}:`, error);
+    }
+}
+
+// Function to fetch and display user-specific pending items from "pending-items"
+async function fetchUserPendingItems(userId) {
+    if (!userId) {
+        console.log("No user is logged in.");
+        return;
+    }
+
+    const pendingItemsContainer = document.getElementById("pendingItemsList");
+    if (!pendingItemsContainer) {
+        console.error("pendingItemsList element not found.");
+        return;
+    }
+
+    pendingItemsContainer.innerHTML = "<p>Loading...</p>";
 
     try {
-        // Fetch all documents from the "pending items" collection
-        const pendingListingsSnapshot = await getDocs(collection(db, "pending items"));
-        pendingListingsContainer.innerHTML = ""; // Clear loading text
+        // Query the "pending-items" collection where sellerId matches the logged-in user's ID
+        const pendingItemsQuery = query(collection(db, "pending_items"), where("sellerId", "==", userId));
+        const pendingItemsSnapshot = await getDocs(pendingItemsQuery);
+        pendingItemsContainer.innerHTML = ""; // Clear loading text
 
-        if (pendingListingsSnapshot.empty) {
-            pendingListingsContainer.innerHTML = "<p>No pending listings found.</p>";
+        if (pendingItemsSnapshot.empty) {
+            pendingItemsContainer.innerHTML = "<p>No pending items found for this user.</p>";
             return;
         }
 
-        // Loop through the documents and display each pending listing
-        for (const docSnapshot of pendingListingsSnapshot.docs) {
-            const listingData = docSnapshot.data();
+        // Loop through the documents and display each pending item
+        for (const docSnapshot of pendingItemsSnapshot.docs) {
+            const itemData = docSnapshot.data();
             const itemDiv = document.createElement("div");
             itemDiv.className = "bg-white shadow-md rounded p-6 mb-4";
 
-            // Fetch image from another collection
+            // Fetch image from another collection if imageDocumentId exists
             let imageUrl = "";
-            if (listingData.imageDocumentId) {
+            if (itemData.imageDocumentId) {
                 imageUrl = await fetchImageFromOtherCollection(
-                    "listed items", // Replace with the actual collection name
-                    listingData.imageDocumentId,
-                    "image" // Replace with the actual field name
+                    "listed-items", // Collection where image is stored
+                    itemData.imageDocumentId,
+                    "image" // Field name for the image URL in that collection
                 );
             }
 
             // Populate item HTML
             itemDiv.innerHTML = `
-                <h3 class="text-xl font-semibold text-gray-800">${listingData.productName}</h3>
-                <p class="text-gray-600">${listingData.productDescription}</p>
-                <p class="text-gray-600">Price: ₱${listingData.price}</p>
-                <p class="text-gray-600">Start Day of Rental: ${listingData.startDate}</p>
-                <p class="text-gray-600">End Day of Rental: ${listingData.endDate}</p>
-                <p class="text-gray-600">Time of Reservation: ${listingData.submissionTime}</p>
-                <p class="text-gray-600">Name of Reserver: ${listingData.userName}</p>
-                ${imageUrl ? `<img src="${image}" alt="Product Image" class="w-full h-auto mt-4 rounded">` : ""}
+                <h3 class="text-xl font-semibold text-gray-800">${itemData.productName}</h3>
+                <p class="text-gray-600">${itemData.productDescription}</p>
+                <p class="text-gray-600">Price: ₱${itemData.price}</p>
+                <p class="text-gray-600">Start Day of Rental: ${itemData.startDate}</p>
+                <p class="text-gray-600">End Day of Rental: ${itemData.endDate}</p>
+                <p class="text-gray-600">Time of Reservation: ${itemData.submissionTime}</p>
+                <p class="text-gray-600">Name of Reserver: ${itemData.userName}</p>
+                ${imageUrl ? `<img src="${imageUrl}" alt="Product Image" class="w-full h-auto mt-4 rounded">` : ""}
             `;
 
-            pendingListingsContainer.appendChild(itemDiv);
+            // Create the dynamic button based on the status
+            const button = document.createElement("button");
+            button.className = "bg-blue-500 text-white px-4 py-2 rounded mt-4";
+
+            if (itemData.status === "picked up") {
+                button.textContent = "Mark as Returned";
+                button.onclick = () => updateItemStatus(docSnapshot.id, "returned");
+            } else if (itemData.status === "returned") {
+                button.textContent = "Relist Item";
+                button.onclick = () => updateItemStatus(docSnapshot.id, "relisted");
+            } else {
+                button.textContent = "Mark as Picked Up";
+                button.onclick = () => updateItemStatus(docSnapshot.id, "picked up");
+            }
+
+            itemDiv.appendChild(button);
+            pendingItemsContainer.appendChild(itemDiv);
         }
     } catch (error) {
-        console.error("Error fetching pending listings:", error);
-        pendingListingsContainer.innerHTML = "<p>Error loading pending listings. Please try again later.</p>";
+        console.error("Error fetching user pending items:", error);
+        pendingItemsContainer.innerHTML = "<p>Error loading pending items. Please try again later.</p>";
     }
 }
 
-// Call fetchPendingListings when the page loads
-document.addEventListener("DOMContentLoaded", fetchPendingListings);
+// Listen for changes in authentication state
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is logged in
+        console.log("Logged in user:", user);
+        fetchUserPendingItems(user.uid); // Pass the user ID to the fetch function
+    } else {
+        // User is not logged in
+        console.log("No user logged in.");
+        const pendingItemsList = document.getElementById("pendingItemsList");
+        if (pendingItemsList) {
+            pendingItemsList.innerHTML = "<p>Please log in to view your pending items.</p>";
+        } else {
+            console.error("pendingItemsList element not found.");
+        }
+    }
+});
+
+// Ensure DOM content is fully loaded before running any code
+document.addEventListener("DOMContentLoaded", function() {
+    // All DOM manipulation related code should be inside here
+});

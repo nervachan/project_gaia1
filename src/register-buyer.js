@@ -48,6 +48,7 @@ document.getElementById('buyerForm').addEventListener('submit', function(event) 
             return addDoc(collection(db, "user-buyer"), {
                 username: username,
                 email: email,
+                role:"buyer"
                         });
         })
         .then(() => {

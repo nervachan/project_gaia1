@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
 import { getFirestore, collection, query, where, getDocs, getDoc, doc, addDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";  // Import Firebase Authentication
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,6 +19,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
+const auth = getAuth();  // Initialize Firebase Authentication
 
 // Load listings when the page is loaded
 window.onload = loadListings;
@@ -28,7 +30,7 @@ async function loadListings() {
     listingsContainer.innerHTML = ''; // Clear the container
 
     try {
-        const listingsQuery = query(collection(db, 'listed items'), where('isActive', '==', true));
+        const listingsQuery = query(collection(db, 'listed_items'), where('isActive', '==', true));
         const listingsSnapshot = await getDocs(listingsQuery);
 
         listingsSnapshot.forEach(doc => {
@@ -55,6 +57,7 @@ function createListingElement(listing, listingId) {
         <p class="text-gray-600 mt-2">${listing.productDescription}</p>
         <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
         <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
+        <p class="text-gray-700 mt-2">Terms: ${listing.garmentSize}</p>
         ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ₱${listing.rentPrice}</p>` : ''}
         ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ₱${listing.sellPrice}</p>` : ''}
         <div class="mt-4">
@@ -85,7 +88,7 @@ async function showListingDetails(listingId) {
     const modalContent = document.getElementById('modal-content');
 
     try {
-        const listingDoc = doc(db, 'listed items', listingId);
+        const listingDoc = doc(db, 'listed_items', listingId);
         const listingSnapshot = await getDoc(listingDoc);
 
         if (listingSnapshot.exists()) {
@@ -135,6 +138,13 @@ let currentListing = null;
 
 // Function to handle rental submission
 async function handleRentalSubmission() {
+    // Get the logged-in user
+    const user = auth.currentUser;
+    if (!user) {
+        alert("You must be logged in to submit a rental request.");
+        return;
+    }
+
     // Get data from the form
     const userName = document.getElementById('userName').value; // Get the user's name
     const startDate = document.getElementById('rentalStartDate').value;
@@ -153,6 +163,22 @@ async function handleRentalSubmission() {
         return;
     }
 
+    // Get the seller's ID from the current listing
+    const sellerId = currentListing.sellerId;
+
+    // Calculate total price based on rental duration
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
+    const timeDiff = endDateObj - startDateObj; // Difference in milliseconds
+    const daysDiff = timeDiff / (1000 * 3600 * 24); // Convert to days
+
+    if (daysDiff <= 0) {
+        alert("End date must be after the start date.");
+        return;
+    }
+
+    const totalPrice = daysDiff * parseFloat(price); // Total price based on the days rented
+
     // Prepare rental data
     const rentalData = {
         productName: currentListing.productName,
@@ -161,13 +187,17 @@ async function handleRentalSubmission() {
         startDate: startDate,
         endDate: endDate,
         price: price,
+        totalPrice: totalPrice.toFixed(2), // Store the total price
         submissionTime: submissionTime,
         listingId: currentListing.id, // Store the listingId for reference
+        buyerId: user.uid, // Store the logged-in user's ID
+        sellerId: sellerId, // Add the seller's ID to the rental data
+        status: "pending"  
     };
 
     try {
-        // Push the rental data to the "pending items" collection
-        await addDoc(collection(db, "pending items"), rentalData);
+        // Push the rental data to the "pending_items" collection
+        await addDoc(collection(db, "pending_items"), rentalData);
         alert("Your rental request has been submitted successfully!");
 
         // Close the modal after submission
@@ -183,7 +213,7 @@ async function openRentalModal(listingId) {
     const modal = document.getElementById('rentModal');
 
     try {
-        const listingDoc = doc(db, 'listed items', listingId);
+        const listingDoc = doc(db, 'listed_items', listingId);
         const listingSnapshot = await getDoc(listingDoc);
 
         if (listingSnapshot.exists()) {
@@ -217,6 +247,7 @@ function closeModal(modalId) {
     modal.classList.add('hidden');
 }
 
+// Calculate total price
 function calculateTotalPrice() {
     const startDateInput = document.getElementById('rentalStartDate').value;
     const endDateInput = document.getElementById('rentalEndDate').value;
@@ -253,4 +284,15 @@ document.addEventListener('DOMContentLoaded', function () {
         dateFormat: "Y-m-d",
         onChange: calculateTotalPrice,
     });
+});
+
+// Add onAuthStateChanged listener
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is logged in:", user);
+        // You can update the UI to show the user is logged in, such as displaying their username or showing logout options.
+    } else {
+        console.log("No user is logged in.");
+        // You can redirect to a login page or show login options.
+    }
 });

@@ -49,6 +49,7 @@ document.getElementById('sellerForm').addEventListener('submit', function(event)
                 username: username,
                 email: email,
                 shopaddress: shopaddress,
+                role:"seller"
             });
         })
         .then(() => {

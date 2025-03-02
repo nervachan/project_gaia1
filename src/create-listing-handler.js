@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const condition = document.getElementById('condition');
     const rentPrice = document.getElementById('rent-price');
     const sellPrice = document.getElementById('sell-price');
+    const size = document.getElementById('size'); // Garment size input field
     const photos = document.getElementById('photos');
 
     // When the "Create Listing" button is clicked
@@ -69,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
             rentPrice: rentPrice.value,
             sellPrice: sellPrice.value,
             isActive: true, // Assuming you want to set the listing as active
-            userId: userId // Add the user's ID to the listing data
+            garmentSize: size.value, // Include the garment size
+            sellerId: userId // Add the user's ID to the listing data
         };
 
         // Convert the image file to base64 if selected
@@ -115,9 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const downscaledImage = canvas.toDataURL('image/jpeg'); // You can change the format if needed
                     listingData.image = downscaledImage; // Store the downscaled image
 
-                    // Now add the new listing to Firestore
+                    // Now add the new listing to the top-level 'listed_items' collection
                     try {
-                        await addDoc(collection(db, 'listed_items'), listingData);
+                        const listingsRef = collection(db, 'listed_items'); // Reference to the top-level 'listed_items' collection
+                        await addDoc(listingsRef, listingData);
                         console.log("Listing added successfully!");
 
                         // Hide the modal and redirect to seller hub page
@@ -134,8 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // If no image is selected, proceed without it
             try {
-                // Add the new listing to Firestore
-                await addDoc(collection(db, 'listed_items'), listingData);
+                // Add the new listing to the top-level 'listed_items' collection
+                const listingsRef = collection(db, 'listed_items'); // Reference to the top-level 'listed_items' collection
+                await addDoc(listingsRef, listingData);
                 console.log("Listing added successfully!");
 
                 // Hide the modal and redirect to seller hub page

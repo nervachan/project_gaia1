@@ -8,10 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <script src="/src/Filter.js"></script>
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script type="module" src="load-listings.js"></script>
+    <script type="module" src="seller-hub-checker.js"></script>
 
     
 
@@ -55,7 +56,7 @@
                   <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                   <a href="#" class="rounded-md  hover:bg-gray-700  px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
                   <a href="/src/become-lender.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Become a lender</a>
-                  <a href="/src/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Seller Hub</a>
+                  <a href="/src/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="sellerHubLink">Seller Hub</a>
                   <a href="/src/History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
                   <a href="/src/watch-list.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch List</a>
                   <a href="/src/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
@@ -84,19 +85,7 @@
           </div>
         </div>
       
-        <!-- Mobile menu, show/hide based on menu state. -->
-        <div class="sm:hidden" id="mobile-menu">
-          <div class="space-y-1 px-2 pb-3 pt-2">
-            <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <a href="#" class="rounded-md  hover:bg-gray-700  px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
-            <a href="/src/become-lender.html" class="rounded-md px-3 py-2 text-sm font-medium bg-gray-900 text-gray-300 hover:text-white">Become a lender</a>
-            <a href="/src/register.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Seller Center</a>
-            <a href="/src/History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
-            <a href="/src/watch-list.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch List</a>
-            
-  
-          </div>
-        </div>
+      
       </nav>
 </header>
 
@@ -140,40 +129,7 @@
 </div>
 
     <footer class="bg-gray-800 text-white py-6">
-      <div class="container mx-auto px-4">
-          <div class="flex flex-col md:flex-row justify-between">
-              <!-- Navigation Links -->
-              <div class="mb-4 md:mb-0">
-                  <h3 class="text-lg font-semibold">Quick Links</h3>
-                  <ul class="mt-2 space-y-2">
-                      <li><a href="/src/about-page.html" class="text-gray-400 hover:text-white">About</a></li>
-                      <li><a href="/privacy" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
-                      <li><a href="/terms" class="text-gray-400 hover:text-white">Terms of Service</a></li>
-                      <li><a href="/faq" class="text-gray-400 hover:text-white">FAQs</a></li>
-                  </ul>
-              </div>
-  
-              <!-- Social Media Icons -->
-              <div class="mb-4 md:mb-0">
-                  <h3 class="text-lg font-semibold">Follow Us</h3>
-                  <div class="flex space-x-4 mt-2">
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
-                  </div>
-              </div>
-          </div>
-  
-          <!-- Copyright Notice -->
-          <div class="mt-6 border-t border-gray-700 pt-4 text-center">
-              <p class="text-sm">© 2024 Project:Gaia. All rights reserved.</p>
-          </div>
-  
-          <!-- Accessibility Links -->
-          <div class="mt-4 text-center">
-              <a href="/accessibility" class="text-gray-400 hover:text-white">Accessibility Statement</a>
-          </div>
+      
       </div>
   </footer>
 
@@ -213,12 +169,21 @@
               <label class="block text-sm font-medium text-gray-700">Total Price</label>
               <p id="totalPrice" class="text-lg font-semibold">₱0.00</p>
           </div>
+
+          <!-- Deposit Fee Reminder -->
+          <div class="mb-4">
+              <p class="text-sm text-gray-500">
+                  * A deposit fee will be added to the rental cost. The deposit will be paid directly at the rental shop.
+              </p>
+          </div>
+
           <div class="flex justify-end">
-              <button type="submit"  class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Submit Rental</button>
+              <button type="submit" id="rent-item-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Submit Rental</button>
           </div>
       </form>
   </div>
 </div>
+
   <!-- signed-in name script -->
 <!-- <script>
   // Retrieve the username from localStorage
