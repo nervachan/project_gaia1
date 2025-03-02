@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <script type="module" src="load-pending-items.js"></script>
+    <script type="module" src="logout.js"></script>
+    
+</head>
+<body class="bg-gray-100">
+    <header>
+        <nav class="bg-gray-800">
+          <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <div class="relative flex h-16 items-center justify-between">
+              
+              <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                <div class="flex flex-shrink-0 items-center">
+                  <h3 class="text-gray-100">Project:Gaia</h3>
+                </div>
+                <div class="hidden sm:ml-6 sm:block">
+                  <div class="flex space-x-4">
+                    <a href="/src/seller-side/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
+                    
+                  </div>
+                </div>
+              </div>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <!-- Profile dropdown with username and logout button -->
+                <div class="relative ml-3 flex items-center space-x-4">
+                  <!-- Hello! username and Logout button placed together -->
+                  <div>
+                    <button type="button" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
+                      Hello! <span class="font-semibold" id="username"></span>
+                    </button>
+                  </div>
+                  <!-- Logout Button -->
+                  <div>
+                    <a href="/src/login-out/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"id="logout">Logout</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+          
+
+        <!-- Main Content -->
+        <div class="flex-auto ">
+            <div class="container mx-auto p-8">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-6">Rented Items</h2>
+
+                <!-- Rented Items List -->
+                <div id="pendingItemsList">
+                    <!-- More items will be inserted here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Mark as Returned Confirmation -->
+    <div id="returnModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 class="text-xl font-semibold text-gray-800">Confirm Return</h3>
+            <p class="mt-2 text-gray-600">Are you sure you want to mark this item as returned?</p>
+            <div class="mt-4 flex space-x-4">
+                <button onclick="confirmReturn()" class="py-2 px-4 bg-red-600 text-white rounded-md">Yes</button>
+                <button onclick="closeReturnModal()" class="py-2 px-4 bg-gray-300 text-gray-800 rounded-md">No</button>
+            </div>
+        </div>
+    </div>
+
+    
+</body>
+</html>
