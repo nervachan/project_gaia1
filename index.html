@@ -8,8 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" /> 
-  <script src="/src/Filter.js"></script>
-  <script type="module" src="/src/load-listings.js"></script>
+  
+  <script type="module" src="/src/index-show-listings.js"></script>
+  
+  
   
 
     
@@ -90,19 +92,7 @@
           </div>
         </div>
       
-        <!-- Mobile menu, show/hide based on menu state. -->
-        <div class="sm:hidden" id="mobile-menu">
-          <div class="space-y-1 px-2 pb-3 pt-2">
-            <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-            <a href="/index.html" class="rounded-md  hover:bg-gray-700  px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
-            <a href="/src/howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">How does it work?</a>
-            <a href="/src/become-lender.html" class="rounded-md px-3 py-2 text-sm font-medium bg-gray-900 text-gray-300 hover:text-white">Become a lender</a>
-            <a href="/src/register.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Register</a>
-            <a href="/src/History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
-            <a href="/src/watch-list.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch List</a>
-          </div>
-        </div>
-      </nav>
+      
 </header>
 
 
@@ -214,7 +204,9 @@
 </div>
  
 
-<!-- MODAL FOR NOTIFICATION-->
+
+
+<!-- MODAL FOR NOTIFICATION
 <script>
   document.getElementById('notification-btn').addEventListener('click', function() {
       document.getElementById('notification-modal').classList.remove('hidden');
@@ -226,6 +218,6 @@
   document.getElementById('view-details').addEventListener('click',function(){
       window.location.href = 'src/listing-page.html'
     });
-</script>
+</script> -->
 </body>
 </html>

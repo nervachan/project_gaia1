@@ -5,96 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/css/output.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="create-listing-handler.js"></script>
+    <script type="module" src="auth-persistence-checker.js"></script>
+    <script type="module" src="logout.js"></script>
 
 </head>
 <body>
     <body class="bg-gray-100">
-        <header>
-            <nav class="bg-gray-800">
-                <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-                  <div class="relative flex h-16 items-center justify-between">
-                    <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                      <!-- Mobile menu button-->
-                      <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
-                        <span class="absolute -inset-0.5"></span>
-                        <span class="sr-only">Open main menu</span>
-                        <!--
-                          Icon when menu is closed.
-              
-                          Menu open: "hidden", Menu closed: "block"
-                        -->
-                        <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                        </svg>
-                        <!--
-                          Icon when menu is open.
-              
-                          Menu open: "block", Menu closed: "hidden"
-                        -->
-                        <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                    <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                      <div class="flex flex-shrink-0 items-center">
-                        <h3 class="text-gray-100">Project:Gaia</h3>
-                      </div>
-                      <div class="hidden sm:ml-6 sm:block">
-                        <div class="flex space-x-4">
-                          <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                          <a href="/src/client-login.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300  hover:text-white">Home</a>
-                          <a href="/src/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300  hover:text-white">Seller Hub</a>
-                          <a href="/src/become-lender.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Purchase History</a>
-                          <a href="/src/register.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch List</a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                      <button type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                        <span class="absolute -inset-1.5"></span>
-                        <span class="sr-only">View notifications</span>
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                        </svg>
-                      </button>
-              
-                      <!-- Profile dropdown -->
-                      <div class="relative ml-3">
-                        <div>
-                          <a href="/src/login.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Hello! #seller </a>
-                        </div>
-              
-                        <!--
-                          Dropdown menu, show/hide based on menu state.
-              
-                          Entering: "transition ease-out duration-100"
-                            From: "transform opacity-0 scale-95"
-                            To: "transform opacity-100 scale-100"
-                          Leaving: "transition ease-in duration-75"
-                            From: "transform opacity-100 scale-100"
-                            To: "transform opacity-0 scale-95"
-                        -->
-                        
-                      </div>
-                    </div>
+      <header>
+        <nav class="bg-gray-800">
+          <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <div class="relative flex h-16 items-center justify-between">
+              <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                <!-- Mobile menu button-->
+                <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                  <span class="absolute -inset-0.5"></span>
+                  <span class="sr-only">Open main menu</span>
+                  <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                  </svg>
+                  <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                <div class="flex flex-shrink-0 items-center">
+                  <h3 class="text-gray-100">Project:Gaia</h3>
+                </div>
+                <div class="hidden sm:ml-6 sm:block">
+                  <div class="flex space-x-4">
+                    <a href="/src/client-login.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
+                    <a href="/src/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Seller Hub</a>
+                    <a href="/src/become-lender.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Purchase History</a>
+                    <a href="/src/register.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch List</a>
                   </div>
                 </div>
-              
-                <!-- Mobile menu, show/hide based on menu state. -->
-                <div class="sm:hidden" id="mobile-menu">
-                  <div class="space-y-1 px-2 pb-3 pt-2">
-                    <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                    <a href="/src/client-login.html" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">Home</a>
-                    <a href="/src/seller-hub-main.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Seller Hub</a>
-                    <a href="/src/History.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
-                    <a href="/src/watch-list.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch list</a>
+              </div>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <!-- Profile dropdown with username and logout button -->
+                <div class="relative ml-3 flex items-center space-x-4">
+                  <!-- Hello! username and Logout button placed together -->
+                  <div>
+                    <button type="button" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
+                      Hello! <span class="font-semibold" id="username">#username</span>
+                    </button>
+                  </div>
+                  <!-- Logout Button -->
+                  <div>
+                    <a href="/src/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"id="logout">Logout</a>
                   </div>
                 </div>
-              </nav>
-        </header>
-
+              </div>
+            </div>
+          </div>
+      
+          <!-- Mobile menu, show/hide based on menu state. -->
+          <div class="sm:hidden" id="mobile-menu">
+            <div class="space-y-1 px-2 pb-3 pt-2">
+              <a href="/src/client-login.html" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">Home</a>
+              <a href="/src/seller-hub-main.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Seller Hub</a>
+              <a href="/src/History.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+              <a href="/src/watch-list.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch list</a>
+            </div>
+          </div>
+        </nav>
+      </header>
+      
 
     <!-- Sidebar -->
     <div class="flex">
@@ -157,8 +135,20 @@
                     <option value="for women">For Women</option>
                     <option value="for children (male)">For Child(Male)</option>
                     <option value="for children (female)">For Child(Female)</option>
-                    <!-- Add more options as needed -->
-                </select>
+                    </select>
+                     <!-- Size dropdown -->
+    <div class="flex items-center justify-between">
+      <label for="size" class="text-gray-700 text-lg">Size</label>
+      <span class="text-sm text-gray-500">Select the size of the product</span>
+  </div>
+  <select id="size" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <option value="" disabled selected>Select size</option>
+      <option value="small">Small (S)</option>
+      <option value="medium">Medium (M)</option>
+      <option value="large">Large (L)</option>
+      <option value="x-large">Extra Large (XL)</option>
+  </select>
+
 
                 <div class="flex items-center justify-between">
                     <label for="condition" class="text-gray-700 text-lg">Shop Term</label>
@@ -168,7 +158,6 @@
                     <option value="" disabled selected>Select term</option>
                     <option value="rent">For Rent Only</option>
                     <option value="sale">For Sale Only</option>
-                    <option value="rent or sale">Both For rent of For Sale</option>
                 </select>
             </div>
 
@@ -246,85 +235,34 @@
             }
         });
         </script>
+   
+        <!-- Script to Validate Form -->
+   <script>
+    const form = document.getElementById('listingForm');
+    const errorMessage = document.getElementById('error-message');
+    const createListingButton = document.getElementById('createListingButton');
 
-      <!-- JavaScript for form and modal functionality
-      <script>
-        // Get references to the form, modal, and buttons
-        const createListingButton = document.getElementById('createListingButton');
-        const confirmationModal = document.getElementById('confirmationModal');
-        const cancelButton = document.getElementById('cancelButton');
-        const confirmButton = document.getElementById('confirmButton');
-        const form = document.querySelector('form'); // Getting the form
+    form.addEventListener('submit', function(event) {
+        // Check if all required fields are filled
+        const productName = document.getElementById('product-name').value;
+        const productDescription = document.getElementById('product-description').value;
+        const category = document.getElementById('category').value;
+        const condition = document.getElementById('condition').value;
+        const photos = document.getElementById('photos').files.length;
+        const rentPrice = document.getElementById('rent-price').value;
+        const sellPrice = document.getElementById('sell-price').value;
+
+        if (!productName || !productDescription || !category || !condition || (condition === 'rent' && !rentPrice) || (condition === 'sale' && !sellPrice) || photos === 0) {
+            // Show error message if validation fails
+            event.preventDefault(); // Prevent form submission
+            errorMessage.classList.remove('hidden');
+        } else {
+            // Hide error message and allow form submission
+            errorMessage.classList.add('hidden');
+        }
+    });
+</script>
     
-        // Get references to the form fields
-        const productName = document.getElementById('product-name');
-        const productDescription = document.getElementById('product-description');
-        const category = document.getElementById('category');
-        const condition = document.getElementById('condition');
-        const rentPrice = document.getElementById('rent-price');
-        const sellPrice = document.getElementById('sell-price');
-        const photos = document.getElementById('photos');
-    
-        // When the "Create Listing" button is clicked
-        createListingButton.addEventListener('click', function() {
-            // Show confirmation modal
-            confirmationModal.classList.remove('hidden');
-        });
-    
-        // If the user cancels, hide the modal
-        cancelButton.addEventListener('click', function() {
-            confirmationModal.classList.add('hidden');
-        });
-    
-        // If the user confirms, submit the form and store the data in localStorage
-        confirmButton.addEventListener('click', function() {
-            // Prepare the listing data
-            const listingData = {
-                productName: productName.value,
-                productDescription: productDescription.value,
-                category: category.value,
-                condition: condition.value,
-                rentPrice: rentPrice.value,
-                sellPrice: sellPrice.value,
-            };
-    
-            // Convert the image file to base64 if selected
-            const imageFile = photos.files[0];
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.onloadend = function() {
-                    listingData.image = reader.result; // Store the base64 image string
-    
-                    // Get existing listings from localStorage, or create an empty array
-                    let listings = JSON.parse(localStorage.getItem('listings')) || [];
-    
-                    // Add the new listing to the array
-                    listings.push(listingData);
-    
-                    // Save the updated listings array to localStorage
-                    localStorage.setItem('listings', JSON.stringify(listings));
-    
-                    // Hide the modal and redirect to seller hub page
-                    confirmationModal.classList.add('hidden');
-                    window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
-                };
-    
-                // Read the image file as base64
-                reader.readAsDataURL(imageFile);
-            } else {
-                // If no image is selected, proceed without it
-                let listings = JSON.parse(localStorage.getItem('listings')) || [];
-                listings.push(listingData);
-    
-                // Save the updated listings array to localStorage
-                localStorage.setItem('listings', JSON.stringify(listings));
-    
-                // Hide the modal and redirect to seller hub page
-                confirmationModal.classList.add('hidden');
-                window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
-            }
-        });
-    </script> -->
     
     
 </body>
