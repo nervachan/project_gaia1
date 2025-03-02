@@ -57,7 +57,7 @@ function createListingElement(listing, listingId) {
         <p class="text-gray-600 mt-2">${listing.productDescription}</p>
         <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
         <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
-        <p class="text-gray-700 mt-2">Terms: ${listing.garmentSize}</p>
+        <p class="text-gray-700 mt-2">Size: ${listing.garmentSize}</p>
         ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ₱${listing.rentPrice}</p>` : ''}
         ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ₱${listing.sellPrice}</p>` : ''}
         <div class="mt-4">
@@ -73,10 +73,7 @@ function createListingElement(listing, listingId) {
 function createActionButton(listing, listingId) {
     if (listing.condition === 'rent') {
         return `<button class="rent-button bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 ml-2" data-id="${listingId}">Rent</button>`;
-    } else if (listing.condition === 'sale') {
-        return `<button class="buy-button bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 ml-2">Buy</button>`;
-    } else if (listing.condition === 'rent or sale') {
-        return `<button class="buy-button bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 ml-2">Rent or Buy</button>`;
+    
     }
     return '';
 }
