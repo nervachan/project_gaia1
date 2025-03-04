@@ -16,35 +16,33 @@
               <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                 <div class="relative flex h-16 items-center justify-between">
                   
+                  <!-- Left Side: Logo and Navigation -->
                   <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                     <div class="flex flex-shrink-0 items-center">
-                      <h3 class="text-gray-100">Project:Gaia</h3>
+                      <h3 class="text-gray-100">Project:Gaia Seller Hub</h3>
                     </div>
                     <div class="hidden sm:ml-6 sm:block">
                       <div class="flex space-x-4">
                         <a href="/src/seller-side/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
-
                       </div>
                     </div>
                   </div>
-                  <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                    <!-- Profile dropdown with username and logout button -->
-                    <div class="relative ml-3 flex items-center space-x-4">
-                      <!-- Hello! username and Logout button placed together -->
-                      <div>
-                        <button type="button" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
-                          Hello! <span class="font-semibold" id="username">#username</span>
-                        </button>
-                      </div>
-                      <!-- Logout Button -->
-                      <div>
-                        <a href="/src/login-out/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"id="logout">Logout</a>
-                      </div>
+          
+                  <!-- Right Side: Hello! Username and Logout button -->
+                  <div class="flex items-center space-x-4">
+                    <div>
+                      <button type="button" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
+                        Hello! <span class="font-semibold" id="username">#username</span>
+                      </button>
+                    </div>
+                    <div>
+                      <a href="/src/login-out/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
                     </div>
                   </div>
                 </div>
               </div>
-          
+            </nav>
+          </header>
               
 
     <!-- Sidebar -->
@@ -64,7 +62,10 @@
                 <li>
                     <a href="/src/seller-side/seller-hub-inactive-listings.html" class="hover:bg-gray-700 p-2 rounded transition">Inactive Listings</a>
                 </li>
-                
+                <!-- New Reviews link -->
+                <li>
+                    <a href="/src/seller-side/seller-hub-reviews.html" class="hover:bg-gray-700 p-2 rounded transition">My Reviews</a>
+                </li>
             </ul>
         </div>
 
@@ -91,84 +92,7 @@
                 </div>
             </div>
         
-            <!-- <script>
-                // Example data for inactive listings
-                const inactiveListings = [
-                    {
-                        id: 1,
-                        imageUrl: "https://via.placeholder.com/250",
-                        title: "Mountain Province Gown",
-                        price: 50,
-                    },
-                    {
-                        id: 2,
-                        imageUrl: "https://via.placeholder.com/250",
-                        title: "Leather Jacket",
-                        price: 30,
-                    },
-                    {
-                        id: 3,
-                        imageUrl: "https://via.placeholder.com/250",
-                        title: "Vintage Watch",
-                        price: 100,
-                    },
-                    {
-                        id: 4,
-                        imageUrl: "https://via.placeholder.com/250",
-                        title: "Luxury Sofa",
-                        price: 200,
-                    }
-                ];
-        
-                // Function to render inactive listings
-                function renderInactiveListings(listings) {
-                    const inactiveListingsContainer = document.getElementById('inactiveListings');
-                    inactiveListingsContainer.innerHTML = ''; // Clear previous listings
-        
-                    listings.forEach(listing => {
-                        const listingCard = document.createElement('div');
-                        listingCard.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'overflow-hidden', 'text-center');
-        
-                        listingCard.innerHTML = `
-                            <img src="${listing.imageUrl}" alt="Item Image" class="w-full h-48 object-cover">
-                            <div class="p-4">
-                                <h3 class="text-xl font-semibold text-gray-800">${listing.title}</h3>
-                                <p class="text-lg font-medium text-blue-600">$${listing.price} per day</p>
-                                <button class="mt-4 py-2 px-6 bg-red-600 text-white rounded-full text-sm hover:bg-red-700" onclick="showModal(${listing.id})">
-                                    Relist Item
-                                </button>
-                            </div>
-                        `;
-        
-                        inactiveListingsContainer.appendChild(listingCard);
-                    });
-                }
-        
-                // Function to show the modal
-                function showModal(listingId) {
-                    const modal = document.getElementById('modal');
-                    modal.classList.remove('hidden');  // Display the modal
-                    const confirmButton = document.getElementById('confirmButton');
-                    const cancelButton = document.getElementById('cancelButton');
-        
-                    // Handle the relist confirmation
-                    confirmButton.onclick = function() {
-                        alert('Item has been relisted!');
-                        // Here you can redirect or update the item status in the backend
-                        closeModal();
-                    };
-        
-                    // Handle modal close (Cancel button)
-                    cancelButton.onclick = closeModal;
-        
-                    function closeModal() {
-                        modal.classList.add('hidden');  // Hide the modal
-                    }
-                }
-        
-                // Call the function to render inactive listings
-                renderInactiveListings(inactiveListings);
-            </script> -->
+            
   </div>
 
     </div>
