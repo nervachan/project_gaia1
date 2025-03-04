@@ -88,8 +88,15 @@ async function openReviewModal(pendingId) {
     const reviewText = document.getElementById('reviewText');
     const ratingInput = document.getElementById('ratingInput');
 
+    // Check if pendingId is valid
+    if (!pendingId) {
+        console.error("No valid pendingId provided.");
+        alert("Unable to open review modal. Please try again.");
+        return;
+    }
+
     try {
-        // Fetch pending item data from pending items collection
+        // Fetch the pending item data from the pending_items collection using the pendingId
         const pendingDoc = doc(db, 'pending_items', pendingId);
         const pendingSnapshot = await getDoc(pendingDoc);
 
@@ -97,16 +104,21 @@ async function openReviewModal(pendingId) {
             const pendingData = pendingSnapshot.data();
             // Populate modal fields with pending item data
             document.getElementById('reviewProductName').innerText = pendingData.productName;
-            reviewText.value = '';
-            ratingInput.value = 5; // Default rating
+            reviewText.value = '';  // Clear the text area for new review
+            ratingInput.value = 5;  // Default rating (5 stars)
+
+            // Attach pendingId to the modal for later use when submitting the review
+            document.getElementById('reviewProductName').setAttribute('data-id', pendingId);
 
             // Show the modal
             modal.classList.remove('hidden');
         } else {
             console.error("No pending item found with the provided ID.");
+            alert("Unable to find the pending item. Please try again later.");
         }
     } catch (error) {
         console.error("Error fetching pending item details for review: ", error);
+        alert("There was an error fetching the item details. Please try again.");
     }
 }
 
@@ -120,7 +132,7 @@ async function handleReviewSubmission() {
 
     const reviewText = document.getElementById('reviewText').value;
     const rating = document.getElementById('ratingInput').value;
-    const pendingId = document.getElementById('reviewProductName').getAttribute('data-id');
+    const pendingId = document.getElementById('reviewProductName').getAttribute('data-id');  // Added data-id attribute to review product name
 
     if (!reviewText || !rating) {
         alert("Please fill in all fields.");
@@ -128,18 +140,34 @@ async function handleReviewSubmission() {
     }
 
     try {
+        // Fetch pending item details from Firestore using the pendingId
+        const pendingDoc = doc(db, 'pending_items', pendingId);
+        const pendingSnapshot = await getDoc(pendingDoc);
+
+        if (!pendingSnapshot.exists()) {
+            alert("No pending item found.");
+            return;
+        }
+
+        const pendingData = pendingSnapshot.data();
+        const listingId = pendingData.listingId;  // Assuming the listingId field is stored in the pending item document
+        const sellerId = pendingData.sellerId;    // Assuming the sellerId field is stored in the pending item document
+        const productName = pendingData.productName; // Fetch product name from pending item
+
         // Save the review to the "reviews" collection
         await addDoc(collection(db, "reviews"), {
             pendingId: pendingId,
             userId: user.uid,
             reviewText: reviewText,
             rating: parseInt(rating),
+            listingId: listingId,  // Include listingId in the review data
+            sellerId: sellerId,    // Include sellerId in the review data
+            productName: productName, // Include productName in the review data
             timestamp: new Date().toISOString(),
         });
 
         // Update the pending item's status to 'reviewed'
-        const pendingDoc = doc(db, "pending_items", pendingId);
-        await updateDoc(pendingDoc, { status: 'reviewed' }); // Mark as reviewed
+        await updateDoc(pendingDoc, { status: 'reviewed' });
 
         alert("Your review has been submitted successfully!");
 
@@ -150,6 +178,7 @@ async function handleReviewSubmission() {
         alert("There was an error submitting your review. Please try again.");
     }
 }
+
 
 // Utility function to close modals
 function closeModal(modalId) {

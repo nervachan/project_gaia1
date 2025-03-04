@@ -39,16 +39,17 @@ async function fetchImageFromOtherCollection(collectionName, documentId, imageFi
 }
 
 // Function to update item status (picked up, returned, or relisted)
-async function updateItemStatus(itemId, status) {
-    const itemRef = doc(db, "pending-items", itemId);
+async function updateItemStatus(itemId, newStatus) {
+    const itemRef = doc(db, "pending_items", itemId);
     try {
         await updateDoc(itemRef, {
-            status: status // Updating the status based on the argument passed
+            status: newStatus // Updating the status based on the argument passed
         });
-        alert(`Item marked as ${status}!`);
-        fetchUserPendingItems(); // Refresh the list
+        alert(`Item marked as ${newStatus}!`);
+        fetchUserPendingItems(); // Refresh the list after status update
     } catch (error) {
-        console.error(`Error marking item as ${status}:`, error);
+        console.error(`Error marking item as ${newStatus}:`, error);
+        alert("Error updating item status. Please try again.");
     }
 }
 
@@ -110,6 +111,7 @@ async function fetchUserPendingItems(userId) {
             const button = document.createElement("button");
             button.className = "bg-blue-500 text-white px-4 py-2 rounded mt-4";
 
+            // Set button text and functionality based on the current status
             if (itemData.status === "picked up") {
                 button.textContent = "Mark as Returned";
                 button.onclick = () => updateItemStatus(docSnapshot.id, "returned");
