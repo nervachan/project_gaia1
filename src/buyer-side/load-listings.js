@@ -98,6 +98,7 @@ async function showListingDetails(listingId) {
                 ${listing.image ? `<img src="${listing.image}" alt="${listing.productName}" class="w-full h-96 object-cover rounded-md mt-4">` : ''}
                 ${listing.rentPrice ? `<p><strong>Rent Price:</strong> ₱${listing.rentPrice}</p>` : ''}
                 ${listing.sellPrice ? `<p><strong>Selling Price:</strong> ₱${listing.sellPrice}</p>` : ''}
+                
             `;
             modal.classList.remove('hidden'); // Show the modal
         } else {
@@ -121,7 +122,13 @@ document.body.addEventListener('click', (event) => {
         } else {
             console.error("Listing ID not found on Rent button.");
         }
-    } else if (event.target.id === 'close-modal') {
+    
+    } 
+    else if (event.target.classList.contains('view-reviews-button')){
+        window.location.href = `/src/buyer-side/reviews.html`;
+        console.log("clicked reviews");
+    }
+    else if (event.target.id === 'close-modal') {
         closeModal('listing-modal');
     } else if (event.target.id === 'submitRental') {
         handleRentalSubmission();

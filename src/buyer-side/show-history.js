@@ -39,11 +39,24 @@ async function showPendingItems(userId) {
         const pendingItemsQuery = query(collection(db, "pending_items"), where('buyerId', '==', userId));
         const pendingItemsSnapshot = await getDocs(pendingItemsQuery);
 
-        pendingItemsSnapshot.forEach(doc => {
-            const pendingData = doc.data();
-            const pendingElement = createPendingItemElement(pendingData, doc.id);
+        for (const docSnapshot of pendingItemsSnapshot.docs) {
+            const pendingData = docSnapshot.data();
+            const listingId = pendingData.listingId;
+
+            // Fetch the image from the 'listed_items' collection using the listingId
+            const listingDoc = doc(db, 'listed_items', listingId);
+            const listingSnapshot = await getDoc(listingDoc);
+            
+            let imageUrl = '';
+            if (listingSnapshot.exists()) {
+                const listingData = listingSnapshot.data();
+                imageUrl = listingData.imageUrl || ''; // Assuming 'imageUrl' is the field storing the image URL
+            }
+
+            // Create and display the pending item element
+            const pendingElement = createPendingItemElement(pendingData, docSnapshot.id, imageUrl);
             pendingItemsContainer.appendChild(pendingElement);
-        });
+        }
 
     } catch (error) {
         console.error("Error fetching pending items: ", error);
@@ -51,20 +64,25 @@ async function showPendingItems(userId) {
 }
 
 // Function to create pending item elements
-function createPendingItemElement(pendingData, pendingId) {
+function createPendingItemElement(pendingData, pendingId, imageUrl) {
     const pendingElement = document.createElement('div');
     pendingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
 
     pendingElement.innerHTML = `
-        <h3 class="text-xl font-semibold text-gray-900">${pendingData.productName}</h3>
-        <p class="text-gray-600 mt-2">${pendingData.productDescription}</p>
-        <p class="text-gray-700 mt-2">Start Date: ${pendingData.startDate}</p>
-        <p class="text-gray-700 mt-2">End Date: ${pendingData.endDate}</p>
-        <p class="text-gray-700 mt-2">Price: ₱${pendingData.totalPrice}</p>
-        <p class="text-gray-700 mt-2">Status: ${pendingData.status}</p>
-        ${pendingData.status === 'returned' ? `
-            <button class="leave-review bg-blue-500 text-white px-4 py-2 rounded-lg mt-4" data-id="${pendingId}">Leave a Review</button>
-        ` : ''}
+        <div class="flex">
+            <img src="${imageUrl}" alt="${pendingData.productName}" class="w-32 h-32 object-cover rounded-lg mr-4">
+            <div>
+                <h3 class="text-xl font-semibold text-gray-900">${pendingData.productName}</h3>
+                <p class="text-gray-600 mt-2">${pendingData.productDescription}</p>
+                <p class="text-gray-700 mt-2">Start Date: ${pendingData.startDate}</p>
+                <p class="text-gray-700 mt-2">End Date: ${pendingData.endDate}</p>
+                <p class="text-gray-700 mt-2">Price: ₱${pendingData.totalPrice}</p>
+                <p class="text-gray-700 mt-2">Status: ${pendingData.status}</p>
+                ${pendingData.status === 'returned' ? ` 
+                    <button class="leave-review bg-blue-500 text-white px-4 py-2 rounded-lg mt-4" data-id="${pendingId}">Leave a Review</button>
+                ` : ''}
+            </div>
+        </div>
     `;
 
     return pendingElement;
