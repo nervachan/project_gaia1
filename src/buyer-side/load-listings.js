@@ -49,20 +49,24 @@ function createListingElement(listing, listingId) {
     const listingElement = document.createElement('div');
     listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
 
-    const image = listing.image ? `<img src="${listing.image}" alt="${listing.productName}" class="w-full h-48 object-cover rounded-md">` : '';
+    // Check if the images field exists and is an array
+    let image = '';
+    if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
+        // Use the first image from the array
+        image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-48 object-cover rounded-md">`;
+    }
 
     listingElement.innerHTML = `
         ${image}
         <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
         <p class="text-gray-600 mt-2">${listing.productDescription}</p>
         <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
-        <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
         <p class="text-gray-700 mt-2">Size: ${listing.garmentSize}</p>
         ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ₱${listing.rentPrice}</p>` : ''}
         ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ₱${listing.sellPrice}</p>` : ''}
         <div class="mt-4">
             <button class="view-details bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" data-id="${listingId}">View Details</button>
-            ${createActionButton(listing, listingId)} <!-- Correctly passing listingId here -->
+            <button class="rent-button bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 ml-2" data-id="${listingId}">Rent</button>
         </div>
     `;
 
@@ -73,10 +77,10 @@ function createListingElement(listing, listingId) {
 function createActionButton(listing, listingId) {
     if (listing.condition === 'rent') {
         return `<button class="rent-button bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 ml-2" data-id="${listingId}">Rent</button>`;
-    
     }
     return '';
 }
+
 
 // Show listing details modal
 async function showListingDetails(listingId) {
@@ -85,22 +89,84 @@ async function showListingDetails(listingId) {
     const modalContent = document.getElementById('modal-content');
 
     try {
+        // Fetch the listing document from Firestore
         const listingDoc = doc(db, 'listed_items', listingId);
         const listingSnapshot = await getDoc(listingDoc);
 
         if (listingSnapshot.exists()) {
             const listing = listingSnapshot.data();
             modalTitle.innerText = listing.productName;
+
+            // Debugging: Check the images content
+            console.log("Listing Images:", listing.images); // Assuming "images" is the field
+
+            // Fetch the images: If it's a single image, convert it into an array
+            const images = Array.isArray(listing.images) ? listing.images : [listing.images];
+
+            let imagesHtml = '';
+
+            // Check if there are multiple images, create a carousel
+            if (images.length > 1) {
+                imagesHtml = `
+                    <div class="relative">
+                        <div class="overflow-hidden relative">
+                            <div class="flex transition-transform duration-300 ease-in-out" id="carousel-${listingId}">
+                                ${images.map((img, index) => `
+                                    <div class="carousel-item w-full ${index === 0 ? 'block' : 'hidden'}">
+                                        <img src="${img}" alt="${listing.productName}" class="w-full h-96 object-cover rounded-md">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer" id="prev-${listingId}">&lt;</button>
+                        <button class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer" id="next-${listingId}">&gt;</button>
+                    </div>
+                `;
+            } else if (images.length === 1) {
+                // If only one image, display it normally
+                imagesHtml = `
+                    <img src="${images[0]}" alt="${listing.productName}" class="w-full h-96 object-cover rounded-md">
+                `;
+            }
+
             modalContent.innerHTML = `
                 <p>${listing.productDescription}</p>
                 <p><strong>Category:</strong> ${listing.category}</p>
-                <p><strong>Condition:</strong> ${listing.condition}</p>
-                ${listing.image ? `<img src="${listing.image}" alt="${listing.productName}" class="w-full h-96 object-cover rounded-md mt-4">` : ''}
+                ${imagesHtml}
                 ${listing.rentPrice ? `<p><strong>Rent Price:</strong> ₱${listing.rentPrice}</p>` : ''}
                 ${listing.sellPrice ? `<p><strong>Selling Price:</strong> ₱${listing.sellPrice}</p>` : ''}
-                
             `;
-            modal.classList.remove('hidden'); // Show the modal
+
+            // Initialize carousel logic if multiple images
+            if (images.length > 1) {
+                const prevButton = document.getElementById(`prev-${listingId}`);
+                const nextButton = document.getElementById(`next-${listingId}`);
+                const carousel = document.getElementById(`carousel-${listingId}`);
+                const items = carousel.querySelectorAll('.carousel-item');
+                let currentIndex = 0;
+
+                // Show next item
+                nextButton.addEventListener('click', () => {
+                    currentIndex = (currentIndex + 1) % items.length;
+                    updateCarousel();
+                });
+
+                // Show previous item
+                prevButton.addEventListener('click', () => {
+                    currentIndex = (currentIndex - 1 + items.length) % items.length;
+                    updateCarousel();
+                });
+
+                function updateCarousel() {
+                    items.forEach((item, index) => {
+                        item.classList.toggle('block', index === currentIndex);
+                        item.classList.toggle('hidden', index !== currentIndex);
+                    });
+                }
+            }
+
+            // Show the modal
+            modal.classList.remove('hidden');
         } else {
             console.error("No listing found with the provided ID.");
         }
@@ -108,6 +174,7 @@ async function showListingDetails(listingId) {
         console.error("Error fetching listing details: ", error);
     }
 }
+
 
 document.body.addEventListener('click', (event) => {
     if (event.target.classList.contains('view-details')) {
@@ -183,6 +250,9 @@ async function handleRentalSubmission() {
 
     const totalPrice = daysDiff * parseFloat(price); // Total price based on the days rented
 
+    // Get the images of the listing
+    const images = currentListing.images || [];  // Fallback to empty array if no images
+
     // Prepare rental data
     const rentalData = {
         productName: currentListing.productName,
@@ -196,7 +266,8 @@ async function handleRentalSubmission() {
         listingId: currentListing.id, // Store the listingId for reference
         buyerId: user.uid, // Store the logged-in user's ID
         sellerId: sellerId, // Add the seller's ID to the rental data
-        status: "pending"  
+        status: "pending",
+        images: images  // Include the images in the rental data
     };
 
     try {

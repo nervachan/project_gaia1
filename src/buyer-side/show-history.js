@@ -44,16 +44,16 @@ async function showPendingItems(userId) {
             const listingId = pendingData.listingId;
 
             // Fetch the image from the 'listed_items' collection using the listingId
-            const listingDoc = doc(db, 'listed_items', listingId);
-            const listingSnapshot = await getDoc(listingDoc);
+            const listingDocRef = doc(db, 'listed_items', listingId);
+            const listingSnapshot = await getDoc(listingDocRef);
             
             let imageUrl = '';
             if (listingSnapshot.exists()) {
                 const listingData = listingSnapshot.data();
-                imageUrl = listingData.imageUrl || ''; // Assuming 'imageUrl' is the field storing the image URL
+                imageUrl = listingData.images || ''; // Assuming 'images' is the field storing the image URL
             }
 
-            // Create and display the pending item element
+            // Create and display the pending item element with image
             const pendingElement = createPendingItemElement(pendingData, docSnapshot.id, imageUrl);
             pendingItemsContainer.appendChild(pendingElement);
         }
@@ -63,15 +63,19 @@ async function showPendingItems(userId) {
     }
 }
 
-// Function to create pending item elements
+// Function to create pending item elements (including image)
 function createPendingItemElement(pendingData, pendingId, imageUrl) {
     const pendingElement = document.createElement('div');
     pendingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
 
     pendingElement.innerHTML = `
         <div class="flex">
-            <img src="${imageUrl}" alt="${pendingData.productName}" class="w-32 h-32 object-cover rounded-lg mr-4">
-            <div>
+            <!-- Image section -->
+            <div class="w-32 h-32 mr-4">
+                <img src="${imageUrl}" alt="${pendingData.productName}" class="w-full h-full object-cover rounded-lg">
+            </div>
+            
+            <div class="flex-1">
                 <h3 class="text-xl font-semibold text-gray-900">${pendingData.productName}</h3>
                 <p class="text-gray-600 mt-2">${pendingData.productDescription}</p>
                 <p class="text-gray-700 mt-2">Start Date: ${pendingData.startDate}</p>
@@ -197,7 +201,6 @@ async function handleReviewSubmission() {
     }
 }
 
-
 // Utility function to close modals
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -211,14 +214,5 @@ onAuthStateChanged(auth, (user) => {
         showPendingItems(user.uid);  // Show pending items for logged-in user
     } else {
         console.log("No user is logged in.");
-    }
-});
-
-// Wait for the DOM to be ready before executing the script
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Firebase and authentication
-    const user = auth.currentUser;
-    if (user) {
-        showPendingItems(user.uid);  // Show pending items for logged-in user
     }
 });

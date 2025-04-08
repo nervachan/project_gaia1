@@ -11,45 +11,38 @@
     <script type="module" src="logout.js"></script>
 
 </head>
-<body>
-    <body class="bg-gray-100">
-        <header>
-            <nav class="bg-gray-800">
-              <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+<body class="bg-gray-100">
+    <header>
+        <nav class="bg-gray-800">
+            <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                 <div class="relative flex h-16 items-center justify-between">
-                  
-                  <!-- Left Side: Logo and Navigation -->
-                  <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                    <div class="flex flex-shrink-0 items-center">
-                      <h3 class="text-gray-100">Project:Gaia Seller Hub</h3>
+                    <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                        <div class="flex flex-shrink-0 items-center">
+                            <h3 class="text-gray-100">Project:Gaia Seller Hub</h3>
+                        </div>
+                        <div class="hidden sm:ml-6 sm:block">
+                            <div class="flex space-x-4">
+                                <a href="/src/seller-side/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="hidden sm:ml-6 sm:block">
-                      <div class="flex space-x-4">
-                        <a href="/src/seller-side/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
-                      </div>
+                    <div class="flex items-center space-x-4">
+                        <div>
+                            <button type="button" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
+                                Hello! <span class="font-semibold" id="username">#username</span>
+                            </button>
+                        </div>
+                        <div>
+                            <a href="/src/login-out/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+                        </div>
                     </div>
-                  </div>
-          
-                  <!-- Right Side: Hello! Username and Logout button -->
-                  <div class="flex items-center space-x-4">
-                    <div>
-                      <button type="button" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
-                        Hello! <span class="font-semibold" id="username">#username</span>
-                      </button>
-                    </div>
-                    <div>
-                      <a href="/src/login-out/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
-                    </div>
-                  </div>
                 </div>
-              </div>
-            </nav>
-          </header>
+            </div>
+        </nav>
+    </header>
 
-    <!-- Sidebar -->
     <div class="flex">
-        <!-- Sidebar -->
-        <div class="w-64 h-screen bg-gray-800 text-white p-10 ">
+        <div class="w-64 h-screen bg-gray-800 text-white p-10">
             <ul class="space-y-6">
                 <li>
                     <a href="/src/seller-side/seller-hub-active-listings.html" class="hover:bg-gray-700 p-2 rounded transition">Active Listings</a>
@@ -63,182 +56,132 @@
                 <li>
                     <a href="/src/seller-side/seller-hub-inactive-listings.html" class="hover:bg-gray-700 p-2 rounded transition">Inactive Listings</a>
                 </li>
-                <!-- New Reviews link -->
                 <li>
                     <a href="/src/seller-side/seller-hub-reviews.html" class="hover:bg-gray-700 p-2 rounded transition">My Reviews</a>
                 </li>
             </ul>
         </div>
-    
-        <!-- Main Content -->
-        <div class="flex-auto ">
-              <!-- Main container -->
-    <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8 mt-8">
 
-        <!-- Page Header -->
-        <h1 class="text-3xl font-semibold text-gray-900 mb-6">Create a Listing</h1>
+        <div class="flex-auto">
+            <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8 mt-8">
 
-        <!-- Form -->
-        <form action="#" method="POST">
+                <h1 class="text-3xl font-semibold text-gray-900 mb-6">Create a Listing</h1>
 
-            <!-- Step 1: Product Details -->
-            <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                    <label for="product-name" class="text-gray-700 text-lg">Product Name</label>
-                    <span class="text-sm text-gray-500">e.g., Mountain Province-weaved gown</span>
-                </div>
-                <input id="product-name" type="text" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter product name">
+                <form action="#" method="POST" id="listingForm">
 
-                <div class="flex items-center justify-between">
-                    <label for="product-description" class="text-gray-700 text-lg">Product Description</label>
-                    <span class="text-sm text-gray-500">Describe your product in detail</span>
-                </div>
-                <textarea id="product-description" rows="5" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter a detailed product description"></textarea>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label for="product-name" class="text-gray-700 text-lg">Product Name</label>
+                            <span class="text-sm text-gray-500">e.g., Mountain Province-weaved gown</span>
+                        </div>
+                        <input id="product-name" type="text" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter product name">
+
+                        <div class="flex items-center justify-between">
+                            <label for="product-description" class="text-gray-700 text-lg">Product Description</label>
+                            <span class="text-sm text-gray-500">Describe your product in detail</span>
+                        </div>
+                        <textarea id="product-description" rows="5" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter a detailed product description"></textarea>
+                    </div>
+
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label for="category" class="text-gray-700 text-lg">Category</label>
+                            <span class="text-sm text-gray-500">Select a category for your product</span>
+                        </div>
+                        <select id="category" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled selected>Select category</option>
+                            <option value="for men">For Men</option>
+                            <option value="for women">For Women</option>
+                            <option value="for children (male)">For Child(Male)</option>
+                            <option value="for children (female)">For Child(Female)</option>
+                        </select>
+
+                        <div class="flex items-center justify-between">
+                            <label for="size" class="text-gray-700 text-lg">Size</label>
+                            <span class="text-sm text-gray-500">Select the size of the product</span>
+                        </div>
+                        <select id="size" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled selected>Select size</option>
+                            <option value="small">Small (S)</option>
+                            <option value="medium">Medium (M)</option>
+                            <option value="large">Large (L)</option>
+                            <option value="x-large">Extra Large (XL)</option>
+                        </select>
+
+                        
+
+                    <div id="rent-select">
+                        <div class="mt-6 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <label for="rent-price" class="text-gray-700 text-lg"> Rent Price</label>
+                                <span class="text-sm text-gray-500">What will be the renting price?</span>
+                            </div>
+                            <input id="rent-price" type="number" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter rent price" min="0">
+                        </div>
+                       
+                    </div>
+
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label for="photos" class="text-gray-700 text-lg">Photos</label>
+                            <span class="text-sm text-gray-500">Upload up to 5 images</span>
+                        </div>
+                        <input type="file" id="photos" accept="image/*" multiple class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div class="mt-6">
+                        <button id="createListingButton" type="button" class="w-full py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Create Listing
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            <!-- Step 2: Category and Condition -->
-            <div class="mt-6 space-y-4">
-                <div class="flex items-center justify-between">
-                    <label for="category" class="text-gray-700 text-lg">Category</label>
-                    <span class="text-sm text-gray-500">Select a category for your product</span>
+            <div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex-auto justify-center items-center hidden">
+                <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <h2 class="text-xl font-semibold text-gray-800">Confirm Your Listing</h2>
+                    <p class="text-gray-600 mt-4">Are you sure you want to create this listing?</p>
+                    <div class="mt-6 flex justify-end space-x-4">
+                        <button id="cancelButton" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Cancel</button>
+                        <button id="confirmButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Confirm</button>
+                    </div>
                 </div>
-                <select id="category" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="" disabled selected>Select category</option>
-                    <option value="for men">For Men</option>
-                    <option value="for women">For Women</option>
-                    <option value="for children (male)">For Child(Male)</option>
-                    <option value="for children (female)">For Child(Female)</option>
-                    </select>
-                     <!-- Size dropdown -->
-    <div class="flex items-center justify-between">
-      <label for="size" class="text-gray-700 text-lg">Size</label>
-      <span class="text-sm text-gray-500">Select the size of the product</span>
-  </div>
-  <select id="size" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-      <option value="" disabled selected>Select size</option>
-      <option value="small">Small (S)</option>
-      <option value="medium">Medium (M)</option>
-      <option value="large">Large (L)</option>
-      <option value="x-large">Extra Large (XL)</option>
-  </select>
-
-
-                <div class="flex items-center justify-between">
-                    <label for="condition" class="text-gray-700 text-lg">Shop Term</label>
-                    <span class="text-sm text-gray-500">Will you post it for rent? for Sale? or both?</span>
-                </div>
-                <select id="condition" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="" disabled selected>Select term</option>
-                    <option value="rent">For Rent Only</option>
-                    <option value="sale">For Sale Only</option>
-                </select>
-            </div>
-
-            <!-- Step 3: Pricing -->
-            <div id="rent-select">
-            <div class="mt-6 space-y-1">
-                <div class="flex items-center justify-between">
-                    <label for="rent-price" class="text-gray-700 text-lg"> Rent Price</label>
-                    <span class="text-sm text-gray-500">What will be the renting price?</span>
-                </div>
-                <input id="rent-price" type="number" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter rent price" min="0">
-            </div>
-            <div id="sell-select" class="mt-5">
-                <div class="flex items-center justify-between space-y-1">
-                    <label for="sell-price" class="text-gray-700 text-lg">Selling Price</label>
-                    <span class="text-sm text-gray-500">What will be the selling price?</span>
-                </div>
-                <input id="sell-price" type="number" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter selling price" min="0">
-            </div>
-                
-                
-
-            <!-- Step 4: Photos -->
-            <div class="mt-6 space-y-4">
-                <div class="flex items-center justify-between">
-                    <label for="photos" class="text-gray-700 text-lg">Photos</label>
-                    <span class="text-sm text-gray-500">Upload up to 5 images</span>
-                </div>
-                <input type="file" id="photos" accept="image/*" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- Step 5: Review & Submit -->
-            <div class="mt-6">
-                <button id="createListingButton" type="button" class="w-full py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Create Listing
-                </button>
-            </div>
-        </form>
-    </div>
-
-     <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex-auto justify-center items-center hidden">
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 class="text-xl font-semibold text-gray-800">Confirm Your Listing</h2>
-            <p class="text-gray-600 mt-4">Are you sure you want to create this listing?</p>
-            <div class="mt-6 flex justify-end space-x-4">
-                <button id="cancelButton" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Cancel</button>
-                <button id="confirmButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Confirm</button>
             </div>
         </div>
-    </div>
-</div>
 
-     <!--Script for rent/sale selection-->
-     <script>
-        // Get references to the dropdown and textbox elements
-        const optionsDropdown = document.getElementById("condition");
-        const sellSelect = document.getElementById("rent-price");
-        const rentSelect = document.getElementById("sell-price");
+        <script>
+            const photosInput = document.getElementById("photos");
 
-        // Event listener to detect change in dropdown selection
-        optionsDropdown.addEventListener("change", function() {
-            // If the selected option is "disable", disable the textbox
-            if (this.value === "rent") {
-                rentSelect.disabled = true;
-                sellSelect.disabled = false;
-            } 
-            else if (this.value === "sale") {
-                sellSelect.disabled = true;
-                rentSelect.disabled = false;
-            }else {
-                // Otherwise, enable the textbox
-                sellSelect.disabled = false;
-                rentSelect.disabled = false;
-            }
-        });
+            photosInput.addEventListener("change", function() {
+                if (this.files.length > 5) {
+                    alert("You can upload a maximum of 5 photos.");
+                    this.value = ""; // Clear the input field
+                }
+            });
         </script>
-   
-        <!-- Script to Validate Form -->
-   <script>
-    const form = document.getElementById('listingForm');
-    const errorMessage = document.getElementById('error-message');
-    const createListingButton = document.getElementById('createListingButton');
 
-    form.addEventListener('submit', function(event) {
-        // Check if all required fields are filled
-        const productName = document.getElementById('product-name').value;
-        const productDescription = document.getElementById('product-description').value;
-        const category = document.getElementById('category').value;
-        const condition = document.getElementById('condition').value;
-        const photos = document.getElementById('photos').files.length;
-        const rentPrice = document.getElementById('rent-price').value;
-        const sellPrice = document.getElementById('sell-price').value;
+        <script>
+            const form = document.getElementById('listingForm');
+            const errorMessage = document.getElementById('error-message');
+            const createListingButton = document.getElementById('createListingButton');
 
-        if (!productName || !productDescription || !category || !condition || (condition === 'rent' && !rentPrice) || (condition === 'sale' && !sellPrice) || photos === 0) {
-            // Show error message if validation fails
-            event.preventDefault(); // Prevent form submission
-            errorMessage.classList.remove('hidden');
-        } else {
-            // Hide error message and allow form submission
-            errorMessage.classList.add('hidden');
-        }
-    });
-</script>
-    
-    
-    
+            form.addEventListener('submit', function(event) {
+                const productName = document.getElementById('product-name').value;
+                const productDescription = document.getElementById('product-description').value;
+                const category = document.getElementById('category').value;
+                const condition = document.getElementById('condition').value;
+                const photos = document.getElementById('photos').files.length;
+                const rentPrice = document.getElementById('rent-price').value;
+                const sellPrice = document.getElementById('sell-price').value;
+
+                if (!productName || !productDescription || !category || !condition || (condition === 'rent' && !rentPrice) || (condition === 'sale' && !sellPrice) || photos === 0) {
+                    event.preventDefault();
+                    errorMessage.classList.remove('hidden');
+                } else {
+                    errorMessage.classList.add('hidden');
+                }
+            });
+        </script>
+
 </body>
 </html>
-
-

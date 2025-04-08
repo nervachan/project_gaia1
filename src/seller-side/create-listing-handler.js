@@ -34,9 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const category = document.getElementById('category');
     const condition = document.getElementById('condition');
     const rentPrice = document.getElementById('rent-price');
-    const sellPrice = document.getElementById('sell-price');
     const size = document.getElementById('size'); // Garment size input field
     const photos = document.getElementById('photos');
+
+    
 
     // When the "Create Listing" button is clicked
     createListingButton.addEventListener('click', function() {
@@ -66,76 +67,91 @@ document.addEventListener('DOMContentLoaded', () => {
             productName: productName.value,
             productDescription: productDescription.value,
             category: category.value,
-            condition: condition.value,
             rentPrice: rentPrice.value,
-            sellPrice: sellPrice.value,
             isActive: true, // Assuming you want to set the listing as active
             garmentSize: size.value, // Include the garment size
             sellerId: userId // Add the user's ID to the listing data
         };
 
-        // Convert the image file to base64 if selected
-        const imageFile = photos.files[0];
-        if (imageFile) {
-            const reader = new FileReader();
-            reader.onloadend = async function() {
-                const img = new Image();
-                img.src = reader.result;
+        // Process each image and convert to base64
+        const imageFiles = photos.files;
+        const imageBase64Array = [];
 
-                img.onload = async function() {
-                    // Create a canvas to downscale the image
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
+        // Check if files are selected
+        if (imageFiles.length > 0) {
+            // Loop through each image file
+            for (let i = 0; i < imageFiles.length; i++) {
+                const imageFile = imageFiles[i];
 
-                    // Set the desired width and height for the downscaled image
-                    const maxWidth = 800; // Set your desired max width
-                    const maxHeight = 800; // Set your desired max height
-                    let width = img.width;
-                    let height = img.height;
+                // Convert image to base64 using FileReader
+                const reader = new FileReader();
+                reader.onloadend = async function() {
+                    const img = new Image();
+                    img.src = reader.result;
 
-                    // Calculate the new dimensions while maintaining the aspect ratio
-                    if (width > height) {
-                        if (width > maxWidth) {
-                            height *= maxWidth / width;
-                            width = maxWidth;
+                    img.onload = async function() {
+                        // Create a canvas to downscale the image
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+
+                        // Set the desired width and height for the downscaled image
+                        const maxWidth = 800; // Set your desired max width
+                        const maxHeight = 800; // Set your desired max height
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Calculate the new dimensions while maintaining the aspect ratio
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height *= maxWidth / width;
+                                width = maxWidth;
+                            }
+                        } else {
+                            if (height > maxHeight) {
+                                width *= maxHeight / height;
+                                height = maxHeight;
+                            }
                         }
-                    } else {
-                        if (height > maxHeight) {
-                            width *= maxHeight / height;
-                            height = maxHeight;
+
+                        // Resize the canvas to the new dimensions
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        // Draw the image onto the canvas
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convert the canvas to a base64 string
+                        const downscaledImage = canvas.toDataURL('image/jpeg'); // You can change the format if needed
+
+                        // Add the downscaled image to the array
+                        imageBase64Array.push(downscaledImage);
+
+                        // Check if all images have been processed
+                        if (imageBase64Array.length === imageFiles.length) {
+                            // Add the image array to the listing data
+                            listingData.images = imageBase64Array;
+
+                            // Now add the new listing to the top-level 'listed_items' collection
+                            try {
+                                const listingsRef = collection(db, 'listed_items'); // Reference to the top-level 'listed_items' collection
+                                await addDoc(listingsRef, listingData);
+                                console.log("Listing added successfully!");
+
+                                // Hide the modal and redirect to seller hub page
+                                confirmationModal.classList.add('hidden');
+                                window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
+                            } catch (error) {
+                                console.error("Error adding document: ", error);
+                            }
                         }
-                    }
-
-                    // Resize the canvas to the new dimensions
-                    canvas.width = width;
-                    canvas.height = height;
-
-                    // Draw the image onto the canvas
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Convert the canvas to a base64 string
-                    const downscaledImage = canvas.toDataURL('image/jpeg'); // You can change the format if needed
-                    listingData.image = downscaledImage; // Store the downscaled image
-
-                    // Now add the new listing to the top-level 'listed_items' collection
-                    try {
-                        const listingsRef = collection(db, 'listed_items'); // Reference to the top-level 'listed_items' collection
-                        await addDoc(listingsRef, listingData);
-                        console.log("Listing added successfully!");
-
-                        // Hide the modal and redirect to seller hub page
-                        confirmationModal.classList.add('hidden');
-                        window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
-                    } catch (error) {
-                        console.error("Error adding document: ", error);
-                    }
+                    };
                 };
-            };
 
-            // Read the image file as base64
-            reader.readAsDataURL(imageFile);
+                // Read the image file as base64
+                reader.readAsDataURL(imageFile);
+            }
         } else {
-            // If no image is selected, proceed without it
+            // If no images are selected, add the listing without images
             try {
                 // Add the new listing to the top-level 'listed_items' collection
                 const listingsRef = collection(db, 'listed_items'); // Reference to the top-level 'listed_items' collection

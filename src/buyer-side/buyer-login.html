@@ -13,6 +13,8 @@
     <script type="module" src="load-listings.js"></script>
     <script type="module" src="logout.js"></script>
     <script type="module" src="auth-persistence-checker.js"></script>
+    <script type="module" src="show-reviews.js"></script>
+    <script type="module" src="view-profile.js"></script>
    
 
     
@@ -20,35 +22,43 @@
 </head>
 <body class="bg-gray-100 pt-16"> <!-- Added padding to body to avoid overlap with fixed header -->
   
-  <!-- Fixed Header -->
-  <header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
-    <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-      <div class="relative flex h-16 items-center justify-between">
-        
-        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-          <div class="flex flex-shrink-0 items-center">
-            <h3 class="text-gray-100">Project:Gaia</h3>
-          </div>
-          <div class="hidden sm:ml-6 sm:block">
-            <div class="flex space-x-4">
-              <a href="#" class="rounded-md  hover:bg-gray-700  px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
-              <a href="/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a>
-              <a href="/src/buyer-side/History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
-              <a href="/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
-            </div>
-          </div>
+<!-- Fixed Header -->
+<header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
+  <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-16 items-center justify-between">
+      
+      <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+        <div class="flex flex-shrink-0 items-center">
+          <h3 class="text-gray-100">Project:Gaia</h3>
         </div>
-
-        <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <div class="relative ml-3">
-            <div>
-              <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
-            </div>
+        <div class="hidden sm:ml-6 sm:block">
+          <div class="flex space-x-4">
+            <a href="#" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+            <a href="/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a>
+            <a href="/src/buyer-side/History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+            <a href="/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
           </div>
         </div>
       </div>
-    </nav>
-  </header>
+
+      <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+        <div class="relative ml-3">
+          <div class="flex items-center space-x-4">
+            <!-- Profile Icon Link -->
+            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2" >
+              <!-- Heroicon for Profile -->
+              <i class="fa-solid fa-user" id="profile-icon"></i>
+            </a>
+
+            <!-- Logout Link -->
+            <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
 
 
 <div class="searchBox flex items-center bg-gray-100 p-4 rounded-lg shadow-lg">
@@ -164,6 +174,21 @@
               <button type="submit"  id="rent-item-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Submit Rental</button>
           </div>
       </form>
+  </div>
+</div>
+
+
+
+<!-- Modal -->
+<div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden z-20">
+  <div class="bg-white p-8 rounded-lg shadow-xl w-1/3">
+    <h2 class="text-2xl font-semibold text-gray-800">User Profile</h2>
+    <div id="user-profile-info" class="mt-4">
+      <!-- User Info will be injected here -->
+    </div>
+    <button id="close-profile" class="mt-4 bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
+      Close
+    </button>
   </div>
 </div>
   <!-- signed-in name script -->
