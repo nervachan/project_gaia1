@@ -37,7 +37,7 @@ async function fetchUserListings() {
 
     try {
         // Query the "listed_items" collection where userId matches the logged-in user's ID
-        const listingsQuery = query(collection(db, "listed_items"), where("userId", "==", userId));
+        const listingsQuery = query(collection(db, "listed_items"), where("sellerId", "==", userId));
         const listingsSnapshot = await getDocs(listingsQuery);
         listingsContainer.innerHTML = ""; // Clear loading text
 
@@ -52,18 +52,40 @@ async function fetchUserListings() {
             const itemDiv = document.createElement("div");
             itemDiv.className = "bg-white shadow-md rounded p-6 mb-4";
 
-            // Dynamically generate the HTML with template literals
-            const image = listingData.image ? `<img src="${listingData.image}" alt="${listingData.productName}" class="w-full h-48 object-cover rounded-md">` : '';
+            // Check if there are multiple images
+            const images = listingData.images || [];
+            let carouselHtml = '';
+
+            if (images.length > 1) {
+                // Create a carousel if there are multiple images
+                carouselHtml = `
+                    <div class="relative">
+                        <div class="overflow-hidden relative">
+                            <div class="flex transition-transform duration-300 ease-in-out" id="carousel-${docSnapshot.id}">
+                                ${images.map((img, index) => `
+                                    <div class="carousel-item w-full ${index === 0 ? 'block' : 'hidden'}">
+                                        <img src="${img}" alt="${listingData.productName}" class="w-full h-48 object-cover rounded-md">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer" id="prev-${docSnapshot.id}">&lt;</button>
+                        <button class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer" id="next-${docSnapshot.id}">&gt;</button>
+                    </div>
+                `;
+            } else if (images.length === 1) {
+                // If there is only one image, display it without the carousel
+                carouselHtml = `<img src="${images[0]}" alt="${listingData.productName}" class="w-full h-48 object-cover rounded-md">`;
+            }
 
             itemDiv.innerHTML = `
-                ${image}
+                ${carouselHtml}
                 <div class="p-4">
+                    <br>
                     <p class="text-gray-700 mt-2">${listingData.category}</p>
                     <h3 class="text-xl font-semibold text-gray-800">${listingData.productName}</h3>
-                    <p class="text-lg font-medium text-gray-600">${listingData.condition}</p>
                     ${listingData.garmentSize ? `<p class="text-gray-700 mt-2">Garment Size: ${listingData.garmentSize}</p>` : ''}
                     ${listingData.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listingData.rentPrice}</p>` : ''}
-                    ${listingData.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ${listingData.sellPrice}</p>` : ''}
                     <div class="flex justify-between mt-4">
                         <a href="#" class="inline-block py-2 px-6 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 deactivate-btn" data-id="${docSnapshot.id}" data-listing='${JSON.stringify(listingData)}'>
                             Deactivate Listing
@@ -76,6 +98,34 @@ async function fetchUserListings() {
             `;
 
             listingsContainer.appendChild(itemDiv);
+
+            // Add event listeners for carousel navigation
+            if (images.length > 1) {
+                const prevButton = document.getElementById(`prev-${docSnapshot.id}`);
+                const nextButton = document.getElementById(`next-${docSnapshot.id}`);
+                const carousel = document.getElementById(`carousel-${docSnapshot.id}`);
+                const items = carousel.querySelectorAll('.carousel-item');
+                let currentIndex = 0;
+
+                // Show next item
+                nextButton.addEventListener('click', () => {
+                    currentIndex = (currentIndex + 1) % items.length;
+                    updateCarousel();
+                });
+
+                // Show previous item
+                prevButton.addEventListener('click', () => {
+                    currentIndex = (currentIndex - 1 + items.length) % items.length;
+                    updateCarousel();
+                });
+
+                function updateCarousel() {
+                    items.forEach((item, index) => {
+                        item.classList.toggle('block', index === currentIndex);
+                        item.classList.toggle('hidden', index !== currentIndex);
+                    });
+                }
+            }
         }
 
     } catch (error) {

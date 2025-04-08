@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project:Gaia</title>
     <link rel="stylesheet" href="/css/output.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
-<body class="bg-blue-400">
-     <!-- Fixed Header -->
-  <header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
+
+<body class="bg-blue-400 font-sans">
+   <!-- Fixed Header -->
+<header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
     <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
       <div class="relative flex h-16 items-center justify-between">
         
@@ -19,17 +23,24 @@
           </div>
           <div class="hidden sm:ml-6 sm:block">
             <div class="flex space-x-4">
-              <a href="/src/buyer-side/buyer-login.html" class="rounded-md  hover:bg-gray-700  px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+              <a href="#" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
               <a href="/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a>
               <a href="/src/buyer-side/History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
               <a href="/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
             </div>
           </div>
         </div>
-
+  
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
           <div class="relative ml-3">
-            <div>
+            <div class="flex items-center space-x-4">
+              <!-- Profile Icon Link -->
+              <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2" >
+                <!-- Heroicon for Profile -->
+                <i class="fa-solid fa-user" id="profile-icon"></i>
+              </a>
+  
+              <!-- Logout Link -->
               <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
             </div>
           </div>
@@ -37,32 +48,34 @@
       </div>
     </nav>
   </header>
-    
+  
 
-    <h1 id="title-text" class="text-2xl text-center">How does Project:Gaia work?</h1>
-    <div class="grid grid-cols-4 md:grid-cols-4 lg:grid-cols-4 gap-5 ml-5 mt-10">
-        <div class="bg-grey p-4 rounded shadow w-15 h-full">
-            <h3 class="text-lg">Look for the item needed and Reserve.</h3>
-            <br>
-            <h3 class="text-sm">Start by browsing our website to find the item you're interested in renting. Take your time to compare options and select the perfect item that meets your needs.</h3>
-        </div>
-        <div class="bg-grey p-4 rounded shadow w-15 h-full">
-            <h3 class="text-lg">Go to the shop to Pick up Reserved item</h3>
-            <br>
-            <h3 class="text-sm">Once reservation is done online, head to the designated shop location for pickup. make sure bring any necessary identification or confirmation details to ensure a smooth collection process.</h3>
-        </div>
-        <div class="bg-grey p-4 rounded shadow w-15 h-full">
-            <h3 class="text-lg">Wear and Enjoy!</h3>
-            <br>
-            <h3 class="text-sm">After picking up the reserved item, It's time to enjoy! Use it as planned, whether it's for a special event, a casual outing, or any other occasion. Make the most of your rental and have fun!</h3>
-        </div>
-        <div class="bg-grey p-4 rounded shadow w-15 h-full">
-            <h3 class="text-lg">Return on Time</h3>
-            <br>
-            <h3 class="text-sm">When you're finished, Please return the item to the shop by the agreed-upon date and time. Timely returns help the shops maintain inventory and provide great service to all clients. If you need an extension, reach out to the shop you reserved from in advance to see if it is possible.</h3>
-        </div>
-    </div>
+    <!-- Main Content -->
+    <main class="mt-32 px-5">
+        <h1 id="title-text" class="text-3xl text-center font-bold text-gray-800 mb-12">How does Project:Gaia work?</h1>
 
+        <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Look for the item needed and Reserve</h3>
+                <p class="text-sm text-gray-600">Start by browsing our website to find the item you're interested in renting. Take your time to compare options and select the perfect item that meets your needs.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Go to the shop to Pick up Reserved item</h3>
+                <p class="text-sm text-gray-600">Once reservation is done online, head to the designated shop location for pickup. Make sure to bring any necessary identification or confirmation details to ensure a smooth collection process.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Wear and Enjoy!</h3>
+                <p class="text-sm text-gray-600">After picking up the reserved item, It's time to enjoy! Use it as planned, whether it's for a special event, a casual outing, or any other occasion. Make the most of your rental and have fun!</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Return on Time</h3>
+                <p class="text-sm text-gray-600">When you're finished, please return the item to the shop by the agreed-upon date and time. Timely returns help the shops maintain inventory and provide great service to all clients. If you need an extension, reach out to the shop you reserved from in advance to see if it is possible.</p>
+            </div>
+        </div>
+    </main>
+
+   
 
 </body>
+
 </html>
