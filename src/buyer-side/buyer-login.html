@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +72,7 @@
           <defs>
               <filter id="filter0_d_2_17" x="-0.418549" y="3.70435" width="29.7139" height="29.7139" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
                   <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
-                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
                   <feOffset dy="4"></feOffset>
                   <feGaussianBlur stdDeviation="2"></feGaussianBlur>
                   <feComposite in2="hardAlpha" operator="out"></feComposite>
@@ -179,18 +178,24 @@
 
 
 
-<!-- Modal -->
+<!--Profile Modal -->
 <div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden z-20">
   <div class="bg-white p-8 rounded-lg shadow-xl w-1/3">
     <h2 class="text-2xl font-semibold text-gray-800">User Profile</h2>
     <div id="user-profile-info" class="mt-4">
       <!-- User Info will be injected here -->
     </div>
-    <button id="close-profile" class="mt-4 bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
-      Close
-    </button>
+    <div class="mt-4 flex justify-between">
+      <button id="close-profile" class="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
+        Close
+      </button>
+      <a href="buyer-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+        Edit Profile
+      </a>
+    </div>
   </div>
 </div>
+
   <!-- signed-in name script -->
 <!-- <script>
   // Retrieve the username from localStorage

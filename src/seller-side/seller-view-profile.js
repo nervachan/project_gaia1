@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       // Query Firestore for the user document matching the 'email' field
-      const q = query(collection(db, "user-buyer"), where("email", "==", email)); // Querying based on the 'email' field
+      const q = query(collection(db, "user-seller"), where("email", "==", email)); // Querying based on the 'email' field
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
