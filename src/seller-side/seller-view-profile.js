@@ -21,24 +21,25 @@ document.addEventListener("DOMContentLoaded", function () {
   const auth = getAuth(); // Initialize Firebase Authentication
 
   // Function to open the modal and display user info from Firestore
-  async function openProfileModal(email) {
+  async function openProfileModal(uid) {
     const modal = document.getElementById("profile-modal");
     const userProfileInfo = document.getElementById("user-profile-info");
 
     try {
-      // Query Firestore for the user document matching the 'email' field
-      const q = query(collection(db, "user-seller"), where("email", "==", email)); // Querying based on the 'email' field
+      // Query Firestore for the user document matching the 'uid' field
+      const q = query(collection(db, "user-seller"), where("uid", "==", uid)); // Querying based on the 'uid' field
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        // Assuming there's only one user with the provided email
+        // Assuming there's only one user with the provided uid
         const userDoc = querySnapshot.docs[0]; // Get the first matched document
         const user = userDoc.data();
 
         // Populate the modal with the user's data from Firestore
         userProfileInfo.innerHTML = `
-          <p><strong>Name:</strong> ${user.username}</p>
+          <p><strong>Shop Name:</strong> ${user.shopname}</p>
           <p><strong>Email:</strong> ${user.email}</p>
+          <p><strong>Shop Address:</strong> ${user.shopaddress}</p>
           <p><strong>Account Type:</strong> ${user.role}</p>
         `;
 
@@ -62,12 +63,12 @@ document.addEventListener("DOMContentLoaded", function () {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       // User is signed in
-      const loggedInEmail = user.email; // Use the logged-in user's email
+      const loggedInUid = user.uid; // Use the logged-in user's uid
 
       // Simulate opening the modal when the profile icon is clicked
       document.getElementById("profile-icon").addEventListener("click", function (event) {
         event.preventDefault(); // Prevent the default link behavior
-        openProfileModal(loggedInEmail); // Pass the logged-in user's email to the function
+        openProfileModal(loggedInUid); // Pass the logged-in user's uid to the function
       });
     } else {
       // No user is signed in

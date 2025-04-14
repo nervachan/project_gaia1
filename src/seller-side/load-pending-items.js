@@ -40,7 +40,7 @@ async function fetchImageFromOtherCollection(collectionName, documentId, imageFi
 
 // Function to update item status (picked up, returned, or relisted)
 async function updateItemStatus(itemId, newStatus) {
-    const itemRef = doc(db, "pending_items", itemId);
+    const itemRef = doc(db, "", itemId);
     try {
         await updateDoc(itemRef, {
             status: newStatus // Updating the status based on the argument passed
@@ -53,7 +53,7 @@ async function updateItemStatus(itemId, newStatus) {
     }
 }
 
-// Function to fetch and display user-specific pending items from "pending-items"
+// Function to fetch and display user-specific pending items from "rentals"
 async function fetchUserPendingItems(userId) {
     if (!userId) {
         console.log("No user is logged in.");
@@ -69,13 +69,13 @@ async function fetchUserPendingItems(userId) {
     pendingItemsContainer.innerHTML = "<p>Loading...</p>";
 
     try {
-        // Query the "pending-items" collection where sellerId matches the logged-in user's ID
-        const pendingItemsQuery = query(collection(db, "pending_items"), where("sellerId", "==", userId));
+        // Query the "rentals" collection where sellerId matches the logged-in user's ID
+        const pendingItemsQuery = query(collection(db, "rentals"), where("sellerId", "==", userId));
         const pendingItemsSnapshot = await getDocs(pendingItemsQuery);
         pendingItemsContainer.innerHTML = ""; // Clear loading text
 
         if (pendingItemsSnapshot.empty) {
-            pendingItemsContainer.innerHTML = "<p>No pending items found for this user.</p>";
+            pendingItemsContainer.innerHTML = "<p>No pending items found for this seller.</p>";
             return;
         }
 
@@ -85,25 +85,17 @@ async function fetchUserPendingItems(userId) {
             const itemDiv = document.createElement("div");
             itemDiv.className = "bg-white shadow-md rounded p-6 mb-4";
 
-            // Fetch image from another collection if imageDocumentId exists
-            let imageUrl = "";
-            if (itemData.imageDocumentId) {
-                imageUrl = await fetchImageFromOtherCollection(
-                    "listed-items", // Collection where image is stored
-                    itemData.imageDocumentId,
-                    "image" // Field name for the image URL in that collection
-                );
-            }
+            // Use the "image" field directly from the rentals collection
+            const imageUrl = itemData.image || "";
 
             // Populate item HTML
             itemDiv.innerHTML = `
-                <h3 class="text-xl font-semibold text-gray-800">${itemData.productName}</h3>
-                <p class="text-gray-600">${itemData.productDescription}</p>
-                <p class="text-gray-600">Price: ₱${itemData.price}</p>
+                <h3 class="text-xl font-semibold text-gray-800">${itemData.listingName}</h3>
+                <p class="text-gray-600">Price: ₱${itemData.finalPrice}</p>
                 <p class="text-gray-600">Start Day of Rental: ${itemData.startDate}</p>
                 <p class="text-gray-600">End Day of Rental: ${itemData.endDate}</p>
-                <p class="text-gray-600">Time of Reservation: ${itemData.submissionTime}</p>
-                <p class="text-gray-600">Name of Reserver: ${itemData.userName}</p>
+                <p class="text-gray-600">Name of Reserver: ${itemData.name}</p>
+                <p class="text-gray-600">Status: ${itemData.status}</p>
                 ${imageUrl ? `<img src="${imageUrl}" alt="Product Image" class="w-full h-auto mt-4 rounded">` : ""}
             `;
 
@@ -132,12 +124,75 @@ async function fetchUserPendingItems(userId) {
     }
 }
 
+// Function to fetch and display rentals for the logged-in user
+async function fetchUserRentals(userId) {
+    if (!userId) {
+        console.log("No user is logged in.");
+        return;
+    }
+
+    const rentalsContainer = document.getElementById("rentalsList");
+    if (!rentalsContainer) {
+
+        return;
+    }
+
+    rentalsContainer.innerHTML = "<p>Loading...</p>";
+
+    try {
+        // Query the "rentals" collection where uid matches the logged-in user's ID
+        const rentalsQuery = query(collection(db, "rentals"), where("uid", "==", userId));
+        const rentalsSnapshot = await getDocs(rentalsQuery);
+        rentalsContainer.innerHTML = ""; // Clear loading text
+
+        if (rentalsSnapshot.empty) {
+            rentalsContainer.innerHTML = "<p>No rentals found for this user.</p>";
+            return;
+        }
+
+        // Loop through the documents and display each rental item
+        for (const docSnapshot of rentalsSnapshot.docs) {
+            const rentalData = docSnapshot.data();
+            const rentalDiv = document.createElement("div");
+            rentalDiv.className = "bg-white shadow-md rounded p-6 mb-4";
+
+            // Fetch image from another collection if imageDocumentId exists
+            let imageUrl = "";
+            if (rentalData.imageDocumentId) {
+                imageUrl = await fetchImageFromOtherCollection(
+                    "listed-items", // Collection where image is stored
+                    rentalData.imageDocumentId,
+                    "image" // Field name for the image URL in that collection
+                );
+            }
+
+            // Populate rental item HTML
+            rentalDiv.innerHTML = `
+                <h3 class="text-xl font-semibold text-gray-800">${rentalData.productName}</h3>
+                <p class="text-gray-600">${rentalData.productDescription}</p>
+                <p class="text-gray-600">Price: ₱${rentalData.price}</p>
+                <p class="text-gray-600">Start Day of Rental: ${rentalData.startDate}</p>
+                <p class="text-gray-600">End Day of Rental: ${rentalData.endDate}</p>
+                <p class="text-gray-600">Time of Reservation: ${rentalData.submissionTime}</p>
+                <p class="text-gray-600">Status: ${rentalData.status}</p>
+                ${imageUrl ? `<img src="${imageUrl}" alt="Product Image" class="w-full h-auto mt-4 rounded">` : ""}
+            `;
+
+            rentalsContainer.appendChild(rentalDiv);
+        }
+    } catch (error) {
+        console.error("Error fetching user rentals:", error);
+        rentalsContainer.innerHTML = "<p>Error loading rentals. Please try again later.</p>";
+    }
+}
+
 // Listen for changes in authentication state
 onAuthStateChanged(auth, (user) => {
     if (user) {
         // User is logged in
         console.log("Logged in user:", user);
         fetchUserPendingItems(user.uid); // Pass the user ID to the fetch function
+        fetchUserRentals(user.uid); // Pass the user ID to the fetch function
     } else {
         // User is not logged in
         console.log("No user logged in.");
@@ -146,6 +201,13 @@ onAuthStateChanged(auth, (user) => {
             pendingItemsList.innerHTML = "<p>Please log in to view your pending items.</p>";
         } else {
             console.error("pendingItemsList element not found.");
+        }
+
+        const rentalsList = document.getElementById("rentalsList");
+        if (rentalsList) {
+            rentalsList.innerHTML = "<p>Please log in to view your rentals.</p>";
+        } else {
+            console.error("rentalsList element not found.");
         }
     }
 });

@@ -1,6 +1,6 @@
 // Import the necessary Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -22,16 +22,16 @@ const auth = getAuth(app);
 // Function to log the user out using Firebase Authentication
 function logoutUser() {
     // Sign the user out using Firebase Auth
-    firebase.auth().signOut()
+    signOut(auth)
       .then(() => {
-        // Redirect the user to index.html after successful logout
-        window.location.href = '/index.html';  // Adjust path if necessary
+        // Redirect the user to logout.html after successful logout
+        window.location.href = '/src/login-out/logout.html';  // Adjust path if necessary
       })
       .catch((error) => {
         // Handle any errors that occur during logout
         console.error('Error during logout:', error);
       });
-  }
-  
-  // Attach the logoutUser function to the logout link with ID 'logout'
-  document.getElementById('logout').addEventListener('click', logoutUser);
+}
+
+// Attach the logoutUser function to the logout link with ID 'logout'
+document.getElementById('logout').addEventListener('click', logoutUser);

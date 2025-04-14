@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Your web app's Firebase configuration
@@ -35,9 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const condition = document.getElementById('condition');
     const rentPrice = document.getElementById('rent-price');
     const size = document.getElementById('size'); // Garment size input field
-    const photos = document.getElementById('photos');
 
-    
+    // Collect photo inputs
+    const photoInputs = [
+        document.getElementById('photo1'),
+        document.getElementById('photo2'),
+        document.getElementById('photo3'),
+        document.getElementById('photo4'),
+        document.getElementById('photo5')
+    ];
 
     // When the "Create Listing" button is clicked
     createListingButton.addEventListener('click', function() {
@@ -50,8 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmationModal.classList.add('hidden');
     });
 
-    // If the user confirms, submit the form and store the data in Firestore
-    confirmButton.addEventListener('click', async function() {
+    // Add validation logic before submitting the form
+    confirmButton.addEventListener('click', async function () {
         // Get the current logged-in user
         const user = auth.currentUser;
 
@@ -60,110 +66,119 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Validate form inputs
+        if (!productName.value.trim()) {
+            alert('Product name is required.');
+            return;
+        }
+
+        if (!productDescription.value.trim()) {
+            alert('Product description is required.');
+            return;
+        }
+
+        if (!category.value.trim()) {
+            alert('Category is required.');
+            return;
+        }
+
+        if (!rentPrice.value.trim() || parseFloat(rentPrice.value) <= 0) {
+            alert('Rent price must be greater than 0.');
+            return;
+        }
+
+        if (!size.value.trim()) {
+            alert('Size is required.');
+            return;
+        }
+
+        const imageFiles = [];
+        photoInputs.forEach((input) => {
+            if (input.files.length > 0) {
+                imageFiles.push(input.files[0]);
+            }
+        });
+
+        if (imageFiles.length === 0) {
+            alert('At least one photo is required.');
+            return;
+        }
+
         const userId = user.uid; // Get the logged-in user's UID
 
         // Prepare the listing data
         const listingData = {
-            productName: productName.value,
-            productDescription: productDescription.value,
-            category: category.value,
-            rentPrice: rentPrice.value,
+            productName: productName.value.trim(),
+            productDescription: productDescription.value.trim(),
+            category: category.value.trim(),
+            rentPrice: parseFloat(rentPrice.value),
             isActive: true, // Assuming you want to set the listing as active
-            garmentSize: size.value, // Include the garment size
+            garmentSize: size.value.trim(), // Include the garment size
             sellerId: userId // Add the user's ID to the listing data
         };
 
+        // Generate a new document reference with a unique ID
+        const listingsRef = collection(db, 'listed_items');
+        const newListingRef = doc(listingsRef); // Create a new document reference
+        const listingId = newListingRef.id; // Get the generated document ID
+        listingData.listingId = listingId; // Add the document ID to the listing data
+
         // Process each image and convert to base64
-        const imageFiles = photos.files;
         const imageBase64Array = [];
 
-        // Check if files are selected
-        if (imageFiles.length > 0) {
-            // Loop through each image file
-            for (let i = 0; i < imageFiles.length; i++) {
-                const imageFile = imageFiles[i];
+        for (const imageFile of imageFiles) {
+            const reader = new FileReader();
+            reader.onloadend = async function () {
+                const img = new Image();
+                img.src = reader.result;
 
-                // Convert image to base64 using FileReader
-                const reader = new FileReader();
-                reader.onloadend = async function() {
-                    const img = new Image();
-                    img.src = reader.result;
+                img.onload = async function () {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
 
-                    img.onload = async function() {
-                        // Create a canvas to downscale the image
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
+                    const maxWidth = 800;
+                    const maxHeight = 800;
+                    let width = img.width;
+                    let height = img.height;
 
-                        // Set the desired width and height for the downscaled image
-                        const maxWidth = 800; // Set your desired max width
-                        const maxHeight = 800; // Set your desired max height
-                        let width = img.width;
-                        let height = img.height;
-
-                        // Calculate the new dimensions while maintaining the aspect ratio
-                        if (width > height) {
-                            if (width > maxWidth) {
-                                height *= maxWidth / width;
-                                width = maxWidth;
-                            }
-                        } else {
-                            if (height > maxHeight) {
-                                width *= maxHeight / height;
-                                height = maxHeight;
-                            }
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
                         }
-
-                        // Resize the canvas to the new dimensions
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        // Draw the image onto the canvas
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        // Convert the canvas to a base64 string
-                        const downscaledImage = canvas.toDataURL('image/jpeg'); // You can change the format if needed
-
-                        // Add the downscaled image to the array
-                        imageBase64Array.push(downscaledImage);
-
-                        // Check if all images have been processed
-                        if (imageBase64Array.length === imageFiles.length) {
-                            // Add the image array to the listing data
-                            listingData.images = imageBase64Array;
-
-                            // Now add the new listing to the top-level 'listed_items' collection
-                            try {
-                                const listingsRef = collection(db, 'listed_items'); // Reference to the top-level 'listed_items' collection
-                                await addDoc(listingsRef, listingData);
-                                console.log("Listing added successfully!");
-
-                                // Hide the modal and redirect to seller hub page
-                                confirmationModal.classList.add('hidden');
-                                window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
-                            } catch (error) {
-                                console.error("Error adding document: ", error);
-                            }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
                         }
-                    };
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const downscaledImage = canvas.toDataURL('image/jpeg');
+                    imageBase64Array.push(downscaledImage);
+
+                    if (imageBase64Array.length === imageFiles.length) {
+                        listingData.images = imageBase64Array;
+
+                        try {
+                            // Add the document to Firestore with the generated ID
+                            await setDoc(newListingRef, listingData);
+                            console.log("Listing added successfully!");
+
+                            confirmationModal.classList.add('hidden');
+                            window.location.href = 'seller-hub-main.html';
+                        } catch (error) {
+                            console.error("Error adding document: ", error);
+                        }
+                    }
                 };
+            };
 
-                // Read the image file as base64
-                reader.readAsDataURL(imageFile);
-            }
-        } else {
-            // If no images are selected, add the listing without images
-            try {
-                // Add the new listing to the top-level 'listed_items' collection
-                const listingsRef = collection(db, 'listed_items'); // Reference to the top-level 'listed_items' collection
-                await addDoc(listingsRef, listingData);
-                console.log("Listing added successfully!");
-
-                // Hide the modal and redirect to seller hub page
-                confirmationModal.classList.add('hidden');
-                window.location.href = 'seller-hub-main.html'; // Redirect to seller hub page
-            } catch (error) {
-                console.error("Error adding document: ", error);
-            }
+            reader.readAsDataURL(imageFile);
         }
     });
 });

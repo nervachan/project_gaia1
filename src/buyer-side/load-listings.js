@@ -21,345 +21,170 @@ const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth();  // Initialize Firebase Authentication
 
-// Load listings when the page is loaded
-window.onload = loadListings;
-
 // Function to load and display listings from Firestore
 async function loadListings() {
     const listingsContainer = document.getElementById('listing-container');
-    listingsContainer.innerHTML = ''; // Clear the container
+
+    // Clear the container before adding new listings
+    listingsContainer.innerHTML = '<p class="text-gray-500 text-center">Loading listings...</p>';
 
     try {
-        const listingsQuery = query(collection(db, 'listed_items'), where('isActive', '==', true));
-        const listingsSnapshot = await getDocs(listingsQuery);
+        // Query the "listed_items" collection where "isActive" is true
+        const listingsQuery = query(collection(db, 'listed_items'), where("isActive", "==", true));
+        const querySnapshot = await getDocs(listingsQuery);
 
-        listingsSnapshot.forEach(doc => {
+        // Clear the loading message
+        listingsContainer.innerHTML = '';
+
+        if (querySnapshot.empty) {
+            // Show a message if no active listings are found
+            listingsContainer.innerHTML = `
+                <p class="text-gray-500 text-center">No active listings available at the moment.</p>
+            `;
+            return;
+        }
+
+        // Loop through the documents and add them to the page
+        querySnapshot.forEach((doc) => {
             const listing = doc.data();
-            const listingElement = createListingElement(listing, doc.id);
-            listingsContainer.appendChild(listingElement);
-        });
+            const listingElement = document.createElement('div');
+            listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
 
+            // Check if the "images" field exists and is an array
+            let image = '';
+            if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
+                // Use the first image from the array
+                image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-100 object-cover rounded-md">`;
+            } else {
+                // Fallback if no images are available
+                image = `<div class="w-full h-full bg-gray-200 flex items-center justify-center rounded-md">
+                            <p class="text-gray-500">No image available</p>
+                         </div>`;
+            }
+
+            listingElement.innerHTML = `
+                ${image}
+                <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
+                <p class="text-gray-700 mt-2">Category: ${listing.category || 'N/A'}</p>
+                
+                ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listing.rentPrice}</p>` : ''}
+                ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: $${listing.sellPrice}</p>` : ''}
+                <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 view-details-btn">View Details</button>
+            `;
+
+            listingsContainer.appendChild(listingElement);
+
+            // Add event listener for 'View Details' button
+            const viewDetailsButton = listingElement.querySelector('.view-details-btn');
+            viewDetailsButton.addEventListener('click', () => {
+                showListingDetails(listing);
+            });
+        });
     } catch (error) {
-        console.error("Error fetching listings: ", error);
+        console.error('Error loading listings:', error);
+        listingsContainer.innerHTML = `
+            <p class="text-red-500 text-center">Failed to load listings. Please try again later.</p>
+        `;
     }
 }
 
-// Function to create a listing element
-function createListingElement(listing, listingId) {
-    const listingElement = document.createElement('div');
-    listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
+// Function to show listing details in a modal
+function showListingDetails(listing) {
+    const modal = document.getElementById('listing-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalImageContainer = document.getElementById('modal-image-container');
+    const modalDescription = document.getElementById('modal-description');
+    const modalCategory = document.getElementById('modal-category');
+    const modalRentPrice = document.getElementById('modal-rent-price');
+    const modalSellPrice = document.getElementById('modal-sell-price');
+    const modalFooter = document.getElementById('modal-footer'); // Footer for the buttons
 
-    // Check if the images field exists and is an array
-    let image = '';
+    // Populate modal content
+    modalTitle.innerText = listing.productName;
+
+    // Handle images
     if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
-        // Use the first image from the array
-        image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-48 object-cover rounded-md">`;
+        if (listing.images.length === 1) {
+            // Single image
+            modalImageContainer.innerHTML = `
+                <div class="w-full h-full overflow-hidden rounded-md">
+                    <img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain">
+                </div>
+            `;
+        } else {
+            // Carousel for multiple images
+            modalImageContainer.innerHTML = `
+                <div class="relative w-full h-full overflow-hidden rounded-md">
+                    <div id="carousel-images" class="flex transition-transform duration-300 ease-in-out">
+                        ${listing.images.map((img, index) => `
+                            <div class="carousel-item w-full ${index === 0 ? 'block' : 'hidden'}">
+                                <img src="${img}" alt="${listing.productName}" class="w-full h-full object-contain">
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button id="prev-image" class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full">&lt;</button>
+                    <button id="next-image" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full">&gt;</button>
+                </div>
+            `;
+
+            // Initialize carousel functionality
+            const carousel = document.getElementById('carousel-images');
+            const items = carousel.querySelectorAll('.carousel-item');
+            let currentIndex = 0;
+
+            document.getElementById('next-image').addEventListener('click', () => {
+                items[currentIndex].classList.add('hidden');
+                currentIndex = (currentIndex + 1) % items.length;
+                items[currentIndex].classList.remove('hidden');
+            });
+
+            document.getElementById('prev-image').addEventListener('click', () => {
+                items[currentIndex].classList.add('hidden');
+                currentIndex = (currentIndex - 1 + items.length) % items.length;
+                items[currentIndex].classList.remove('hidden');
+            });
+        }
+    } else {
+        // Fallback if no images are available
+        modalImageContainer.innerHTML = `
+            <div class="w-full h-auto bg-gray-200 flex items-center justify-center rounded-md">
+                <p class="text-gray-500">No image available</p>
+            </div>
+        `;
     }
 
-    listingElement.innerHTML = `
-        ${image}
-        <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
-        <p class="text-gray-600 mt-2">${listing.productDescription}</p>
-        <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
-        <p class="text-gray-700 mt-2">Size: ${listing.garmentSize}</p>
-        ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ₱${listing.rentPrice}</p>` : ''}
-        ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ₱${listing.sellPrice}</p>` : ''}
-        <div class="mt-4">
-            <button class="view-details bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600" data-id="${listingId}">View Details</button>
-            <button class="rent-button bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 ml-2" data-id="${listingId}">Rent</button>
+    modalDescription.innerText = listing.productDescription || 'No description available.';
+    modalCategory.innerText = `Category: ${listing.category || 'N/A'}`;
+    modalRentPrice.innerText = listing.rentPrice ? `Rent Price: $${listing.rentPrice}` : '';
+    modalSellPrice.innerText = listing.sellPrice ? `Selling Price: $${listing.sellPrice}` : '';
+
+    // Add Rent and View Reviews buttons to the modal footer
+    modalFooter.innerHTML = `
+        <div class="flex justify-between w-full">
+            <button id="view-reviews-button" class="px-8 py-4 bg-blue-500 text-white text-lg font-semibold rounded-md hover:bg-blue-600">View Reviews</button>
+            <button id="rent-button" class="px-8 py-4 bg-green-500 text-white text-lg font-semibold rounded-md hover:bg-green-600">Rent</button>
         </div>
     `;
 
-    return listingElement;
-}
+   
 
-// Function to create action buttons based on listing condition
-function createActionButton(listing, listingId) {
-    if (listing.condition === 'rent') {
-        return `<button class="rent-button bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 ml-2" data-id="${listingId}">Rent</button>`;
-    }
-    return '';
-}
-
-
-// Show listing details modal
-async function showListingDetails(listingId) {
-    const modal = document.getElementById('listing-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalContent = document.getElementById('modal-content');
-
-    try {
-        // Fetch the listing document from Firestore
-        const listingDoc = doc(db, 'listed_items', listingId);
-        const listingSnapshot = await getDoc(listingDoc);
-
-        if (listingSnapshot.exists()) {
-            const listing = listingSnapshot.data();
-            modalTitle.innerText = listing.productName;
-
-            // Debugging: Check the images content
-            console.log("Listing Images:", listing.images); // Assuming "images" is the field
-
-            // Fetch the images: If it's a single image, convert it into an array
-            const images = Array.isArray(listing.images) ? listing.images : [listing.images];
-
-            let imagesHtml = '';
-
-            // Check if there are multiple images, create a carousel
-            if (images.length > 1) {
-                imagesHtml = `
-                    <div class="relative">
-                        <div class="overflow-hidden relative">
-                            <div class="flex transition-transform duration-300 ease-in-out" id="carousel-${listingId}">
-                                ${images.map((img, index) => `
-                                    <div class="carousel-item w-full ${index === 0 ? 'block' : 'hidden'}">
-                                        <img src="${img}" alt="${listing.productName}" class="w-full h-96 object-cover rounded-md">
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        <button class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer" id="prev-${listingId}">&lt;</button>
-                        <button class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full cursor-pointer" id="next-${listingId}">&gt;</button>
-                    </div>
-                `;
-            } else if (images.length === 1) {
-                // If only one image, display it normally
-                imagesHtml = `
-                    <img src="${images[0]}" alt="${listing.productName}" class="w-full h-96 object-cover rounded-md">
-                `;
-            }
-
-            modalContent.innerHTML = `
-                <p>${listing.productDescription}</p>
-                <p><strong>Category:</strong> ${listing.category}</p>
-                ${imagesHtml}
-                ${listing.rentPrice ? `<p><strong>Rent Price:</strong> ₱${listing.rentPrice}</p>` : ''}
-                ${listing.sellPrice ? `<p><strong>Selling Price:</strong> ₱${listing.sellPrice}</p>` : ''}
-            `;
-
-            // Initialize carousel logic if multiple images
-            if (images.length > 1) {
-                const prevButton = document.getElementById(`prev-${listingId}`);
-                const nextButton = document.getElementById(`next-${listingId}`);
-                const carousel = document.getElementById(`carousel-${listingId}`);
-                const items = carousel.querySelectorAll('.carousel-item');
-                let currentIndex = 0;
-
-                // Show next item
-                nextButton.addEventListener('click', () => {
-                    currentIndex = (currentIndex + 1) % items.length;
-                    updateCarousel();
-                });
-
-                // Show previous item
-                prevButton.addEventListener('click', () => {
-                    currentIndex = (currentIndex - 1 + items.length) % items.length;
-                    updateCarousel();
-                });
-
-                function updateCarousel() {
-                    items.forEach((item, index) => {
-                        item.classList.toggle('block', index === currentIndex);
-                        item.classList.toggle('hidden', index !== currentIndex);
-                    });
-                }
-            }
-
-            // Show the modal
-            modal.classList.remove('hidden');
-        } else {
-            console.error("No listing found with the provided ID.");
-        }
-    } catch (error) {
-        console.error("Error fetching listing details: ", error);
-    }
-}
-
-
-document.body.addEventListener('click', (event) => {
-    if (event.target.classList.contains('view-details')) {
-        const listingId = event.target.getAttribute('data-id');
-        console.log("View details clicked for listing ID:", listingId); // Debug log
-        showListingDetails(listingId);
-    } else if (event.target.classList.contains('rent-button')) {
-        const listingId = event.target.getAttribute('data-id');
-        console.log("Rent button clicked for listing ID:", listingId); // Debug log
-        if (listingId) {
-            openRentalModal(listingId); // Pass the listing ID to the modal function
-        } else {
-            console.error("Listing ID not found on Rent button.");
-        }
     
-    } 
-    else if (event.target.classList.contains('view-reviews-button')){
-        window.location.href = `/src/buyer-side/reviews.html`;
-        console.log("clicked reviews");
-    }
-    else if (event.target.id === 'close-modal') {
-        closeModal('listing-modal');
-    } else if (event.target.id === 'submitRental') {
-        handleRentalSubmission();
-    } else if (event.target.id === 'close-rent') {
-        closeModal('rentModal');
-    }
+
+    // Show the modal
+    modal.classList.remove('hidden');
+}
+
+// Close modal functionality
+document.getElementById('close-modal').addEventListener('click', () => {
+    document.getElementById('listing-modal').classList.add('hidden');
 });
 
-// Global variable to store the currently selected listing
-let currentListing = null;
-
-// Function to handle rental submission
-async function handleRentalSubmission() {
-    // Get the logged-in user
-    const user = auth.currentUser;
-    if (!user) {
-        alert("You must be logged in to submit a rental request.");
-        return;
-    }
-
-    // Get data from the form
-    const userName = document.getElementById('userName').value; // Get the user's name
-    const startDate = document.getElementById('rentalStartDate').value;
-    const endDate = document.getElementById('rentalEndDate').value;
-    const price = document.getElementById('rentalPrice').value;
-    const submissionTime = new Date().toISOString();
-
-    // Validate form data
-    if (!userName || !startDate || !endDate || !price) {
-        alert("Please fill in all required fields.");
-        return;
-    }
-
-    if (!currentListing) {
-        alert("Unable to process request. Listing information is missing.");
-        return;
-    }
-
-    // Get the seller's ID from the current listing
-    const sellerId = currentListing.sellerId;
-
-    // Calculate total price based on rental duration
-    const startDateObj = new Date(startDate);
-    const endDateObj = new Date(endDate);
-    const timeDiff = endDateObj - startDateObj; // Difference in milliseconds
-    const daysDiff = timeDiff / (1000 * 3600 * 24); // Convert to days
-
-    if (daysDiff <= 0) {
-        alert("End date must be after the start date.");
-        return;
-    }
-
-    const totalPrice = daysDiff * parseFloat(price); // Total price based on the days rented
-
-    // Get the images of the listing
-    const images = currentListing.images || [];  // Fallback to empty array if no images
-
-    // Prepare rental data
-    const rentalData = {
-        productName: currentListing.productName,
-        productDescription: currentListing.productDescription,
-        userName: userName,
-        startDate: startDate,
-        endDate: endDate,
-        price: price,
-        totalPrice: totalPrice.toFixed(2), // Store the total price
-        submissionTime: submissionTime,
-        listingId: currentListing.id, // Store the listingId for reference
-        buyerId: user.uid, // Store the logged-in user's ID
-        sellerId: sellerId, // Add the seller's ID to the rental data
-        status: "pending",
-        images: images  // Include the images in the rental data
-    };
-
-    try {
-        // Push the rental data to the "pending_items" collection
-        await addDoc(collection(db, "pending_items"), rentalData);
-        alert("Your rental request has been submitted successfully!");
-
-        // Close the modal after submission
-        closeModal('rentModal');
-    } catch (error) {
-        console.error("Error submitting rental request: ", error);
-        alert("There was an error submitting your request. Please try again.");
-    }
-}
-
-// Function to open the rental modal
-async function openRentalModal(listingId) {
-    const modal = document.getElementById('rentModal');
-
-    try {
-        const listingDoc = doc(db, 'listed_items', listingId);
-        const listingSnapshot = await getDoc(listingDoc);
-
-        if (listingSnapshot.exists()) {
-            currentListing = { ...listingSnapshot.data(), id: listingId }; // Store the current listing
-            console.log("Fetched listing:", currentListing);
-
-            // Populate the modal fields
-            document.getElementById('userName').value = ''; // Clear the name input
-            document.getElementById('rentalPrice').value = currentListing.rentPrice; // Set the price per day
-            document.getElementById('totalPrice').innerText = '₱0.00'; // Reset total price
-
-            // Show the modal
-            modal.classList.remove('hidden');
-        } else {
-            console.error("No listing found with the provided ID.");
-        }
-    } catch (error) {
-        console.error("Error fetching listing details: ", error);
-    }
-}
-
-// Event listener for form submission
-document.getElementById('rentalForm').addEventListener('submit', async function (event) {
-    event.preventDefault(); // Prevent default form submission
-    await handleRentalSubmission(); // Call the submission handler
+document.getElementById('close-modal-footer').addEventListener('click', () => {
+    document.getElementById('listing-modal').classList.add('hidden');
 });
 
-// Utility functions
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.add('hidden');
-}
-
-// Calculate total price
-function calculateTotalPrice() {
-    const startDateInput = document.getElementById('rentalStartDate').value;
-    const endDateInput = document.getElementById('rentalEndDate').value;
-    const pricePerDayInput = document.getElementById('rentalPrice').value;
-
-    if (startDateInput && endDateInput) {
-        const startDate = new Date(startDateInput);
-        const endDate = new Date(endDateInput);
-        const timeDiff = endDate - startDate; // Difference in milliseconds
-        const daysDiff = timeDiff / (1000 * 3600 * 24); // Convert to days
-
-        if (daysDiff >= 0) {
-            const totalPrice = daysDiff * parseFloat(pricePerDayInput);
-            document.getElementById('totalPrice').innerText = `₱${totalPrice.toFixed(2)}`;
-        } else {
-            document.getElementById('totalPrice').innerText = '₱0.00'; // Reset if dates are invalid
-        }
-    }
-}
-
-// Event listeners for date and price changes
-document.getElementById('rentalStartDate').addEventListener('change', calculateTotalPrice);
-document.getElementById('rentalEndDate').addEventListener('change', calculateTotalPrice);
-document.getElementById('rentalPrice').addEventListener('input', calculateTotalPrice);
-
-// Initialize Flatpickr
-document.addEventListener('DOMContentLoaded', function () {
-    flatpickr("#rentalStartDate", {
-        dateFormat: "Y-m-d",
-        onChange: calculateTotalPrice,
-    });
-
-    flatpickr("#rentalEndDate", {
-        dateFormat: "Y-m-d",
-        onChange: calculateTotalPrice,
-    });
-});
+// Load listings when the page is loaded
+window.onload = loadListings;
 
 // Add onAuthStateChanged listener
 onAuthStateChanged(auth, (user) => {

@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/css/output.css">
     <script type="module" src="sell-hub-show-inactive-listings.js"></script>
     <script type="module" src="logout.js"></script>
+    <script type="module" src="seller-view-profile.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
 </head>
 <body>
@@ -28,15 +30,18 @@
                     </div>
                   </div>
           
-                  <!-- Right Side: Hello! Username and Logout button -->
-                  <div class="flex items-center space-x-4">
-                    <div>
-                      <button type="button" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
-                        Hello! <span class="font-semibold" id="username">#username</span>
-                      </button>
-                    </div>
-                    <div>
-                      <a href="/src/login-out/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                    <div class="relative ml-3">
+                      <div class="flex items-center space-x-4">
+                        <!-- Profile Icon Link -->
+                        <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2" >
+                          <!-- Heroicon for Profile -->
+                          <i class="fa-solid fa-user" id="profile-icon"></i>
+                        </a>
+            
+                        <!-- Logout Link -->
+                        <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -99,123 +104,26 @@
 
 
 
-    <script type="module">
-      // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-      import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-  
-      // Your web app's Firebase configuration
-      const firebaseConfig = {
-          apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
-          authDomain: "project-gaia1.firebaseapp.com",
-          projectId: "project-gaia1",
-          storageBucket: "project-gaia1.firebasestorage.app",
-          messagingSenderId: "832122601643",
-          appId: "1:832122601643:web:1ab91b347704174f52b7ee",
-          measurementId: "G-DX2L33NH4H"
-      };
-  
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
-      const db = getFirestore(app);
-  
-      // Function to render inactive listings
-      async function renderInactiveListings() {
-          const inactiveListingsContainer = document.getElementById('inactiveListings');
-          inactiveListingsContainer.innerHTML = ''; // Clear previous listings
-  
-          const querySnapshot = await getDocs(collection(db, "inactive listings"));
-          querySnapshot.forEach((doc) => {
-              const listing = doc.data();
-  
-              const listingCard = document.createElement('div');
-              listingCard.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'overflow-hidden', 'text-center');
-  
-              listingCard.innerHTML = `
-                  <img src="${listing.image}" alt="Item Image" class="w-full h-48 object-cover">
-                  <div class="p-4">
-                      <h3 class="text-xl font-semibold text-gray-800">${listing.productName}</h3>
-                      <button class="mt-4 py-2 px-6 bg-red-600 text-white rounded-full text-sm hover:bg-red-700" data-action="relist" data-id="${doc.id}">
-                          Relist Item
-                      </button>
-                      <button class="mt-2 py-2 px-6 bg-red-500 text-white rounded-full text-sm hover:bg-red-600" data-action="delete" data-id="${doc.id}">
-                          Delete Item
-                      </button>
-                  </div>
-              `;
-  
-              inactiveListingsContainer.appendChild(listingCard);
-          });
-  
-          // Add event listeners for buttons
-          inactiveListingsContainer.querySelectorAll('button[data-action="relist"]').forEach(button => {
-              button.addEventListener('click', () => showModal(button.dataset.id));
-          });
-  
-          inactiveListingsContainer.querySelectorAll('button[data-action="delete"]').forEach(button => {
-              button.addEventListener('click', () => deleteListing(button.dataset.id));
-          });
-      }
-  
-      // Function to show the modal
-      function showModal(listingId) {
-          const modal = document.getElementById('modal');
-          modal.classList.remove('hidden');  // Display the modal
-          const confirmButton = document.getElementById('confirmButton');
-          const cancelButton = document.getElementById('cancelButton');
-  
-          // Handle the relist confirmation
-confirmButton.onclick = async function() {
-    const listingRef = doc(db, "inactive listings", listingId); // Get a reference to the document
-    await updateDoc(listingRef, {
-        isActive: "true"
-    });
-    alert('Item has been relisted!');
-    renderInactiveListings();
-    closeModal();
-};
-  
-          // Handle modal close (Cancel button)
-          cancelButton.onclick = closeModal;
-  
-          function closeModal() {
-              modal.classList.add('hidden');  // Hide the modal
-          }
-      }
-  
-      // Function to delete a listing
-      async function deleteListing(listingId) {
-          const confirmation = confirm("Are you sure you want to delete this item?");
-          if (confirmation) {
-              await deleteDoc(doc(db, "inactive listings", listingId));
-              alert('Item has been deleted!');
-              renderInactiveListings();
-          }
-      }
-  
-      // Call the function to render inactive listings
-      renderInactiveListings();
-  </script>
-</body>
-<!--Profile Modal -->
+   
+  <!--Profile Modal -->
 <div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden z-20">
-    <div class="bg-white p-8 rounded-lg shadow-xl w-1/3">
-      <h2 class="text-2xl font-semibold text-gray-800">User Profile</h2>
-      <div id="user-profile-info" class="mt-4">
-        <!-- User Info will be injected here -->
-      </div>
-      <div class="mt-4 flex justify-between">
-        <button id="close-profile" class="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
-          Close
-        </button>
-        <a href="buyer-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-          Edit Profile
-        </a>
-      </div>
+  <div class="bg-white p-8 rounded-lg shadow-xl w-1/3">
+    <h2 class="text-2xl font-semibold text-gray-800">User Profile</h2>
+    <div id="user-profile-info" class="mt-4">
+      <!-- User Info will be injected here -->
+    </div>
+    <div class="mt-4 flex justify-between">
+      <button id="close-profile" class="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
+        Close
+      </button>
+      <a href="seller-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+        Edit Profile
+      </a>
     </div>
   </div>
+</div>
+</body>
+
 </html>
 
 <!-- buttons not

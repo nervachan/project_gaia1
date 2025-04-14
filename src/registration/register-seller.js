@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-import { getFirestore, collection, addDoc, getDocs,setDoc, } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import {getAuth,createUserWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"; 
+import { getFirestore, collection, addDoc, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"; 
 
 
 
@@ -32,31 +32,35 @@ const auth = getAuth(app);
 document.getElementById('sellerForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    const username = document.getElementById('shop-name').value;
-    const email = document.getElementById('email').value;
-    const shopaddress = document.getElementById('shop-address').value;
-    const password = document.getElementById('password').value;
+    const username = document.getElementById('shop-name').value.trim();
+    const loginname = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const shopaddress = document.getElementById('shop-address').value.trim();
+    const password = document.getElementById('password').value.trim();
 
     // Create user with email and password
-    
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             // Signed up
             const user = userCredential.user;
 
-            // Store username in Firestore
-            return addDoc(collection(db, "user-seller"), {
-                username: username,
+            // Store user data in Firestore, including the auth UID
+            return setDoc(doc(db, "user-seller", user.uid), {
+                uid: user.uid, // Add the UID
+                shopname: username,
+                username: loginname,
                 email: email,
                 shopaddress: shopaddress,
-                role:"seller"
+                role: "seller"
             });
         })
         .then(() => {
-            alert('User signed up successfully! Welcome to Project Gaia!');
-            document.getElementById('signUpForm').reset();
+            alert('User signed up successfully! Redirecting to login page...');
+            document.getElementById('sellerForm').reset();
+            window.location.href = "/src/login-out/login.html"; // Redirect to login page
         })
         .catch((error) => {
             console.error('Error signing up:', error.message);
+            alert('Error signing up: ' + error.message);
         });
 });

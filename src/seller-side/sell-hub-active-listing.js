@@ -1,6 +1,6 @@
 // Import Firebase libraries and initialize Firestore
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Firebase configuration and initialization
@@ -24,9 +24,6 @@ async function fetchUserListings() {
     const user = auth.currentUser;
     const userId = user ? user.uid : null;
 
-    // Log the logged-in user details for debugging
-    console.log("Logged in user:", user);
-
     if (!userId) {
         console.log("No user is logged in.");
         return;
@@ -36,7 +33,6 @@ async function fetchUserListings() {
     listingsContainer.innerHTML = "<p>Loading...</p>";
 
     try {
-        // Query the "listed_items" collection where userId matches the logged-in user's ID
         const listingsQuery = query(collection(db, "listed_items"), where("sellerId", "==", userId));
         const listingsSnapshot = await getDocs(listingsQuery);
         listingsContainer.innerHTML = ""; // Clear loading text
@@ -46,18 +42,15 @@ async function fetchUserListings() {
             return;
         }
 
-        // Loop through the documents and display each listing
         for (const docSnapshot of listingsSnapshot.docs) {
             const listingData = docSnapshot.data();
             const itemDiv = document.createElement("div");
             itemDiv.className = "bg-white shadow-md rounded p-6 mb-4";
 
-            // Check if there are multiple images
             const images = listingData.images || [];
             let carouselHtml = '';
 
             if (images.length > 1) {
-                // Create a carousel if there are multiple images
                 carouselHtml = `
                     <div class="relative">
                         <div class="overflow-hidden relative">
@@ -74,7 +67,6 @@ async function fetchUserListings() {
                     </div>
                 `;
             } else if (images.length === 1) {
-                // If there is only one image, display it without the carousel
                 carouselHtml = `<img src="${images[0]}" alt="${listingData.productName}" class="w-full h-48 object-cover rounded-md">`;
             }
 
@@ -99,6 +91,12 @@ async function fetchUserListings() {
 
             listingsContainer.appendChild(itemDiv);
 
+            // Add event listener for the "Edit Listing" button
+            const editButton = itemDiv.querySelector(".edit-btn");
+            editButton.addEventListener("click", () => {
+                showEditModal(docSnapshot.id, listingData);
+            });
+
             // Add event listeners for carousel navigation
             if (images.length > 1) {
                 const prevButton = document.getElementById(`prev-${docSnapshot.id}`);
@@ -107,13 +105,11 @@ async function fetchUserListings() {
                 const items = carousel.querySelectorAll('.carousel-item');
                 let currentIndex = 0;
 
-                // Show next item
                 nextButton.addEventListener('click', () => {
                     currentIndex = (currentIndex + 1) % items.length;
                     updateCarousel();
                 });
 
-                // Show previous item
                 prevButton.addEventListener('click', () => {
                     currentIndex = (currentIndex - 1 + items.length) % items.length;
                     updateCarousel();
@@ -134,13 +130,64 @@ async function fetchUserListings() {
     }
 }
 
+// Function to show the edit modal
+function showEditModal(listingId, listingData) {
+    const modal = document.getElementById("edit-modal");
+    const modalContent = modal.querySelector(".modal-content");
+
+    modalContent.innerHTML = `
+        <h2 class="text-xl font-semibold mb-4">Edit Listing</h2>
+        <form id="edit-listing-form">
+            <label class="block mb-2">Product Name:</label>
+            <input type="text" name="productName" value="${listingData.productName}" class="w-full p-2 border rounded mb-4">
+
+            <label class="block mb-2">Category:</label>
+            <input type="text" name="category" value="${listingData.category}" class="w-full p-2 border rounded mb-4">
+
+            <label class="block mb-2">Garment Size:</label>
+            <input type="text" name="garmentSize" value="${listingData.garmentSize || ''}" class="w-full p-2 border rounded mb-4">
+
+            <label class="block mb-2">Rent Price:</label>
+            <input type="number" name="rentPrice" value="${listingData.rentPrice || ''}" class="w-full p-2 border rounded mb-4">
+
+            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded">Save Changes</button>
+        </form>
+    `;
+
+    modal.classList.remove("hidden");
+
+    // Handle form submission
+    const form = modal.querySelector("#edit-listing-form");
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const updatedData = Object.fromEntries(formData.entries());
+
+        try {
+            // Update the listing in Firestore
+            await updateDoc(doc(db, "listed_items", listingId), updatedData);
+            console.log("Listing updated successfully!");
+            modal.classList.add("hidden");
+            fetchUserListings(); // Refresh the listings
+        } catch (error) {
+            console.error("Error updating listing:", error);
+        }
+    });
+
+    // Close the modal when clicking outside the content
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            modal.classList.add("hidden");
+        }
+    });
+}
+
 // Listen for authentication state changes
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // If the user is logged in, fetch their listings
         fetchUserListings();
     } else {
-        // Handle case where no user is logged in (e.g., show a message or redirect)
         console.log("User is not logged in.");
         const listingsContainer = document.getElementById("rentedItemsList");
         listingsContainer.innerHTML = "<p>You need to log in to view your listings.</p>";
@@ -151,7 +198,7 @@ onAuthStateChanged(auth, (user) => {
 document.addEventListener("DOMContentLoaded", () => {
     const user = auth.currentUser;
     if (user) {
-        fetchUserListings(); // Fetch listings if the user is already logged in
+        fetchUserListings();
     } else {
         console.log("User is not logged in yet.");
     }
