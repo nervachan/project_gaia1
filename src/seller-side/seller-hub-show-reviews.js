@@ -59,7 +59,6 @@ onAuthStateChanged(auth, (user) => {
     const reviewsContainer = document.getElementById("reviewsContainer");
 
     if (user) {
-        document.getElementById("username").textContent = user.displayName || "User";
         fetchUserReviews(user.uid);
     } else {
         reviewsContainer.innerHTML = "<p>Please log in to view your reviews.</p>";

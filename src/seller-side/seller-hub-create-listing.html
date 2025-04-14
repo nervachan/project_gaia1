@@ -9,6 +9,8 @@
     <script type="module" src="create-listing-handler.js"></script>
     <script type="module" src="auth-persistence-checker.js"></script>
     <script type="module" src="logout.js"></script>
+    <script type="module" src="seller-view-profile.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
 </head>
 <body class="bg-gray-100">
@@ -26,16 +28,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <div>
-                            <button type="button" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
-                                Hello! <span class="font-semibold" id="username">#username</span>
-                            </button>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                        <div class="relative ml-3">
+                          <div class="flex items-center space-x-4">
+                            <!-- Profile Icon Link -->
+                            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2" >
+                              <!-- Heroicon for Profile -->
+                              <i class="fa-solid fa-user" id="profile-icon"></i>
+                            </a>
+                
+                            <!-- Logout Link -->
+                            <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+                          </div>
                         </div>
-                        <div>
-                            <a href="/src/login-out/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
-                        </div>
-                    </div>
+                      </div>
                 </div>
             </div>
         </nav>
@@ -126,7 +132,13 @@
                             <label for="photos" class="text-gray-700 text-lg">Photos</label>
                             <span class="text-sm text-gray-500">Upload up to 5 images</span>
                         </div>
-                        <input type="file" id="photos" accept="image/*" multiple class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div class="space-y-2">
+                            <input type="file" id="photo1" accept="image/*" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="file" id="photo2" accept="image/*" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="file" id="photo3" accept="image/*" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="file" id="photo4" accept="image/*" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="file" id="photo5" accept="image/*" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
                     </div>
 
                     <div class="mt-6">
@@ -137,7 +149,7 @@
                 </form>
             </div>
 
-            <div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex-auto justify-center items-center hidden">
+            <div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex-auto justify-center items-center hidden flex">
                 <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
                     <h2 class="text-xl font-semibold text-gray-800">Confirm Your Listing</h2>
                     <p class="text-gray-600 mt-4">Are you sure you want to create this listing?</p>
@@ -149,39 +161,7 @@
             </div>
         </div>
 
-        <script>
-            const photosInput = document.getElementById("photos");
-
-            photosInput.addEventListener("change", function() {
-                if (this.files.length > 5) {
-                    alert("You can upload a maximum of 5 photos.");
-                    this.value = ""; // Clear the input field
-                }
-            });
-        </script>
-
-        <script>
-            const form = document.getElementById('listingForm');
-            const errorMessage = document.getElementById('error-message');
-            const createListingButton = document.getElementById('createListingButton');
-
-            form.addEventListener('submit', function(event) {
-                const productName = document.getElementById('product-name').value;
-                const productDescription = document.getElementById('product-description').value;
-                const category = document.getElementById('category').value;
-                const condition = document.getElementById('condition').value;
-                const photos = document.getElementById('photos').files.length;
-                const rentPrice = document.getElementById('rent-price').value;
-                const sellPrice = document.getElementById('sell-price').value;
-
-                if (!productName || !productDescription || !category || !condition || (condition === 'rent' && !rentPrice) || (condition === 'sale' && !sellPrice) || photos === 0) {
-                    event.preventDefault();
-                    errorMessage.classList.remove('hidden');
-                } else {
-                    errorMessage.classList.add('hidden');
-                }
-            });
-        </script>
+        
 
 <!--Profile Modal -->
 <div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden z-20">
@@ -194,7 +174,7 @@
         <button id="close-profile" class="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
           Close
         </button>
-        <a href="buyer-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+        <a href="seller-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
           Edit Profile
         </a>
       </div>

@@ -1,9 +1,22 @@
-// Import the necessary Firebase functions
+// Import Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";  // Import Firebase Authentication
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    doc,
+    setDoc,
+    deleteDoc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import {
+    getAuth,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
-// Firebase Configuration (use the same config as your main app)
+// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
     authDomain: "project-gaia1.firebaseapp.com",
@@ -14,12 +27,12 @@ const firebaseConfig = {
     measurementId: "G-DX2L33NH4H"
 };
 
-// Initialize Firebase and Firestore
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore();
-const auth = getAuth();  // Initialize Firebase Authentication
+const auth = getAuth();
 
-// Function to fetch inactive listings for the logged-in user
+// Fetch inactive listings for the logged-in seller
 async function fetchInactiveListings() {
     const user = auth.currentUser;
 
@@ -29,53 +42,103 @@ async function fetchInactiveListings() {
     }
 
     const listingsContainer = document.getElementById('inactive-listings-container');
-    listingsContainer.innerHTML = ''; // Clear the container
+    listingsContainer.innerHTML = ''; // Clear existing content
 
     try {
-        // Query to get inactive listings associated with the logged-in user
-        const inactiveItemsQuery = query(collection(db, 'inactive_listings'), where('userId', '==', user.uid));
-        const inactiveItemsSnapshot = await getDocs(inactiveItemsQuery);
+        const q = query(collection(db, 'inactive_listings'), where('sellerId', '==', user.uid));
+        const querySnapshot = await getDocs(q);
 
-        if (inactiveItemsSnapshot.empty) {
+        if (querySnapshot.empty) {
             listingsContainer.innerHTML = "<p>No inactive listings found.</p>";
             return;
         }
 
-        // Loop through and display the inactive listings
-        inactiveItemsSnapshot.forEach(doc => {
-            const listing = doc.data();
-            const listingElement = createInactiveListingElement(listing, doc.id);
+        for (const docSnap of querySnapshot.docs) {
+            const listing = docSnap.data();
+            const listingElement = createInactiveListingElement(listing, docSnap.id);
             listingsContainer.appendChild(listingElement);
-        });
+        }
     } catch (error) {
         console.error("Error fetching inactive listings: ", error);
     }
 }
 
-// Function to create an element for each inactive listing
+// Create listing card with image/carousel and details
 function createInactiveListingElement(listing, listingId) {
     const listingElement = document.createElement('div');
-    listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
+    listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg', 'mb-6');
 
-    const image = listing.image ? `<img src="${listing.image}" alt="${listing.productName}" class="w-full h-48 object-cover rounded-md">` : '';
+    let imageHTML = '';
+
+    if (Array.isArray(listing.images) && listing.images.length > 0) {
+        if (listing.images.length === 1) {
+            imageHTML = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-48 object-cover rounded-md mb-4">`;
+        } else {
+            const carouselId = `carousel-${listingId}`;
+            const slides = listing.images.map((url, i) => `
+                <div class="carousel-slide ${i === 0 ? 'block' : 'hidden'} transition-all duration-300 ease-in-out">
+                    <img src="${url}" class="w-full h-48 object-cover rounded-md" alt="Slide ${i + 1}">
+                </div>
+            `).join('');
+
+            const indicators = listing.images.map((_, i) => `
+                <button type="button"
+                    data-carousel-slide-to="${i}"
+                    class="w-3 h-3 rounded-full bg-gray-300 hover:bg-gray-500 transition"
+                    aria-label="Slide ${i + 1}">
+                </button>
+            `).join('');
+
+            imageHTML = `
+                <div id="${carouselId}" class="relative mb-4">
+                    <div class="carousel-inner relative overflow-hidden rounded-md">
+                        ${slides}
+                    </div>
+                    <div class="absolute inset-x-0 bottom-2 flex justify-center gap-2">
+                        ${indicators}
+                    </div>
+                </div>
+            `;
+        }
+    }
 
     listingElement.innerHTML = `
-        ${image}
-        <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
+        ${imageHTML}
+        <h3 class="text-xl font-semibold text-gray-900 mt-2">${listing.productName}</h3>
         <p class="text-gray-600 mt-2">${listing.productDescription}</p>
         <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
         <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
         ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ₱${listing.rentPrice}</p>` : ''}
         ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ₱${listing.sellPrice}</p>` : ''}
         <div class="mt-4">
-            <button class="relist-button bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" data-id="${listingId}">Re-list</button>
+            <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" data-id="${listingId}"id="relist-button">Re-list</button>
         </div>
     `;
+
+    if (Array.isArray(listing.images) && listing.images.length > 1) {
+        setupCarousel(`carousel-${listingId}`);
+    }
 
     return listingElement;
 }
 
-// Function to re-list the item from 'inactive_listings' to 'listed_items'
+// Setup basic image carousel switching
+function setupCarousel(carouselId) {
+    const carousel = document.getElementById(carouselId);
+    if (!carousel) return;
+
+    const slides = carousel.querySelectorAll(".carousel-slide");
+    const buttons = carousel.querySelectorAll("button[data-carousel-slide-to]");
+
+    buttons.forEach((btn, index) => {
+        btn.addEventListener("click", () => {
+            slides.forEach(slide => slide.classList.add("hidden"));
+            slides[index].classList.remove("hidden");
+        });
+    });
+}
+
+// Re-list item to listed_items collection
 async function relistItem(listingId) {
     const user = auth.currentUser;
 
@@ -85,56 +148,40 @@ async function relistItem(listingId) {
     }
 
     try {
-        // Fetch the inactive listing
-        const listingDocRef = doc(db, 'inactive_listings', listingId);
-        const listingDocSnap = await getDoc(listingDocRef);
+        const listingRef = doc(db, 'inactive_listings', listingId);
+        const listingSnap = await getDoc(listingRef);
 
-        if (listingDocSnap.exists()) {
-            const listingData = listingDocSnap.data();
-            listingData.userId = user.uid;  // Ensure the listing is associated with the logged-in user
+        if (listingSnap.exists()) {
+            const listingData = listingSnap.data();
+            listingData.sellerId = user.uid;
 
-            // Add the item to the "listed_items" collection
             await setDoc(doc(db, 'listed_items', listingId), listingData);
-            console.log("Item re-listed successfully!");
+            await deleteDoc(listingRef);
 
-            // Remove from the "inactive_listings" collection
-            await deleteDoc(listingDocRef);
-            console.log("Item removed from inactive listings.");
-
-            // Refresh the list of inactive listings
+            console.log("Item re-listed successfully.");
             fetchInactiveListings();
         } else {
-            console.error("No listing found with the provided ID.");
+            console.error("Listing not found.");
         }
     } catch (error) {
         console.error("Error re-listing item: ", error);
     }
 }
 
-// Add event listener for re-list buttons
+// Event delegation for relist buttons
 document.body.addEventListener('click', (event) => {
     if (event.target.classList.contains('relist-button')) {
         const listingId = event.target.getAttribute('data-id');
-        console.log("Re-list button clicked for listing ID:", listingId); // Debug log
         relistItem(listingId);
     }
 });
 
-// Load the inactive listings when the page is loaded
-window.onload = fetchInactiveListings;
-
-// Add onAuthStateChanged listener to fetch inactive listings when user is logged in
+// Auth state listener
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("User is logged in:", user);
-        fetchInactiveListings(); // Fetch inactive listings once user is logged in
+        fetchInactiveListings();
     } else {
         console.log("No user is logged in.");
     }
-
-    // Call the function to fetch inactive listings when the page loads
-document.addEventListener('DOMContentLoaded', function () {
-    fetchInactiveListings();  // Load inactive listings once the DOM is ready
 });
-});
-

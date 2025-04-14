@@ -11,9 +11,11 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script type="module" src="load-listings.js"></script>
     <script type="module" src="logout.js"></script>
+    <script type="module" src="view-listing-details.js"></script>
     <script type="module" src="auth-persistence-checker.js"></script>
     <script type="module" src="show-reviews.js"></script>
     <script type="module" src="view-profile.js"></script>
+    <script type="module" src="rent-item.js"></script>
    
 
     
@@ -130,14 +132,26 @@
       </div>
   </footer>
 
-  <div id="listing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg">
-        <h2 id="modal-title" class="text-xl font-bold"></h2>
-        <div id="modal-content"></div>
-        <button id="view-reviews-button" class=" mt-4 mr-6 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 ">
-          View Reviews
-      </button>
-      <button id="close-modal" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Close</button>
+<!-- Listing Details Modal -->
+<div id="listing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90%] overflow-y-auto">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 id="modal-title" class="text-xl font-semibold text-gray-800">Listing Details</h2>
+            <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="modal-image-container" class="p-4"></div>
+        <div id="modal-description" class="p-4"></div>
+        <div id="modal-category" class="p-4"></div>
+        <div id="modal-rent-price" class="p-4"></div>
+        <div id="modal-sell-price" class="p-4"></div>
+        <div id="modal-footer" class="p-4 border-t border-gray-200 flex justify-end">
+          <button id="close-modal-footer" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Close</button>
+        </div>
+        
     </div>
 </div>
 

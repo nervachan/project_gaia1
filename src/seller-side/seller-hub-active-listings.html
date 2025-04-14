@@ -9,6 +9,8 @@
     <script type="module" src="sell-hub-active-listing.js"></script>
     <script type="module" src="auth-persistence-checker.js"></script>
     <script type="module" src="logout.js"></script>
+    <script type="module" src="seller-view-profile.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
     <body class="bg-gray-100">
       <header>
@@ -28,15 +30,18 @@
                 </div>
               </div>
       
-              <!-- Right Side: Hello! Username and Logout button -->
-              <div class="flex items-center space-x-4">
-                <div>
-                  <button type="button" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
-                    Hello! <span class="font-semibold" id="username">#username</span>
-                  </button>
-                </div>
-                <div>
-                  <a href="/src/login-out/logout.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <div class="relative ml-3">
+                  <div class="flex items-center space-x-4">
+                    <!-- Profile Icon Link -->
+                    <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2" >
+                      <!-- Heroicon for Profile -->
+                      <i class="fa-solid fa-user" id="profile-icon"></i>
+                    </a>
+        
+                    <!-- Logout Link -->
+                    <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -64,7 +69,9 @@
                 <li>
                     <a href="/src/seller-side/seller-hub-inactive-listings.html" class="hover:bg-gray-700 p-2 rounded transition">Inactive Listings</a>
                 </li>
-                
+                <li>
+                  <a href="/src/seller-side/seller-hub-reviews.html" class="hover:bg-gray-700 p-2 rounded transition">My Reviews</a>
+              </li>
             </ul>
         </div>
 
@@ -130,6 +137,13 @@
       </form>
   </div>
 </div>
+
+<!-- New Modal -->
+<div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="modal-content bg-white p-6 rounded shadow-md w-1/2">
+        <!-- Modal content will be dynamically injected here -->
+    </div>
+</div>
             
     </div>
   </div>
@@ -147,7 +161,7 @@
       <button id="close-profile" class="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
         Close
       </button>
-      <a href="buyer-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+      <a href="seller-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
         Edit Profile
       </a>
     </div>
