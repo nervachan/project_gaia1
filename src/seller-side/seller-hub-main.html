@@ -9,6 +9,7 @@
     <script type="module" src="logout.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <script type="module" src="seller-view-profile.js"></script>
+    <script type="module" src="main-fetch-active-listings.js"></script>
 </head>
 <body>
     <body class="bg-gray-100">
@@ -78,55 +79,71 @@
              <!-- Statistics Container -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             
-          <!-- Items Sold & Revenue Stats -->
-          <div class="bg-white p-6 rounded-lg shadow-md flex-auto">
-              <h3 class="text-xl font-semibold text-gray-800 mb-4">Items Sold & Revenue</h3>
-              <div class="space-y-4">
-                  <!-- Placeholder for graphical representation -->
-                  <div class="h-40 bg-gray-200 rounded-md flex justify-center items-center">
-                      <span class="text-gray-500">Chart Placeholder (Items Sold)</span>
-                  </div>
-                  <div class="text-center">
-                      <p class="text-2xl font-bold text-blue-600">$4,500</p>
-                      <p class="text-sm text-gray-600">Revenue This Month</p>
-                  </div>
-              </div>
-          </div>
         
-
-          <!-- Pending Orders Stats -->
-          <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Pending Orders</h3>
-            <div class="space-y-4">
-                <!-- Placeholder for graphical representation -->
-                <div class="h-40 bg-gray-200 rounded-md flex justify-center items-center">
-                    <span class="text-gray-500">Chart Placeholder (Pending Orders)</span>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-yellow-600">12</p>
-                    <p class="text-sm text-gray-600">Orders Pending</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Released Goods & Items to Return Stats -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">Released Goods & Items to Return</h3>
-          <div class="space-y-4">
-              <!-- Placeholder for graphical representation -->
-              <div class="h-40 bg-gray-200 rounded-md flex justify-center items-center">
-                  <span class="text-gray-500">Chart Placeholder (Released Goods)</span>
-              </div>
-              <div class="space-y-4 text-center">
-                  <p class="text-2xl font-bold text-green-600">30</p>
-                  <p class="text-sm text-gray-600">Goods Released</p>
-                  <p class="text-2xl font-bold text-red-600">5</p>
-                  <p class="text-sm text-gray-600">Items to Return</p>
+          <!-- Active Listings Stats -->
+          <div class="bg-white p-6 rounded-lg shadow-md flex-auto">
+              <h3 class="text-xl font-semibold text-gray-800 mb-4">Active Listings</h3>
+              <div class="space-y-4">
+                  <!-- Placeholder for active listings -->
+                  <ul id="active-listings" class="list-disc pl-5">
+                      <!-- Active listings will be dynamically injected here -->
+                  </ul>
+                  <div class="text-center mt-4">
+                      <a href="/src/seller-side/seller-hub-active-listings.html" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                          View All Active Listings
+                      </a>
+                  </div>
               </div>
           </div>
+
+          <!-- Pending Listings Stats -->
+          <div class="bg-white p-6 rounded-lg shadow-md flex-auto">
+              <h3 class="text-xl font-semibold text-gray-800 mb-4">Pending Listings</h3>
+              <div class="space-y-4">
+                  <!-- Placeholder for pending listings -->
+                  <ul id="pending-listings" class="list-disc pl-5">
+                      <!-- Pending listings will be dynamically injected here -->
+                  </ul>
+                  <div class="text-center mt-4">
+                      <a href="/src/seller-side/seller-hub-pending-items.html" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                          View All Pending Listings
+                      </a>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Inactive Listings Stats -->
+          <div class="bg-white p-6 rounded-lg shadow-md flex-auto">
+              <h3 class="text-xl font-semibold text-gray-800 mb-4">Inactive Listings</h3>
+              <div class="space-y-4">
+                  <!-- Placeholder for inactive listings -->
+                  <ul id="inactive-listings" class="list-disc pl-5">
+                      <!-- Inactive listings will be dynamically injected here -->
+                  </ul>
+                  <div class="text-center mt-4">
+                    <a href="/src/seller-side/seller-hub-inactive-listings.html" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                        View All Inactive Listings
+                    </a>
+                </div>
+              </div>
+          </div>
+
+         
+        
       </div>
+      <br>
+      <br>
+      
+       <!-- Rental History Stats -->
+       <div class="bg-white p-6 rounded-lg shadow-md flex-auto w-full">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">Rental History</h3>
+        <div id="rental-history" class="overflow-y-auto max-h-64 space-y-4">
+            <!-- Rental history items will be dynamically injected here -->
+        </div>
+    </div>
     </div>
   </div>
+  
 
 <!--Profile Modal -->
 <div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden z-20">
@@ -140,7 +157,7 @@
         Close
       </button>
       <a href="seller-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-        Edit Profile
+       Edit Profile
       </a>
     </div>
   </div>

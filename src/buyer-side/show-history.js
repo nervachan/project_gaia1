@@ -1,8 +1,7 @@
 // Import necessary functions from Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-import { getFirestore, collection, query, where, getDocs, getDoc, doc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";  // Import Firebase Authentication
+import { getFirestore, collection, query, where, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -17,202 +16,72 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getFirestore(app);
-const auth = getAuth();  // Initialize Firebase Authentication
+const auth = getAuth(); // Initialize Firebase Authentication
 
-// Load pending items and other functionality when the page loads
+// Load rental history when the page loads
 window.onload = () => {
-  const user = auth.currentUser;
-  if (user) {
-    showPendingItems(user.uid);  // Show pending items for logged-in user
-  }
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("User is logged in:", user);
+            showRentalHistory(user.uid); // Show rental history for the logged-in user
+        } else {
+            console.log("No user is logged in.");
+        }
+    });
 };
 
-// Show pending items when the page loads
-async function showPendingItems(userId) {
-    const pendingItemsContainer = document.getElementById('pendingItemsContainer');
-    pendingItemsContainer.innerHTML = ''; // Clear the container
+// Show rental history for the logged-in user
+async function showRentalHistory(userId) {
+    const rentalHistoryContainer = document.getElementById('rentalHistoryContainer');
+    rentalHistoryContainer.innerHTML = ''; // Clear the container
 
     try {
-        // Query the 'pending_items' collection for documents where the 'buyerId' matches the logged-in user's ID
-        const pendingItemsQuery = query(collection(db, "pending_items"), where('buyerId', '==', userId));
-        const pendingItemsSnapshot = await getDocs(pendingItemsQuery);
+        // Query the 'rentals' collection for documents where the 'buyerId' matches the logged-in user's ID
+        const rentalsQuery = query(collection(db, "rentals"), where('buyerId', '==', userId));
+        const rentalsSnapshot = await getDocs(rentalsQuery);
 
-        for (const docSnapshot of pendingItemsSnapshot.docs) {
-            const pendingData = docSnapshot.data();
-            const listingId = pendingData.listingId;
-
-            // Fetch the image from the 'listed_items' collection using the listingId
-            const listingDocRef = doc(db, 'listed_items', listingId);
-            const listingSnapshot = await getDoc(listingDocRef);
-            
-            let imageUrl = '';
-            if (listingSnapshot.exists()) {
-                const listingData = listingSnapshot.data();
-                imageUrl = listingData.images || ''; // Assuming 'images' is the field storing the image URL
-            }
-
-            // Create and display the pending item element with image
-            const pendingElement = createPendingItemElement(pendingData, docSnapshot.id, imageUrl);
-            pendingItemsContainer.appendChild(pendingElement);
+        if (rentalsSnapshot.empty) {
+            rentalHistoryContainer.innerHTML = '<p class="text-gray-500 text-center">No rental history found.</p>';
+            return;
         }
 
+        // Loop through the documents and display each rental item
+        for (const docSnapshot of rentalsSnapshot.docs) {
+            const rentalData = docSnapshot.data();
+            const rentalElement = createRentalHistoryElement(rentalData);
+            rentalHistoryContainer.appendChild(rentalElement);
+        }
     } catch (error) {
-        console.error("Error fetching pending items: ", error);
+        console.error("Error fetching rental history: ", error);
+        rentalHistoryContainer.innerHTML = '<p class="text-red-500 text-center">Failed to load rental history. Please try again later.</p>';
     }
 }
 
-// Function to create pending item elements (including image)
-function createPendingItemElement(pendingData, pendingId, imageUrl) {
-    const pendingElement = document.createElement('div');
-    pendingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
+// Function to create rental history elements
+function createRentalHistoryElement(rentalData) {
+    const rentalElement = document.createElement('div');
+    rentalElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg', 'mb-4');
 
-    pendingElement.innerHTML = `
+    // Check if the "image" field exists
+    const imageUrl = rentalData.image || '';
+
+    rentalElement.innerHTML = `
         <div class="flex">
             <!-- Image section -->
             <div class="w-32 h-32 mr-4">
-                <img src="${imageUrl}" alt="${pendingData.productName}" class="w-full h-full object-cover rounded-lg">
+                <img src="${imageUrl}" alt="${rentalData.productName}" class="w-full h-full object-cover rounded-lg">
             </div>
             
             <div class="flex-1">
-                <h3 class="text-xl font-semibold text-gray-900">${pendingData.productName}</h3>
-                <p class="text-gray-600 mt-2">${pendingData.productDescription}</p>
-                <p class="text-gray-700 mt-2">Start Date: ${pendingData.startDate}</p>
-                <p class="text-gray-700 mt-2">End Date: ${pendingData.endDate}</p>
-                <p class="text-gray-700 mt-2">Price: ₱${pendingData.totalPrice}</p>
-                <p class="text-gray-700 mt-2">Status: ${pendingData.status}</p>
-                ${pendingData.status === 'returned' ? ` 
-                    <button class="leave-review bg-blue-500 text-white px-4 py-2 rounded-lg mt-4" data-id="${pendingId}">Leave a Review</button>
-                ` : ''}
+                <h3 class="text-xl font-semibold text-gray-900">${rentalData.listingName}</h3>
+                <p class="text-gray-700 mt-2">Start Date: ${rentalData.startDate}</p>
+                <p class="text-gray-700 mt-2">End Date: ${rentalData.endDate}</p>
+                <p class="text-gray-700 mt-2">Price: ₱${rentalData.finalPrice}</p>
+                <p class="text-gray-700 mt-2">Status: ${rentalData.status}</p>
             </div>
         </div>
     `;
 
-    return pendingElement;
+    return rentalElement;
 }
-
-// Event listener for review button click
-document.body.addEventListener('click', async (event) => {
-    if (event.target.classList.contains('leave-review')) {
-        const pendingId = event.target.getAttribute('data-id');
-        openReviewModal(pendingId); // Open the review modal for this pending item
-    } else if (event.target.id === 'submitReview') {
-        await handleReviewSubmission(); // Handle the review submission
-    } else if (event.target.id === 'close-review') {
-        closeModal('reviewModal'); // Close the review modal
-    }
-});
-
-// Function to open the review modal
-async function openReviewModal(pendingId) {
-    const modal = document.getElementById('reviewModal');
-    const reviewText = document.getElementById('reviewText');
-    const ratingInput = document.getElementById('ratingInput');
-
-    // Check if pendingId is valid
-    if (!pendingId) {
-        console.error("No valid pendingId provided.");
-        alert("Unable to open review modal. Please try again.");
-        return;
-    }
-
-    try {
-        // Fetch the pending item data from the pending_items collection using the pendingId
-        const pendingDoc = doc(db, 'pending_items', pendingId);
-        const pendingSnapshot = await getDoc(pendingDoc);
-
-        if (pendingSnapshot.exists()) {
-            const pendingData = pendingSnapshot.data();
-            // Populate modal fields with pending item data
-            document.getElementById('reviewProductName').innerText = pendingData.productName;
-            reviewText.value = '';  // Clear the text area for new review
-            ratingInput.value = 5;  // Default rating (5 stars)
-
-            // Attach pendingId to the modal for later use when submitting the review
-            document.getElementById('reviewProductName').setAttribute('data-id', pendingId);
-
-            // Show the modal
-            modal.classList.remove('hidden');
-        } else {
-            console.error("No pending item found with the provided ID.");
-            alert("Unable to find the pending item. Please try again later.");
-        }
-    } catch (error) {
-        console.error("Error fetching pending item details for review: ", error);
-        alert("There was an error fetching the item details. Please try again.");
-    }
-}
-
-// Function to handle review submission
-async function handleReviewSubmission() {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("You must be logged in to submit a review.");
-        return;
-    }
-
-    const reviewText = document.getElementById('reviewText').value;
-    const rating = document.getElementById('ratingInput').value;
-    const pendingId = document.getElementById('reviewProductName').getAttribute('data-id');  // Added data-id attribute to review product name
-
-    if (!reviewText || !rating) {
-        alert("Please fill in all fields.");
-        return;
-    }
-
-    try {
-        // Fetch pending item details from Firestore using the pendingId
-        const pendingDoc = doc(db, 'pending_items', pendingId);
-        const pendingSnapshot = await getDoc(pendingDoc);
-
-        if (!pendingSnapshot.exists()) {
-            alert("No pending item found.");
-            return;
-        }
-
-        const pendingData = pendingSnapshot.data();
-        const listingId = pendingData.listingId;  // Assuming the listingId field is stored in the pending item document
-        const sellerId = pendingData.sellerId;    // Assuming the sellerId field is stored in the pending item document
-        const productName = pendingData.productName; // Fetch product name from pending item
-
-        // Save the review to the "reviews" collection
-        await addDoc(collection(db, "reviews"), {
-            pendingId: pendingId,
-            userId: user.uid,
-            reviewText: reviewText,
-            rating: parseInt(rating),
-            listingId: listingId,  // Include listingId in the review data
-            sellerId: sellerId,    // Include sellerId in the review data
-            productName: productName, // Include productName in the review data
-            timestamp: new Date().toISOString(),
-        });
-
-        // Update the pending item's status to 'reviewed'
-        await updateDoc(pendingDoc, { status: 'reviewed' });
-
-        alert("Your review has been submitted successfully!");
-
-        // Close the review modal
-        closeModal('reviewModal');
-    } catch (error) {
-        console.error("Error submitting review: ", error);
-        alert("There was an error submitting your review. Please try again.");
-    }
-}
-
-// Utility function to close modals
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.add('hidden');
-}
-
-// Add onAuthStateChanged listener
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("User is logged in:", user);
-        showPendingItems(user.uid);  // Show pending items for logged-in user
-    } else {
-        console.log("No user is logged in.");
-    }
-});

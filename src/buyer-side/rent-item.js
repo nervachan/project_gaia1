@@ -1,6 +1,7 @@
 // Import the necessary Firebase functions
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -16,6 +17,7 @@ const firebaseConfig = {
 // Initialize Firebase only if no apps are already initialized
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 // Fetch and display listings
 document.addEventListener('DOMContentLoaded', async () => {
@@ -49,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${image}
                 <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
                 <p class="text-gray-700 mt-2">Category: ${listing.category || 'N/A'}</p>
-                ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listing.rentPrice}</p>` : ''}
+                ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ${listing.rentPrice}/day</p>` : ''}
                 <button id="rent-button" data-listing-id="${listingId}" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Rent</button>
             `;
 
@@ -89,10 +91,10 @@ document.addEventListener('click', async (event) => {
                 const rentPrice = listingData.rentPrice;
 
                 if (rentPrice) {
-                    console.log(`Rent Price for listing "${listingName}": $${rentPrice}`);
+                    console.log(`Rent Price for listing "${listingName}": ${rentPrice}/day`);
                     const rentPriceInput = document.getElementById('rentalPrice');
                     if (rentPriceInput) {
-                        rentPriceInput.value = `$${rentPrice}`;
+                        rentPriceInput.value = `${rentPrice}/day`;
                     }
 
                     // Initialize Flatpickr for start and end dates
@@ -223,6 +225,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
+                    // Get the logged-in user's UID
+                    const user = auth.currentUser;
+                    if (!user) {
+                        alert('You must be logged in to rent an item.');
+                        return;
+                    }
+                    const userId = user.uid;
+
                     // Prepare the rental data
                     const rentalData = {
                         name: userName,
@@ -234,6 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         status: 'for preparation', // Add the status
                         listingName: listingName, // Add the listing name for reference
                         sellerId: sellerId, // Add the seller ID
+                        buyerId: userId, // Add the logged-in user's UID
                     };
 
                     // Push the rental data to the "rentals" collection
@@ -244,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     await updateDoc(listingDocRef, { isActive: false });
 
                     alert('Rental submitted successfully! The listing is now inactive.');
+                    
                     const rentModal = document.getElementById('rentModal');
                     if (rentModal) {
                         rentModal.classList.add('hidden'); // Hide the rent modal
@@ -257,5 +269,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else {
         console.error('Submit Rental button with id "rent-item-btn" not found.');
+    }
+});
+
+// Ensure the user is authenticated
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        console.warn('No user is logged in.');
     }
 });

@@ -67,7 +67,7 @@ async function loadListings() {
                 <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
                 <p class="text-gray-700 mt-2">Category: ${listing.category || 'N/A'}</p>
                 
-                ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listing.rentPrice}</p>` : ''}
+                ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ${listing.rentPrice}/day</p>` : ''}
                 ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: $${listing.sellPrice}</p>` : ''}
                 <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 view-details-btn">View Details</button>
             `;

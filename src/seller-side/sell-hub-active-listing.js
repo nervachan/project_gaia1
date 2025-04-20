@@ -44,6 +44,12 @@ async function fetchUserListings() {
 
         for (const docSnapshot of listingsSnapshot.docs) {
             const listingData = docSnapshot.data();
+
+            // Skip listings where isActive is false
+            if (!listingData.isActive) {
+                continue;
+            }
+
             const itemDiv = document.createElement("div");
             itemDiv.className = "bg-white shadow-md rounded p-6 mb-4";
 
