@@ -1,6 +1,6 @@
 // Import Firebase libraries and initialize Firestore
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where, doc, getDoc, updateDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Firebase configuration and initialization
@@ -38,17 +38,80 @@ async function fetchImageFromOtherCollection(collectionName, documentId, imageFi
     }
 }
 
-// Function to update item status (picked up, returned, or relisted)
-async function updateItemStatus(itemId, newStatus) {
-    const itemRef = doc(db, "", itemId);
+// Function to update item status (picked up, returned, relisted, or cancelled)
+async function updateItemStatus(docId, newStatus) {
+    console.log("Updating item with document ID:", docId); // Log the document ID
+    const itemRef = doc(db, "rentals", docId); // Reference to the document in the rentals collection
     try {
-        await updateDoc(itemRef, {
-            status: newStatus // Updating the status based on the argument passed
-        });
-        alert(`Item marked as ${newStatus}!`);
-        fetchUserPendingItems(); // Refresh the list after status update
+        // Fetch the document using the document ID
+        const itemSnap = await getDoc(itemRef);
+        if (!itemSnap.exists()) {
+            throw new Error(`Document with ID ${docId} not found in rentals collection.`);
+        }
+
+        const itemData = itemSnap.data();
+
+        if (newStatus === "cancelled") {
+            // Move the document to the rental_history collection
+            const historyRef = doc(db, "rental_history", docId);
+            await setDoc(historyRef, { ...itemData, status: "cancelled" }); // Update status to "cancelled"
+
+            // Delete the document from the rentals collection
+            await deleteDoc(itemRef);
+
+            // Query the listed_items collection using the listingName from the rentals collection
+            const listedItemsQuery = query(
+                collection(db, "listed_items"),
+                where("productName", "==", itemData.listingName)
+            );
+            const listedItemsSnapshot = await getDocs(listedItemsQuery);
+
+            if (!listedItemsSnapshot.empty) {
+                // Update the isActive status to true for the matching document
+                listedItemsSnapshot.forEach(async (docSnapshot) => {
+                    const listingRef = doc(db, "listed_items", docSnapshot.id);
+                    await updateDoc(listingRef, { isActive: true });
+                });
+            } else {
+                console.warn("No matching document found in listed_items collection.");
+            }
+
+            alert("Item has been cancelled and moved to rental history!");
+        } else if (newStatus === "relisted") {
+            // Move the document to the rental_history collection
+            const historyRef = doc(db, "rental_history", docId);
+            await setDoc(historyRef, { ...itemData, status: "relisted" }); // Update status to "relisted"
+
+            // Delete the document from the rentals collection
+            await deleteDoc(itemRef);
+
+            // Query the listed_items collection using the listingName from the rentals collection
+            const listedItemsQuery = query(
+                collection(db, "listed_items"),
+                where("productName", "==", itemData.listingName)
+            );
+            const listedItemsSnapshot = await getDocs(listedItemsQuery);
+
+            if (!listedItemsSnapshot.empty) {
+                // Update the isActive status to true for the matching document
+                listedItemsSnapshot.forEach(async (docSnapshot) => {
+                    const listingRef = doc(db, "listed_items", docSnapshot.id);
+                    await updateDoc(listingRef, { isActive: true });
+                });
+            } else {
+                console.warn("No matching document found in listed_items collection.");
+            }
+
+            alert("Item has been relisted and moved to rental history!");
+        } else {
+            // Update the status in the rentals collection
+            await updateDoc(itemRef, { status: newStatus });
+            alert(`Item marked as ${newStatus}!`);
+        }
+
+        location.reload(); // Reload the page after the operation
     } catch (error) {
-        console.error(`Error marking item as ${newStatus}:`, error);
+        console.error(`Error updating item status:`, error);
         alert("Error updating item status. Please try again.");
     }
 }
@@ -110,12 +173,63 @@ async function fetchUserPendingItems(userId) {
             } else if (itemData.status === "returned") {
                 button.textContent = "Relist Item";
                 button.onclick = () => updateItemStatus(docSnapshot.id, "relisted");
+            } else if (itemData.status === "cancelled") {
+                button.textContent = "Relist Item";
+                button.onclick = () => updateItemStatus(docSnapshot.id, "relisted");
             } else {
                 button.textContent = "Mark as Picked Up";
                 button.onclick = () => updateItemStatus(docSnapshot.id, "picked up");
             }
 
+            // Add a "Cancel Item" button
+            const cancelButton = document.createElement("button");
+            cancelButton.className = "bg-red-500 text-white px-4 py-2 rounded mt-4 ml-2";
+            cancelButton.textContent = "Cancel Item";
+
+            // Add click event listener to the "Cancel Item" button
+            cancelButton.onclick = async () => {
+                try {
+                    // Show a confirmation alert before proceeding
+                    const confirmation = confirm("Are you sure you want to cancel this item? This action cannot be undone.");
+                    if (!confirmation) {
+                        return; // Exit if the user cancels the action
+                    }
+
+                    // Move the document to the rental_history collection
+                    const historyRef = doc(db, "rental_history", docSnapshot.id);
+                    await setDoc(historyRef, { ...itemData, status: "cancelled" });
+
+                    // Delete the document from the rentals collection
+                    const rentalRef = doc(db, "rentals", docSnapshot.id);
+                    await deleteDoc(rentalRef);
+
+                    // Query the listed_items collection using the listingName from the rentals collection
+                    const listedItemsQuery = query(
+                        collection(db, "listed_items"),
+                        where("productName", "==", itemData.listingName)
+                    );
+                    const listedItemsSnapshot = await getDocs(listedItemsQuery);
+
+                    if (!listedItemsSnapshot.empty) {
+                        // Update the isActive status to true for the matching document
+                        listedItemsSnapshot.forEach(async (docSnapshot) => {
+                            const listingRef = doc(db, "listed_items", docSnapshot.id);
+                            await updateDoc(listingRef, { isActive: true });
+                        });
+                    } else {
+                        console.warn("No matching document found in listed_items collection.");
+                    }
+
+                    alert("Item has been cancelled and moved to rental history!");
+                    location.reload(); // Reload the page to reflect changes
+                } catch (error) {
+                    console.error("Error cancelling item:", error);
+                    alert("Failed to cancel the item. Please try again.");
+                }
+            };
+
             itemDiv.appendChild(button);
+            itemDiv.appendChild(cancelButton);
             pendingItemsContainer.appendChild(itemDiv);
         }
     } catch (error) {

@@ -24,7 +24,7 @@ async function showListingDetails(listingId) {
 
     try {
         // Fetch the document from Firestore
-        const listingDoc = doc(db, 'listed items', listingId);
+        const listingDoc = doc(db, 'listed_items', listingId);
         const listingSnapshot = await getDoc(listingDoc);
 
         if (listingSnapshot.exists()) {
@@ -66,6 +66,27 @@ async function showListingDetails(listingId) {
                 `;
             }
 
+            // Fetch the shop address using the sellerId
+            let shopAddressHtml = '';
+            if (listing.sellerId) {
+                const sellerDoc = doc(db, 'user_seller', listing.sellerId);
+                const sellerSnapshot = await getDoc(sellerDoc);
+
+                if (sellerSnapshot.exists()) {
+                    const sellerData = sellerSnapshot.data();
+                    const shopAddress = sellerData.shopaddress || 'No shop address available';
+
+                    shopAddressHtml = `
+                        <p><strong>Shop Address:</strong> ${shopAddress}</p>
+                        <button class="mt-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" onclick="redirectToGoogleMaps('${shopAddress}')">
+                            View on Google Maps
+                        </button>
+                    `;
+                } else {
+                    shopAddressHtml = '<p class="text-red-500">Shop address not found.</p>';
+                }
+            }
+
             // Populate modal content
             modalContent.innerHTML = `
                 ${imagesHtml}
@@ -74,6 +95,7 @@ async function showListingDetails(listingId) {
                 <p><strong>Condition:</strong> ${listing.condition || 'N/A'}</p>
                 ${listing.rentPrice ? `<p><strong>Rent Price:</strong> $${listing.rentPrice}</p>` : ''}
                 ${listing.sellPrice ? `<p><strong>Selling Price:</strong> $${listing.sellPrice}</p>` : ''}
+                ${shopAddressHtml}
             `;
 
             // Initialize carousel functionality if there are multiple images
@@ -104,13 +126,19 @@ async function showListingDetails(listingId) {
     }
 }
 
+// Function to redirect to Google Maps with the shop address
+function redirectToGoogleMaps(shopAddress) {
+    const encodedAddress = encodeURIComponent(shopAddress);
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+    window.open(googleMapsUrl, '_blank');
+}
+
 // Add event listeners to all view details buttons
-const viewDetailsButtons = document.querySelectorAll('.view-details');
-viewDetailsButtons.forEach(button => {
-    button.addEventListener('click', (event) => {
+document.addEventListener('click', (event) => {
+    if (event.target.classList.contains('view-details')) {
         const listingId = event.target.getAttribute('data-id');
         showListingDetails(listingId); // Show the modal with listing details
-    });
+    }
 });
 
 // Close modal functionality

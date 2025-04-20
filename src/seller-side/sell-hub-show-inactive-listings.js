@@ -77,7 +77,7 @@ function createInactiveListingElement(listing, listingId) {
             const carouselId = `carousel-${listingId}`;
             const slides = listing.images.map((url, i) => `
                 <div class="carousel-slide ${i === 0 ? 'block' : 'hidden'} transition-all duration-300 ease-in-out">
-                    <img src="${url}" class="w-full h-48 object-cover rounded-md" alt="Slide ${i + 1}">
+                    <img src="${url}" class="w-full h-auto object-cover rounded-md" alt="Slide ${i + 1}">
                 </div>
             `).join('');
 
@@ -105,13 +105,13 @@ function createInactiveListingElement(listing, listingId) {
     listingElement.innerHTML = `
         ${imageHTML}
         <h3 class="text-xl font-semibold text-gray-900 mt-2">${listing.productName}</h3>
-        <p class="text-gray-600 mt-2">${listing.productDescription}</p>
         <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
         <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
         ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ₱${listing.rentPrice}</p>` : ''}
         ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ₱${listing.sellPrice}</p>` : ''}
-        <div class="mt-4">
-            <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" data-id="${listingId}"id="relist-button">Re-list</button>
+        <div class="mt-4 flex gap-4">
+            <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 relist-button" data-id="${listingId}">Re-list</button>
+            <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 delete-button" data-id="${listingId}">Delete</button>
         </div>
     `;
 
@@ -159,12 +159,43 @@ async function relistItem(listingId) {
             await deleteDoc(listingRef);
 
             console.log("Item re-listed successfully.");
-            fetchInactiveListings();
+            alert("Item has been re-listed successfully!"); // Show relisted alert
+            fetchInactiveListings(); // Refresh the inactive listings
         } else {
             console.error("Listing not found.");
         }
     } catch (error) {
         console.error("Error re-listing item: ", error);
+        alert("Failed to re-list the item. Please try again.");
+    }
+}
+
+// Delete item from inactive_listings collection
+async function deleteListing(listingId) {
+    const user = auth.currentUser;
+
+    if (!user) {
+        console.log("No user is logged in.");
+        return;
+    }
+
+    try {
+        const listingRef = doc(db, 'inactive_listings', listingId);
+
+        // Confirm before deleting
+        const confirmation = confirm("Are you sure you want to delete this listing? This action cannot be undone.");
+        if (!confirmation) {
+            return; // Exit if the user cancels the action
+        }
+
+        await deleteDoc(listingRef);
+
+        console.log("Listing deleted successfully.");
+        alert("Listing has been deleted successfully!"); // Show delete success alert
+        fetchInactiveListings(); // Refresh the inactive listings
+    } catch (error) {
+        console.error("Error deleting listing: ", error);
+        alert("Failed to delete the listing. Please try again.");
     }
 }
 
@@ -173,6 +204,14 @@ document.body.addEventListener('click', (event) => {
     if (event.target.classList.contains('relist-button')) {
         const listingId = event.target.getAttribute('data-id');
         relistItem(listingId);
+    }
+});
+
+// Event delegation for delete buttons
+document.body.addEventListener('click', (event) => {
+    if (event.target.classList.contains('delete-button')) {
+        const listingId = event.target.getAttribute('data-id');
+        deleteListing(listingId);
     }
 });
 
