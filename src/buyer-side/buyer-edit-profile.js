@@ -50,7 +50,7 @@ onAuthStateChanged(auth, (user) => {
         fetchAndInjectUserData(user.email);
     } else {
         console.log("No user is logged in.");
-        window.location.href = "src/buyer-side/buyer-login.html";
+        window.location.href = "buyer-side/buyer-login.html";
     }
 });
 

@@ -25,7 +25,7 @@ function logoutUser() {
     signOut(auth)  // Use `signOut` from the modular SDK
       .then(() => {
         // Redirect the user to index.html after successful logout
-        window.location.href = 'src/login-out/logout.html';  // Adjust path if necessary
+        window.location.href = 'login-out/logout.html';  // Adjust path if necessary
       })
       .catch((error) => {
         // Handle any errors that occur during logout
