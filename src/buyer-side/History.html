@@ -17,39 +17,62 @@
     <!-- Fixed Header -->
 <header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
     <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-      <div class="relative flex h-16 items-center justify-between">
-        
-        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-          <div class="flex flex-shrink-0 items-center">
-            <h3 class="text-gray-100">Project:Gaia</h3>
-          </div>
-          <div class="hidden sm:ml-6 sm:block">
-            <div class="flex space-x-4">
-              <a href="buyer-login.html" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
-              <a href="howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a>
-              <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
-              <a href="/project_gaia1/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+        <div class="relative flex h-16 items-center justify-between">
+            <!-- Logo Section -->
+            <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                <div class="flex flex-shrink-0 items-center">
+                    <h3 class="text-gray-100">Project:Gaia</h3>
+                </div>
             </div>
-          </div>
-        </div>
-  
-        <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <div class="relative ml-3">
-            <div class="flex items-center space-x-4">
-              <!-- Profile Icon Link -->
-              <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2" >
-                <!-- Heroicon for Profile -->
-                <i class="fa-solid fa-user" id="profile-icon"></i>
-              </a>
-  
-              <!-- Logout Link -->
-              <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+
+            <!-- Hamburger Menu Button -->
+            <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <span class="sr-only">Open main menu</span>
+                    <i class="fa-solid fa-bars"></i>
+                </button>
             </div>
-          </div>
+
+            <!-- Navigation Links -->
+            <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block">
+                <div class="flex flex-col sm:flex-row sm:space-x-4">
+                    <a href="buyer-login.html" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+                    <a href="howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a>
+                    <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+                    <a href="/project_gaia1/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+                </div>
+            </div>
+
+            <!-- Profile and Logout -->
+            <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <div class="relative ml-3">
+                    <div class="flex items-center space-x-4">
+                        <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2">
+                            <i class="fa-solid fa-user" id="profile-icon"></i>
+                        </a>
+                        <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </nav>
-  </header>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
+        <a href="buyer-login.html" class="block px-3 py-2 text-base font-medium text-white hover:bg-gray-700">Home</a>
+        <a href="howitworks.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">How It Works</a>
+        <a href="#" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+        <a href="/project_gaia1/src/ai/AI.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+    </div>
+</header>
+
+<script>
+    // filepath: /workspaces/project_gaia1/src/buyer-side/History.js
+    document.getElementById('mobile-menu-button').addEventListener('click', () => {
+        const mobileMenu = document.getElementById('mobile-menu-dropdown');
+        mobileMenu.classList.toggle('hidden');
+    });
+</script>
   
     <div><h2 class="text-2xl font-semibold text-gray-900">Your Rental History</h2></div>
     
