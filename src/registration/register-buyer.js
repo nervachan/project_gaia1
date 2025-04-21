@@ -54,7 +54,7 @@ document.getElementById('buyerForm').addEventListener('submit', function(event) 
         .then(() => {
             alert('User signed up successfully! Redirecting to login page...');
             document.getElementById('buyerForm').reset();
-            window.location.href = "/src/login-out/login.html"; // Redirect to login page
+            window.location.href = "src/login-out/login.html"; // Redirect to login page
         })
         .catch((error) => {
             console.error('Error signing up:', error.message);
