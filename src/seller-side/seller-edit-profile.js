@@ -126,7 +126,7 @@ onAuthStateChanged(auth, (user) => {
         }
     } else {
         console.log("No user is logged in.");
-        window.location.href = "/src/seller-side/seller-hub-main.html"; // Redirect to main hub if not logged in
+        window.location.href = "src/seller-side/seller-hub-main.html"; // Redirect to main hub if not logged in
     }
 });
 
