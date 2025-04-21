@@ -63,9 +63,9 @@ document.getElementById('login-form').addEventListener('submit', function(event)
 
                   // Redirect based on user type (buyer or seller)
                   if (userType === "buyer") {
-                    window.location.href = 'src/buyer-side/buyer-login.html'; // Redirect to buyer login page
+                    window.location.href = 'buyer-side/buyer-login.html'; // Redirect to buyer login page
                   } else if (userType === "seller") {
-                    window.location.href = 'src/seller-side/seller-hub-main.html'; // Redirect to seller hub page
+                    window.location.href = 'seller-side/seller-hub-main.html'; // Redirect to seller hub page
                   }
 
                   alert('Sign-in successful!');
