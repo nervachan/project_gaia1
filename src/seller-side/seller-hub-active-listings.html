@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Active Listings - Project:Gaia</title>
     <link rel="stylesheet" href="/css/output.css">
     <script type="module" src="sell-hub-deactivate-listing.js"></script>
     <script type="module" src="sell-hub-active-listing.js"></script>
@@ -13,50 +13,58 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-    <body class="bg-gray-100">
-      <header>
+<body class="bg-gray-100">
+    <header>
         <nav class="bg-gray-800">
-          <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-            <div class="relative flex h-16 items-center justify-between">
-              
-              <!-- Left Side: Logo and Navigation -->
-              <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <div class="flex flex-shrink-0 items-center">
-                  <h3 class="text-gray-100">Project:Gaia Seller Hub</h3>
+            <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+                <div class="relative flex h-16 items-center justify-between">
+                    <!-- Left Side: Logo -->
+                    <div class="flex flex-1 items-center justify-between sm:items-stretch sm:justify-start">
+                        <div class="flex flex-shrink-0 items-center">
+                            <h3 class="text-gray-100">Project:Gaia Seller Hub</h3>
+                        </div>
+                        <!-- Mobile Menu Button -->
+                        <div class="sm:hidden">
+                            <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                                <span class="sr-only">Open main menu</span>
+                                <i class="fa-solid fa-bars"></i>
+                            </button>
+                        </div>
+                        <!-- Desktop Navigation -->
+                        <div class="hidden sm:ml-6 sm:block">
+                            <div class="flex space-x-4">
+                                <a href="seller-side/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Profile and Logout -->
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                        <div class="relative ml-3">
+                            <div class="flex items-center space-x-4">
+                                <!-- Profile Icon Link -->
+                                <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2">
+                                    <i class="fa-solid fa-user" id="profile-icon"></i>
+                                </a>
+                                <!-- Logout Link -->
+                                <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="hidden sm:ml-6 sm:block">
-                  <div class="flex space-x-4">
-                    <a href="seller-side/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
-                  </div>
-                </div>
-              </div>
-      
-              <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <div class="relative ml-3">
-                  <div class="flex items-center space-x-4">
-                    <!-- Profile Icon Link -->
-                    <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2" >
-                      <!-- Heroicon for Profile -->
-                      <i class="fa-solid fa-user" id="profile-icon"></i>
-                    </a>
-        
-                    <!-- Logout Link -->
-                    <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden sm:hidden">
+                <div class="space-y-1 px-2 pt-2 pb-3">
+                    <a href="seller-side/seller-hub-main.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Home</a>
+                </div>
+            </div>
         </nav>
-      </header>
-      
-      
+    </header>
 
-
-    <!-- Sidebar -->
     <div class="flex">
         <!-- Sidebar -->
-        <div class="w-64 h-screen bg-gray-800 text-white p-10 ">
+        <div id="sidebar" class="w-64 h-screen bg-gray-800 text-white p-10 hidden sm:block">
             <ul class="space-y-6">
                 <li>
                     <a href="/seller-side/seller-hub-active-listings.html" class="hover:bg-gray-700 p-2 rounded transition">Active Listings</a>
@@ -71,103 +79,37 @@
                     <a href="/seller-side/seller-hub-inactive-listings.html" class="hover:bg-gray-700 p-2 rounded transition">Inactive Listings</a>
                 </li>
                 <li>
-                  <a href="/seller-side/seller-hub-reviews.html" class="hover:bg-gray-700 p-2 rounded transition">My Reviews</a>
-              </li>
+                    <a href="/seller-side/seller-hub-reviews.html" class="hover:bg-gray-700 p-2 rounded transition">My Reviews</a>
+                </li>
             </ul>
         </div>
 
         <!-- Main Content -->
-        <div class="flex-auto ">
+        <div class="flex-auto">
             <div class="container mx-auto p-8">
                 <h2 class="text-3xl font-semibold text-gray-800 mb-6">Active Listings for Rent</h2>
-        
                 <!-- Active Listings Grid -->
                 <div id="activeListings" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     <!-- Listing Cards will be inserted here dynamically -->
                 </div>
             </div>
-        
-<!-- Modal form to edit the listing -->
-<div id="edit-listing-modal" class="fixed top-0 left-0 w-full h-full bg-gray-500 bg-opacity-75 flex justify-center items-center hidden">
-  <div class="bg-white rounded-lg shadow-lg p-4 w-1/2">
-      <h2 class="text-2xl font-bold mb-4">Edit Listing</h2>
-      <form id="edit-listing-form">
-          <div class="mb-4">
-              <label for="productName" class="block text-gray-700 text-sm font-bold mb-2">Product Name:</label>
-              <input type="text" id="productName" name="productName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-          </div>
-          <div class="mb-4">
-            <select id="category" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="" disabled selected>Select category</option>
-              <option value="for men">For Men</option>
-              <option value="for women">For Women</option>
-              <option value="for children (male)">For Child(Male)</option>
-              <option value="for children (female)">For Child(Female)</option>
-              <!-- Add more options as needed -->
-          </select>
         </div>
-          
-          
-          <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save Changes</button>
-      </form>
-  </div>
-</div>
-
-<!-- Modal structure -->
-<div id="editModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center hidden">
-  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-      <span class="absolute top-2 right-2 text-2xl text-gray-600 cursor-pointer" onclick="closeEditModal()">&times;</span>
-      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Edit Listing</h2>
-      <form id="editListingForm">
-          <label for="editProductName" class="block text-gray-700">Product Name</label>
-          <input type="text" id="editProductName" class="w-full p-3 mt-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
-
-          <label for="editCategory" class="block text-gray-700 mt-4">Category</label>
-          <input type="text" id="editCategory" class="w-full p-3 mt-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
-
-          <label for="editCondition" class="block text-gray-700 mt-4">Condition</label>
-          <input type="text" id="editCondition" class="w-full p-3 mt-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
-
-          <label for="editRentPrice" class="block text-gray-700 mt-4">Rent Price</label>
-          <input type="number" id="editRentPrice" class="w-full p-3 mt-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
-
-          <label for="editSellPrice" class="block text-gray-700 mt-4">Selling Price</label>
-          <input type="number" id="editSellPrice" class="w-full p-3 mt-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none">
-
-          <button type="button" id="saveEditBtn" class="w-full py-3 mt-6 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Save Changes</button>
-      </form>
-  </div>
-</div>
-
-<!-- New Modal -->
-<div id="edit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="modal-content bg-white p-6 rounded shadow-md w-1/2">
-        <!-- Modal content will be dynamically injected here -->
-    </div>
-</div>
-            
-    </div>
-  </div>
-
     </div>
 
-<!--Profile Modal -->
-<div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden z-20">
-  <div class="bg-white p-8 rounded-lg shadow-xl w-1/3">
-    <h2 class="text-2xl font-semibold text-gray-800">User Profile</h2>
-    <div id="user-profile-info" class="mt-4">
-      <!-- User Info will be injected here -->
-    </div>
-    <div class="mt-4 flex justify-between">
-      <button id="close-profile" class="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
-        Close
-      </button>
-      <a href="seller-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
-        Edit Profile
-      </a>
-    </div>
-  </div>
-</div>
-   
+    <script>
+        // Toggle mobile menu visibility
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Toggle sidebar visibility on mobile
+        const sidebar = document.getElementById('sidebar');
+        mobileMenuButton.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html>

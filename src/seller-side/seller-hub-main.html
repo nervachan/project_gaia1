@@ -12,49 +12,57 @@
     <script type="module" src="main-fetch-active-listings.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <body class="bg-gray-100">
-      <header>
+<body class="bg-gray-100">
+    <header>
         <nav class="bg-gray-800">
-          <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-            <div class="relative flex h-16 items-center justify-between">
-              
-              <!-- Left Side: Logo and Navigation -->
-              <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <div class="flex flex-shrink-0 items-center">
-                  <h3 class="text-gray-100">Project:Gaia Seller Hub</h3>
+            <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+                <div class="relative flex h-16 items-center justify-between">
+                    <!-- Left Side: Logo -->
+                    <div class="flex flex-1 items-center justify-between sm:items-stretch sm:justify-start">
+                        <div class="flex flex-shrink-0 items-center">
+                            <h3 class="text-gray-100">Project:Gaia Seller Hub</h3>
+                        </div>
+                        <!-- Mobile Menu Button -->
+                        <div class="sm:hidden">
+                            <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                                <span class="sr-only">Open main menu</span>
+                                <i class="fa-solid fa-bars"></i>
+                            </button>
+                        </div>
+                        <!-- Desktop Navigation -->
+                        <div class="hidden sm:ml-6 sm:block">
+                            <div class="flex space-x-4">
+                                <a href="seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Side: Profile and Logout -->
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                        <div class="relative ml-3">
+                            <div class="flex items-center space-x-4">
+                                <!-- Profile Icon Link -->
+                                <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2">
+                                    <i class="fa-solid fa-user" id="profile-icon"></i>
+                                </a>
+                                <!-- Logout Link -->
+                                <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="hidden sm:ml-6 sm:block">
-                  <div class="flex space-x-4">
-                    <a href="seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
-                  </div>
-                </div>
-              </div>
-      
-              <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <div class="relative ml-3">
-                  <div class="flex items-center space-x-4">
-                    <!-- Profile Icon Link -->
-                    <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2" >
-                      <!-- Heroicon for Profile -->
-                      <i class="fa-solid fa-user" id="profile-icon"></i>
-                    </a>
-        
-                    <!-- Logout Link -->
-                    <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden sm:hidden">
+                <div class="space-y-1 px-2 pt-2 pb-3">
+                    <a href="seller-hub-main.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Home</a>
+                </div>
+            </div>
         </nav>
-      </header>
+    </header>
 
-
-    <!-- Sidebar -->
     <div class="flex">
         <!-- Sidebar -->
-        <div class="w-64 h-screen bg-gray-800 text-white p-10 ">
+        <div id="sidebar" class="w-64 h-screen bg-gray-800 text-white p-10 hidden sm:block">
             <ul class="space-y-6">
                 <li>
                     <a href="seller-hub-active-listings.html" class="hover:bg-gray-700 p-2 rounded transition">Active Listings</a>
@@ -68,10 +76,9 @@
                 <li>
                     <a href="seller-hub-inactive-listings.html" class="hover:bg-gray-700 p-2 rounded transition">Inactive Listings</a>
                 </li>
-                <!-- New Reviews link -->
                 <li>
-                  <a href="seller-hub-reviews.html" class="hover:bg-gray-700 p-2 rounded transition">My Reviews</a>
-              </li>
+                    <a href="seller-hub-reviews.html" class="hover:bg-gray-700 p-2 rounded transition">My Reviews</a>
+                </li>
             </ul>
         </div>
 
@@ -163,5 +170,21 @@
     </div>
   </div>
 </div>
+
+<script>
+    // Toggle mobile menu visibility
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // Toggle sidebar visibility on mobile
+    const sidebar = document.getElementById('sidebar');
+    mobileMenuButton.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+    });
+</script>
 </body>
 </html>
