@@ -66,6 +66,12 @@ function createRentalHistoryElement(rentalData) {
     // Check if the "image" field exists
     const imageUrl = rentalData.image || '';
 
+    // Determine if the cancel button should be disabled
+    const isPickedUp = rentalData.status.toLowerCase() === 'picked up';
+    const cancelButtonAttributes = isPickedUp
+        ? 'disabled class="mt-4 bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed"'
+        : 'class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 cancel-rent-button"';
+
     rentalElement.innerHTML = `
         <div class="flex">
             <!-- Image section -->
@@ -79,6 +85,7 @@ function createRentalHistoryElement(rentalData) {
                 <p class="text-gray-700 mt-2">End Date: ${rentalData.endDate}</p>
                 <p class="text-gray-700 mt-2">Price: ₱${rentalData.finalPrice}</p>
                 <p class="text-gray-700 mt-2">Status: ${rentalData.status}</p>
+                <button ${cancelButtonAttributes} data-id="${rentalData.id}">Cancel Rent</button>
             </div>
         </div>
     `;
