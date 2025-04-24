@@ -1,6 +1,8 @@
 // Import necessary functions from Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getDoc, doc, setDoc, deleteDoc, updateDoc, query, collection, where, getDocs 
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Your Firebase configuration
@@ -19,12 +21,14 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(); // Initialize Firebase Authentication
 
-// Load rental history when the page loads
+// ... (imports and firebase config stay the same)
+
+// Load rental history on page load
 window.onload = () => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("User is logged in:", user);
-            showRentalHistory(user.uid); // Show rental history for the logged-in user
+            showRentalHistory(user.uid);
         } else {
             console.log("No user is logged in.");
         }
@@ -34,10 +38,9 @@ window.onload = () => {
 // Show rental history for the logged-in user
 async function showRentalHistory(userId) {
     const rentalHistoryContainer = document.getElementById('rentalHistoryContainer');
-    rentalHistoryContainer.innerHTML = ''; // Clear the container
+    rentalHistoryContainer.innerHTML = ''; // Clear previous
 
     try {
-        // Query the 'rentals' collection for documents where the 'buyerId' matches the logged-in user's ID
         const rentalsQuery = query(collection(db, "rentals"), where('buyerId', '==', userId));
         const rentalsSnapshot = await getDocs(rentalsQuery);
 
@@ -46,12 +49,21 @@ async function showRentalHistory(userId) {
             return;
         }
 
-        // Loop through the documents and display each rental item
         for (const docSnapshot of rentalsSnapshot.docs) {
             const rentalData = docSnapshot.data();
+            rentalData.id = docSnapshot.id; // Attach doc ID for cancellation
             const rentalElement = createRentalHistoryElement(rentalData);
             rentalHistoryContainer.appendChild(rentalElement);
         }
+
+        // Attach event listeners to all cancel buttons
+        document.querySelectorAll('.cancel-rent-button').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const listingId = event.target.getAttribute('data-id');
+                await cancelRental(listingId);
+            });
+        });
+
     } catch (error) {
         console.error("Error fetching rental history: ", error);
         rentalHistoryContainer.innerHTML = '<p class="text-red-500 text-center">Failed to load rental history. Please try again later.</p>';
@@ -63,32 +75,78 @@ function createRentalHistoryElement(rentalData) {
     const rentalElement = document.createElement('div');
     rentalElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg', 'mb-4');
 
-    // Check if the "image" field exists
     const imageUrl = rentalData.image || '';
-
-    // Determine if the cancel button should be disabled
     const isPickedUp = rentalData.status.toLowerCase() === 'picked up';
-    const cancelButtonAttributes = isPickedUp
-        ? 'disabled class="mt-4 bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed"'
-        : 'class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 cancel-rent-button"';
+
+    const cancelButton = isPickedUp
+        ? `<button disabled class="mt-4 bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed">Cancel Rent</button>`
+        : `<button class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 cancel-rent-button" data-id="${rentalData.id}">Cancel Rent</button>`;
 
     rentalElement.innerHTML = `
         <div class="flex">
-            <!-- Image section -->
             <div class="w-32 h-32 mr-4">
                 <img src="${imageUrl}" alt="${rentalData.productName}" class="w-full h-full object-cover rounded-lg">
             </div>
-            
             <div class="flex-1">
                 <h3 class="text-xl font-semibold text-gray-900">${rentalData.listingName}</h3>
                 <p class="text-gray-700 mt-2">Start Date: ${rentalData.startDate}</p>
                 <p class="text-gray-700 mt-2">End Date: ${rentalData.endDate}</p>
                 <p class="text-gray-700 mt-2">Price: ₱${rentalData.finalPrice}</p>
                 <p class="text-gray-700 mt-2">Status: ${rentalData.status}</p>
-                <button ${cancelButtonAttributes} data-id="${rentalData.id}">Cancel Rent</button>
+                ${cancelButton}
             </div>
         </div>
     `;
 
     return rentalElement;
+}
+
+// Function to handle rental cancellation
+async function cancelRental(rentalId) {
+    try {
+        const rentalRef = doc(db, "rentals", rentalId);
+        const rentalSnap = await getDoc(rentalRef);
+
+        if (!rentalSnap.exists()) {
+            alert("Rental record not found.");
+            return;
+        }
+
+        const rentalData = rentalSnap.data();
+
+        // Step 1: Move to rental_history with status "cancelled"
+        const historyRef = doc(db, "rental_history", rentalId);
+        await setDoc(historyRef, { ...rentalData, status: "cancelled" });
+
+        // Step 2: Delete from rentals collection
+        await deleteDoc(rentalRef);
+
+        // Step 3: Find related listing in listed_items and set isActive: true
+        const listedItemsQuery = query(
+            collection(db, "listed_items"),
+            where("productName", "==", rentalData.listingName)
+        );
+        const listedItemsSnapshot = await getDocs(listedItemsQuery);
+
+        if (!listedItemsSnapshot.empty) {
+            listedItemsSnapshot.forEach(async (docSnapshot) => {
+                const listingRef = doc(db, "listed_items", docSnapshot.id);
+                await updateDoc(listingRef, { isActive: true });
+            });
+        } else {
+            console.warn("No matching listing found in 'listed_items'.");
+        }
+
+        alert("Rental cancelled and listing reactivated.");
+
+        // Refresh rental history
+        const user = auth.currentUser;
+        if (user) {
+            showRentalHistory(user.uid);
+        }
+
+    } catch (error) {
+        console.error("Error cancelling rental:", error);
+        alert("Failed to cancel the rental. Please try again.");
+    }
 }
