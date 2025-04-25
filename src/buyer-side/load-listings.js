@@ -115,7 +115,7 @@ async function getShopAddress(listing) {
     }
   }
   
- // Function to show listing details in a modal
+// Function to show listing details in a modal
 async function showListingDetails(listing) {
     const modal = document.getElementById('listing-modal');
     const modalTitle = document.getElementById('modal-title');
@@ -125,7 +125,12 @@ async function showListingDetails(listing) {
     const modalRentPrice = document.getElementById('modal-rent-price');
     const modalSellPrice = document.getElementById('modal-sell-price');
     const modalFooter = document.getElementById('modal-footer'); // Footer for the buttons
-    const modalShopAddress = document.getElementById('modal-shop-address'); // Placeholder for shop address
+    const modalShopAddress = document.getElementById('modal-shop-address'); // Ensure this element exists
+  
+    if (!modalShopAddress) {
+      console.error("modal-shop-address element not found.");
+      return; // Exit early if the element doesn't exist
+    }
   
     // Fetch the shop address for the seller
     const shopAddress = await getShopAddress(listing);
@@ -214,14 +219,11 @@ async function showListingDetails(listing) {
     modal.classList.remove('hidden');
   }
   
-  // Close modal functionality
-  document.getElementById('close-modal').addEventListener('click', () => {
-    document.getElementById('listing-modal').classList.add('hidden');
-  });
-  
-  document.getElementById('close-modal-footer').addEventListener('click', () => {
-    document.getElementById('listing-modal').classList.add('hidden');
-  });
+  // Function to open Google Maps with the shop address
+  function openGoogleMaps(address) {
+    const googleMapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
+    window.open(googleMapsUrl, '_blank');
+  }
   
   // Load listings when the page is loaded
   window.onload = loadListings;
