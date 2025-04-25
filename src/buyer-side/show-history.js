@@ -100,7 +100,7 @@ function createRentalHistoryElement(rentalData) {
 
     // Now fetch and display shop address
     if (rentalData.sellerId) {
-        const sellerRef = doc(db, 'user_seller', rentalData.sellerId);
+        const sellerRef = doc(db, 'user-seller', rentalData.sellerId);
         getDoc(sellerRef).then((sellerSnap) => {
             const shopAddress = sellerSnap.exists() ? sellerSnap.data().shopaddress : 'Not available';
             const shopAddressDiv = rentalElement.querySelector('.shop-address');
