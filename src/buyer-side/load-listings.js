@@ -47,14 +47,18 @@ async function loadListings() {
 
             // Fetch seller shop address using sellerId
             let shopAddress = 'Not available';
-            if (listing.sellerId) {
-                const sellerDocRef = doc(db, 'user_seller', listing.sellerId);
-                const sellerDocSnap = await getDoc(sellerDocRef);
-                if (sellerDocSnap.exists()) {
-                    const sellerData = sellerDocSnap.data();
-                    shopAddress = sellerData.shopaddress || 'Not available';
-                }
-            }
+
+if (listing.sellerId) {
+    const sellerDocRef = doc(db, 'user_seller', listing.sellerId); // listing.sellerId is the doc ID
+    const sellerDocSnap = await getDoc(sellerDocRef);
+
+    if (sellerDocSnap.exists()) {
+        const sellerData = sellerDocSnap.data();
+        shopAddress = sellerData.shopaddress || 'Not available'; // ✅ lowercase field
+    } else {
+        console.warn('Seller document not found for ID:', listing.sellerId);
+    }
+}
 
             let image = '';
             if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
