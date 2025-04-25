@@ -45,7 +45,7 @@ async function loadListings() {
             const listingElement = document.createElement('div');
             listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
 
-            // ✅ Fetch seller shop address using sellerId
+            // Fetch seller shop address using sellerId
             let shopAddress = 'Not available';
             if (listing.sellerId) {
                 const sellerDocRef = doc(db, 'user_seller', listing.sellerId);
