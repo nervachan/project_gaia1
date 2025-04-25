@@ -155,9 +155,9 @@ function showListingDetails(listing, shopAddress = 'Not available') {
     modalRentPrice.innerText = listing.rentPrice ? `Rent Price: ${listing.rentPrice}/day` : '';
     modalSellPrice.innerText = listing.sellPrice ? `Selling Price: ${listing.sellPrice}` : '';
 
-    // ✅ Add Shop Address
+    // Add Shop Address
     modalFooter.insertAdjacentHTML('beforebegin', `
-        <p class="text-gray-600 mt-4 text-center">Shop Address: ${shopAddress}</p>
+        <p class="text-gray-600 mt-4 text-center">Shop Address: ${shopaddress}</p>
     `);
 
     modalFooter.innerHTML = `
