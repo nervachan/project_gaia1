@@ -115,8 +115,8 @@ async function getShopAddress(listing) {
     }
   }
   
-  // Function to show listing details in a modal
-  function showListingDetails(listing) {
+ // Function to show listing details in a modal
+async function showListingDetails(listing) {
     const modal = document.getElementById('listing-modal');
     const modalTitle = document.getElementById('modal-title');
     const modalImageContainer = document.getElementById('modal-image-container');
@@ -125,6 +125,10 @@ async function getShopAddress(listing) {
     const modalRentPrice = document.getElementById('modal-rent-price');
     const modalSellPrice = document.getElementById('modal-sell-price');
     const modalFooter = document.getElementById('modal-footer'); // Footer for the buttons
+    const modalShopAddress = document.getElementById('modal-shop-address'); // Placeholder for shop address
+  
+    // Fetch the shop address for the seller
+    const shopAddress = await getShopAddress(listing);
   
     // Populate modal content
     modalTitle.innerText = listing.productName;
@@ -153,7 +157,7 @@ async function getShopAddress(listing) {
             <button id="next-image" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full">&gt;</button>
           </div>
         `;
-        
+  
         // Initialize carousel functionality
         const carousel = document.getElementById('carousel-images');
         const items = carousel.querySelectorAll('.carousel-item');
@@ -192,6 +196,18 @@ async function getShopAddress(listing) {
         <button id="view-reviews-button" class="px-8 py-4 bg-blue-500 text-white text-lg font-semibold rounded-md hover:bg-blue-600">View Reviews</button>
         <button id="rent-button" class="px-8 py-4 bg-green-500 text-white text-lg font-semibold rounded-md hover:bg-green-600">Rent</button>
       </div>
+    `;
+  
+    // Display shop address and the Google Maps button
+    modalShopAddress.innerHTML = `
+      <p class="text-gray-700 mt-2">Shop Address: ${shopAddress}</p>
+      <button 
+        id="view-google-maps" 
+        class="mt-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+        onclick="openGoogleMaps('${shopAddress}')"
+      >
+        View on Google Maps
+      </button>
     `;
   
     // Show the modal
