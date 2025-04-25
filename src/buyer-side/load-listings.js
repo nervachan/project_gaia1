@@ -45,20 +45,23 @@ async function loadListings() {
             const listingElement = document.createElement('div');
             listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
 
-            // Fetch seller shop address using sellerId
-            let shopAddress = 'Not available';
-
-if (listing.sellerId) {
-    const sellerDocRef = doc(db, 'user_seller', listing.sellerId); // listing.sellerId is the doc ID
-    const sellerDocSnap = await getDoc(sellerDocRef);
-
-    if (sellerDocSnap.exists()) {
-        const sellerData = sellerDocSnap.data();
-        shopAddress = sellerData.shopaddress || 'Not available'; // ✅ lowercase field
-    } else {
-        console.warn('Seller document not found for ID:', listing.sellerId);
-    }
-}
+            async function getShopAddress(listing) {
+                let shopAddress = 'Not available';
+              
+                if (listing.sellerId) {
+                  const sellerDocRef = doc(db, 'user_seller', listing.sellerId);
+                  const sellerDocSnap = await getDoc(sellerDocRef);
+              
+                  if (sellerDocSnap.exists()) {
+                    const sellerData = sellerDocSnap.data();
+                    shopAddress = sellerData.shopaddress || 'Not available';
+                  } else {
+                    console.warn('Seller document not found for ID:', listing.sellerId);
+                  }
+                }
+              
+                return shopAddress;
+              }
 
             let image = '';
             if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
