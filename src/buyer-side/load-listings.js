@@ -1,8 +1,12 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-import { getFirestore, collection, query, where, getDocs, getDoc, doc, addDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";  // Import Firebase Authentication
+import {
+    getFirestore, collection, query, where, getDocs, getDoc, doc, addDoc
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import {
+    getAuth, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -19,7 +23,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
-const auth = getAuth();  // Initialize Firebase Authentication
+const auth = getAuth();
 
 // Function to load and display listings from Firestore
 async function loadListings() {
@@ -87,9 +91,8 @@ async function loadListings() {
     }
 }
 
-
 // Function to show listing details in a modal
-function showListingDetails(listing) {
+function showListingDetails(listing, shopAddress = 'Not available') {
     const modal = document.getElementById('listing-modal');
     const modalTitle = document.getElementById('modal-title');
     const modalImageContainer = document.getElementById('modal-image-container');
@@ -97,22 +100,18 @@ function showListingDetails(listing) {
     const modalCategory = document.getElementById('modal-category');
     const modalRentPrice = document.getElementById('modal-rent-price');
     const modalSellPrice = document.getElementById('modal-sell-price');
-    const modalFooter = document.getElementById('modal-footer'); // Footer for the buttons
+    const modalFooter = document.getElementById('modal-footer');
 
-    // Populate modal content
     modalTitle.innerText = listing.productName;
 
-    // Handle images
     if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
         if (listing.images.length === 1) {
-            // Single image
             modalImageContainer.innerHTML = `
                 <div class="w-full h-full overflow-hidden rounded-md">
                     <img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain">
                 </div>
             `;
         } else {
-            // Carousel for multiple images
             modalImageContainer.innerHTML = `
                 <div class="relative w-full h-full overflow-hidden rounded-md">
                     <div id="carousel-images" class="flex transition-transform duration-300 ease-in-out">
@@ -127,7 +126,6 @@ function showListingDetails(listing) {
                 </div>
             `;
 
-            // Initialize carousel functionality
             const carousel = document.getElementById('carousel-images');
             const items = carousel.querySelectorAll('.carousel-item');
             let currentIndex = 0;
@@ -145,7 +143,6 @@ function showListingDetails(listing) {
             });
         }
     } else {
-        // Fallback if no images are available
         modalImageContainer.innerHTML = `
             <div class="w-full h-auto bg-gray-200 flex items-center justify-center rounded-md">
                 <p class="text-gray-500">No image available</p>
@@ -154,12 +151,15 @@ function showListingDetails(listing) {
     }
 
     modalDescription.innerText = listing.productDescription || 'No description available.';
-    modalCategory.innerText = `Category: ${listing.category || 'N/A'}`;
-    modalCategory.innerText = `Size: ${listing.garmentSize || 'N/A'}`;
+    modalCategory.innerText = `Category: ${listing.category || 'N/A'} - Size: ${listing.garmentSize || 'N/A'}`;
     modalRentPrice.innerText = listing.rentPrice ? `Rent Price: ${listing.rentPrice}/day` : '';
     modalSellPrice.innerText = listing.sellPrice ? `Selling Price: ${listing.sellPrice}` : '';
 
-    // Add Rent and View Reviews buttons to the modal footer
+    // ✅ Add Shop Address
+    modalFooter.insertAdjacentHTML('beforebegin', `
+        <p class="text-gray-600 mt-4 text-center">Shop Address: ${shopAddress}</p>
+    `);
+
     modalFooter.innerHTML = `
         <div class="flex justify-between w-full">
             <button id="view-reviews-button" class="px-8 py-4 bg-blue-500 text-white text-lg font-semibold rounded-md hover:bg-blue-600">View Reviews</button>
@@ -167,11 +167,6 @@ function showListingDetails(listing) {
         </div>
     `;
 
-   
-
-    
-
-    // Show the modal
     modal.classList.remove('hidden');
 }
 
@@ -187,13 +182,11 @@ document.getElementById('close-modal-footer').addEventListener('click', () => {
 // Load listings when the page is loaded
 window.onload = loadListings;
 
-// Add onAuthStateChanged listener
+// Auth state listener
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("User is logged in:", user);
-        // You can update the UI to show the user is logged in, such as displaying their username or showing logout options.
     } else {
         console.log("No user is logged in.");
-        // You can redirect to a login page or show login options.
     }
 });
