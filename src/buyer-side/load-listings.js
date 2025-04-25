@@ -229,11 +229,10 @@ async function showListingDetails(listing) {
     modal.classList.remove('hidden');
   }
   
-  // Function to open Google Maps with the shop address
-  function openGoogleMaps(address) {
+  window.openGoogleMaps = function(address) {
     const googleMapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
     window.open(googleMapsUrl, '_blank');
-  }
+  };
 
   // Load listings when the page is loaded
   window.onload = loadListings;
