@@ -70,7 +70,6 @@ async function showRentalHistory(userId) {
     }
 }
 
-// Function to create rental history elements
 function createRentalHistoryElement(rentalData) {
     const rentalElement = document.createElement('div');
     rentalElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg', 'mb-4');
@@ -93,10 +92,29 @@ function createRentalHistoryElement(rentalData) {
                 <p class="text-gray-700 mt-2">End Date: ${rentalData.endDate}</p>
                 <p class="text-gray-700 mt-2">Price: ₱${rentalData.finalPrice}</p>
                 <p class="text-gray-700 mt-2">Status: ${rentalData.status}</p>
+                <div class="shop-address mt-2 text-gray-700">Loading shop address...</div>
                 ${cancelButton}
             </div>
         </div>
     `;
+
+    // Now fetch and display shop address
+    if (rentalData.sellerId) {
+        const sellerRef = doc(db, 'user_seller', rentalData.sellerId);
+        getDoc(sellerRef).then((sellerSnap) => {
+            const shopAddress = sellerSnap.exists() ? sellerSnap.data().shopaddress : 'Not available';
+            const shopAddressDiv = rentalElement.querySelector('.shop-address');
+            if (shopAddressDiv) {
+                shopAddressDiv.innerHTML = `
+                    <p>Shop Address: ${shopAddress}</p>
+                    ${shopAddress !== 'Not available' ? `
+                    <button class="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" onclick="window.open('https://www.google.com/maps?q=${encodeURIComponent(shopAddress)}', '_blank')">View on Google Maps</button>` : ''}
+                `;
+            }
+        }).catch((err) => {
+            console.error('Error fetching seller address:', err);
+        });
+    }
 
     return rentalElement;
 }
