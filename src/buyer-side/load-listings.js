@@ -125,7 +125,17 @@ async function showListingDetails(listing) {
     const modalRentPrice = document.getElementById('modal-rent-price');
     const modalSellPrice = document.getElementById('modal-sell-price');
     const modalFooter = document.getElementById('modal-footer'); // Footer for the buttons
-    const modalShopAddress = document.getElementById('modal-shop-address'); // Ensure this element exists
+    const modalShopAddress = document.getElementById('modal-shop-address'); // Shop Address Section
+  
+    // Reset modal content before showing new details
+    modalTitle.innerText = '';
+    modalImageContainer.innerHTML = '';
+    modalDescription.innerText = '';
+    modalCategory.innerText = '';
+    modalRentPrice.innerText = '';
+    modalSellPrice.innerText = '';
+    modalFooter.innerHTML = '';
+    modalShopAddress.innerHTML = '';  // Clear previous shop address
   
     if (!modalShopAddress) {
       console.error("modal-shop-address element not found.");
@@ -224,6 +234,6 @@ async function showListingDetails(listing) {
     const googleMapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
     window.open(googleMapsUrl, '_blank');
   }
-  
+
   // Load listings when the page is loaded
   window.onload = loadListings;
