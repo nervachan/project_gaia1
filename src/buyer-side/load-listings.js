@@ -52,7 +52,7 @@ async function loadListings() {
                 const sellerDocSnap = await getDoc(sellerDocRef);
                 if (sellerDocSnap.exists()) {
                     const sellerData = sellerDocSnap.data();
-                    shopAddress = sellerData.shopAddress || 'Not available';
+                    shopAddress = sellerData.shopaddress || 'Not available';
                 }
             }
 
@@ -157,7 +157,7 @@ function showListingDetails(listing, shopAddress = 'Not available') {
 
     // Add Shop Address
     modalFooter.insertAdjacentHTML('beforebegin', `
-        <p class="text-gray-600 mt-4 text-center">Shop Address: ${shopaddress}</p>
+        <p class="text-gray-600 mt-4 text-center">Shop Address: ${shopAddress}</p>
     `);
 
     modalFooter.innerHTML = `
