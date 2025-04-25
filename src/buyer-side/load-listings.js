@@ -24,39 +24,38 @@ const auth = getAuth();  // Initialize Firebase Authentication
 // Function to load and display listings from Firestore
 async function loadListings() {
     const listingsContainer = document.getElementById('listing-container');
-
-    // Clear the container before adding new listings
     listingsContainer.innerHTML = '<p class="text-gray-500 text-center">Loading listings...</p>';
 
     try {
-        // Query the "listed_items" collection where "isActive" is true
         const listingsQuery = query(collection(db, 'listed_items'), where("isActive", "==", true));
         const querySnapshot = await getDocs(listingsQuery);
-
-        // Clear the loading message
         listingsContainer.innerHTML = '';
 
         if (querySnapshot.empty) {
-            // Show a message if no active listings are found
-            listingsContainer.innerHTML = `
-                <p class="text-gray-500 text-center">No active listings available at the moment.</p>
-            `;
+            listingsContainer.innerHTML = `<p class="text-gray-500 text-center">No active listings available at the moment.</p>`;
             return;
         }
 
-        // Loop through the documents and add them to the page
-        querySnapshot.forEach((doc) => {
-            const listing = doc.data();
+        for (const docSnap of querySnapshot.docs) {
+            const listing = docSnap.data();
             const listingElement = document.createElement('div');
             listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
 
-            // Check if the "images" field exists and is an array
+            // ✅ Fetch seller shop address using sellerId
+            let shopAddress = 'Not available';
+            if (listing.sellerId) {
+                const sellerDocRef = doc(db, 'user_seller', listing.sellerId);
+                const sellerDocSnap = await getDoc(sellerDocRef);
+                if (sellerDocSnap.exists()) {
+                    const sellerData = sellerDocSnap.data();
+                    shopAddress = sellerData.shopAddress || 'Not available';
+                }
+            }
+
             let image = '';
             if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
-                // Use the first image from the array
                 image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-100 object-cover rounded-md">`;
             } else {
-                // Fallback if no images are available
                 image = `<div class="w-full h-full bg-gray-200 flex items-center justify-center rounded-md">
                             <p class="text-gray-500">No image available</p>
                          </div>`;
@@ -69,17 +68,17 @@ async function loadListings() {
                 <p class="text-gray-700 mt-2">Size: ${listing.garmentSize || 'N/A'}</p>
                 ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ${listing.rentPrice}/day</p>` : ''}
                 ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ${listing.sellPrice}</p>` : ''}
+                <p class="text-gray-600 mt-2 text-sm">Shop Address: ${shopAddress}</p>
                 <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 view-details-btn">View Details</button>
             `;
 
             listingsContainer.appendChild(listingElement);
 
-            // Add event listener for 'View Details' button
             const viewDetailsButton = listingElement.querySelector('.view-details-btn');
             viewDetailsButton.addEventListener('click', () => {
-                showListingDetails(listing);
+                showListingDetails(listing, shopAddress);
             });
-        });
+        }
     } catch (error) {
         console.error('Error loading listings:', error);
         listingsContainer.innerHTML = `
@@ -87,6 +86,7 @@ async function loadListings() {
         `;
     }
 }
+
 
 // Function to show listing details in a modal
 function showListingDetails(listing) {
