@@ -30,7 +30,7 @@ async function getShopAddress(listing) {
     let shopAddress = 'Not available';
   
     if (listing.sellerId) {
-      const sellerDocRef = doc(db, 'user_seller', listing.sellerId);
+      const sellerDocRef = doc(db, 'user-seller', listing.sellerId);
       const sellerDocSnap = await getDoc(sellerDocRef);
   
       if (sellerDocSnap.exists()) {
