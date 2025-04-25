@@ -66,9 +66,9 @@ async function loadListings() {
                 ${image}
                 <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
                 <p class="text-gray-700 mt-2">Category: ${listing.category || 'N/A'}</p>
-                
+                <p class="text-gray-700 mt-2">Size: ${listing.garmentSize || 'N/A'}</p>
                 ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ${listing.rentPrice}/day</p>` : ''}
-                ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: $${listing.sellPrice}</p>` : ''}
+                ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ${listing.sellPrice}</p>` : ''}
                 <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 view-details-btn">View Details</button>
             `;
 
@@ -155,8 +155,9 @@ function showListingDetails(listing) {
 
     modalDescription.innerText = listing.productDescription || 'No description available.';
     modalCategory.innerText = `Category: ${listing.category || 'N/A'}`;
-    modalRentPrice.innerText = listing.rentPrice ? `Rent Price: $${listing.rentPrice}` : '';
-    modalSellPrice.innerText = listing.sellPrice ? `Selling Price: $${listing.sellPrice}` : '';
+    modalCategory.innerText = `Size: ${listing.garmentSize || 'N/A'}`;
+    modalRentPrice.innerText = listing.rentPrice ? `Rent Price: ${listing.rentPrice}/day` : '';
+    modalSellPrice.innerText = listing.sellPrice ? `Selling Price: ${listing.sellPrice}` : '';
 
     // Add Rent and View Reviews buttons to the modal footer
     modalFooter.innerHTML = `

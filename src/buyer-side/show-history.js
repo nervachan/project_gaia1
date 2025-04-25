@@ -1,6 +1,6 @@
 // Import necessary functions from Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getDoc, doc, setDoc, deleteDoc, updateDoc, query, collection, where, getDocs 
+import { getFirestore, getDoc, doc, setDoc, deleteDoc, updateDoc, query, collection, where, getDocs 
 } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";

@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const listingDocRef = listingDoc.ref; // Reference to the listing document
                     await updateDoc(listingDocRef, { isActive: false });
 
-                    alert('Rental submitted successfully! The listing is now inactive.');
+                    alert('Rental submitted successfully!');
                     
                     const rentModal = document.getElementById('rentModal');
                     if (rentModal) {
