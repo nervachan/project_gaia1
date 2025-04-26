@@ -1,8 +1,6 @@
 // Import necessary functions from Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, getDoc, doc, setDoc, deleteDoc, updateDoc, query, collection, where, getDocs 
-} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-
+import { getFirestore, getDoc, doc, setDoc, deleteDoc, updateDoc, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Your Firebase configuration
@@ -21,24 +19,22 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(); // Initialize Firebase Authentication
 
-// ... (imports and firebase config stay the same)
-
 // Load rental history on page load
 window.onload = () => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("User is logged in:", user);
-            showRentalHistory(user.uid);
+            showRentalHistory(user.uid); // Show history for the logged-in user
         } else {
             console.log("No user is logged in.");
         }
     });
 };
 
-// Show rental history for the logged-in user (Buyer)
+// Show rental history for the logged-in user
 async function showRentalHistory(userId) {
     const rentalHistoryContainer = document.getElementById('rentalHistoryContainer');
-    rentalHistoryContainer.innerHTML = ''; // Clear previous
+    rentalHistoryContainer.innerHTML = ''; // Clear previous content
 
     try {
         const rentalsQuery = query(collection(db, "rentals"), where('buyerId', '==', userId));
@@ -55,7 +51,6 @@ async function showRentalHistory(userId) {
             const rentalElement = createRentalHistoryElement(rentalData);
             rentalHistoryContainer.appendChild(rentalElement);
         }
-
     } catch (error) {
         console.error("Error fetching rental history: ", error);
         rentalHistoryContainer.innerHTML = '<p class="text-red-500 text-center">Failed to load rental history. Please try again later.</p>';
@@ -69,6 +64,7 @@ function createRentalHistoryElement(rentalData) {
 
     const imageUrl = rentalData.image || '';
     const isReturned = rentalData.status.toLowerCase() === 'returned';
+    const reviewGiven = rentalData.reviewGiven || false;
 
     rentalElement.innerHTML = `
         <div class="flex">
@@ -82,9 +78,9 @@ function createRentalHistoryElement(rentalData) {
                 <p class="text-gray-700 mt-2">Price: ₱${rentalData.finalPrice}</p>
                 <p class="text-gray-700 mt-2">Status: ${rentalData.status}</p>
 
-                <!-- Show the review form if item is returned -->
+                <!-- Show the review form if item is returned and no review is given -->
                 <div class="reviews mt-4">
-                    ${isReturned && !rentalData.reviewGiven ? `
+                    ${isReturned && !reviewGiven ? `
                         <h4 class="text-lg font-semibold text-gray-800">Leave a Review</h4>
                         <textarea id="buyerReviewText-${rentalData.id}" class="w-full p-2 border rounded-md mt-2" placeholder="Write your review..."></textarea>
                         <button class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4" onclick="submitBuyerReview('${rentalData.id}', '${rentalData.sellerId}')">Submit Review</button>
@@ -97,7 +93,7 @@ function createRentalHistoryElement(rentalData) {
     return rentalElement;
 }
 
-// Submit the review from the buyer
+// Function to submit the review from the buyer
 async function submitBuyerReview(rentalId, sellerId) {
     const reviewText = document.getElementById(`buyerReviewText-${rentalId}`).value;
 
@@ -123,60 +119,12 @@ async function submitBuyerReview(rentalId, sellerId) {
         alert("Review submitted successfully!");
 
         // Refresh the rental history to reflect the review submission
-        showRentalHistory(auth.currentUser.uid);
-
-    } catch (error) {
-        console.error("Error submitting buyer review:", error);
-        alert("Failed to submit the review. Please try again.");
-    }
-}
-
-// Function to handle rental cancellation
-async function cancelRental(rentalId) {
-    try {
-        const rentalRef = doc(db, "rentals", rentalId);
-        const rentalSnap = await getDoc(rentalRef);
-
-        if (!rentalSnap.exists()) {
-            alert("Rental record not found.");
-            return;
-        }
-
-        const rentalData = rentalSnap.data();
-
-        // Step 1: Move to rental_history with status "cancelled"
-        const historyRef = doc(db, "rental_history", rentalId);
-        await setDoc(historyRef, { ...rentalData, status: "cancelled" });
-
-        // Step 2: Delete from rentals collection
-        await deleteDoc(rentalRef);
-
-        // Step 3: Find related listing in listed_items and set isActive: true
-        const listedItemsQuery = query(
-            collection(db, "listed_items"),
-            where("productName", "==", rentalData.listingName)
-        );
-        const listedItemsSnapshot = await getDocs(listedItemsQuery);
-
-        if (!listedItemsSnapshot.empty) {
-            listedItemsSnapshot.forEach(async (docSnapshot) => {
-                const listingRef = doc(db, "listed_items", docSnapshot.id);
-                await updateDoc(listingRef, { isActive: true });
-            });
-        } else {
-            console.warn("No matching listing found in 'listed_items'.");
-        }
-
-        alert("Rental cancelled and listing reactivated.");
-
-        // Refresh rental history
         const user = auth.currentUser;
         if (user) {
             showRentalHistory(user.uid);
         }
-
     } catch (error) {
-        console.error("Error cancelling rental:", error);
-        alert("Failed to cancel the rental. Please try again.");
+        console.error("Error submitting buyer review:", error);
+        alert("Failed to submit the review. Please try again.");
     }
 }
