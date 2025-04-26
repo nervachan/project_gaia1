@@ -97,7 +97,7 @@ function createRentalHistoryElement(rentalData) {
     return rentalElement;
 }
 
-// Function to submit the review from the buyer
+// Submit the review from the buyer
 async function submitBuyerReview(rentalId, sellerId) {
     const reviewText = document.getElementById(`buyerReviewText-${rentalId}`).value;
 
@@ -130,14 +130,6 @@ async function submitBuyerReview(rentalId, sellerId) {
         alert("Failed to submit the review. Please try again.");
     }
 }
-
-// Example: Initialize and display rental history when the page loads
-window.onload = () => {
-    const user = auth.currentUser;
-    if (user) {
-        showRentalHistory(user.uid);
-    }
-};
 
 // Function to handle rental cancellation
 async function cancelRental(rentalId) {
