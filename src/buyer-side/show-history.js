@@ -35,7 +35,7 @@ window.onload = () => {
     });
 };
 
-// Show rental history for the logged-in user
+// Show rental history for the logged-in user (Buyer)
 async function showRentalHistory(userId) {
     const rentalHistoryContainer = document.getElementById('rentalHistoryContainer');
     rentalHistoryContainer.innerHTML = ''; // Clear previous
@@ -56,30 +56,19 @@ async function showRentalHistory(userId) {
             rentalHistoryContainer.appendChild(rentalElement);
         }
 
-        // Attach event listeners to all cancel buttons
-        document.querySelectorAll('.cancel-rent-button').forEach(button => {
-            button.addEventListener('click', async (event) => {
-                const listingId = event.target.getAttribute('data-id');
-                await cancelRental(listingId);
-            });
-        });
-
     } catch (error) {
         console.error("Error fetching rental history: ", error);
         rentalHistoryContainer.innerHTML = '<p class="text-red-500 text-center">Failed to load rental history. Please try again later.</p>';
     }
 }
 
+// Create the rental history element for the buyer
 function createRentalHistoryElement(rentalData) {
     const rentalElement = document.createElement('div');
     rentalElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg', 'mb-4');
 
     const imageUrl = rentalData.image || '';
-    const isPickedUp = rentalData.status.toLowerCase() === 'picked up';
-
-    const cancelButton = isPickedUp
-        ? `<button disabled class="mt-4 bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed">Cancel Rent</button>`
-        : `<button class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 cancel-rent-button" data-id="${rentalData.id}">Cancel Rent</button>`;
+    const isReturned = rentalData.status.toLowerCase() === 'returned';
 
     rentalElement.innerHTML = `
         <div class="flex">
@@ -92,31 +81,54 @@ function createRentalHistoryElement(rentalData) {
                 <p class="text-gray-700 mt-2">End Date: ${rentalData.endDate}</p>
                 <p class="text-gray-700 mt-2">Price: ₱${rentalData.finalPrice}</p>
                 <p class="text-gray-700 mt-2">Status: ${rentalData.status}</p>
-                <div class="shop-address mt-2 text-gray-700">Loading shop address...</div>
-                ${cancelButton}
+
+                <!-- Show the review form if item is returned -->
+                <div class="reviews mt-4">
+                    ${isReturned && !rentalData.reviewGiven ? `
+                        <h4 class="text-lg font-semibold text-gray-800">Leave a Review</h4>
+                        <textarea id="buyerReviewText-${rentalData.id}" class="w-full p-2 border rounded-md mt-2" placeholder="Write your review..."></textarea>
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4" onclick="submitBuyerReview('${rentalData.id}', '${rentalData.sellerId}')">Submit Review</button>
+                    ` : ''}
+                </div>
             </div>
         </div>
     `;
 
-    // Now fetch and display shop address
-    if (rentalData.sellerId) {
-        const sellerRef = doc(db, 'user-seller', rentalData.sellerId);
-        getDoc(sellerRef).then((sellerSnap) => {
-            const shopAddress = sellerSnap.exists() ? sellerSnap.data().shopaddress : 'Not available';
-            const shopAddressDiv = rentalElement.querySelector('.shop-address');
-            if (shopAddressDiv) {
-                shopAddressDiv.innerHTML = `
-                    <p>Shop Address: ${shopAddress}</p>
-                    ${shopAddress !== 'Not available' ? `
-                    <button class="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" onclick="window.open('https://www.google.com/maps?q=${encodeURIComponent(shopAddress)}', '_blank')">View on Google Maps</button>` : ''}
-                `;
-            }
-        }).catch((err) => {
-            console.error('Error fetching seller address:', err);
-        });
+    return rentalElement;
+}
+
+// Submit the review from the buyer
+async function submitBuyerReview(rentalId, sellerId) {
+    const reviewText = document.getElementById(`buyerReviewText-${rentalId}`).value;
+
+    if (!reviewText.trim()) {
+        alert("Please write a review before submitting.");
+        return;
     }
 
-    return rentalElement;
+    try {
+        // Store the review in the 'reviews' collection
+        await setDoc(doc(db, "reviews", rentalId), {
+            rentalId,
+            sellerId,
+            reviewText,
+            reviewBy: "buyer", // Indicate it's the buyer's review
+            timestamp: new Date(),
+        });
+
+        // Update the rental document to mark that the buyer has submitted a review
+        const rentalRef = doc(db, "rentals", rentalId);
+        await updateDoc(rentalRef, { reviewGiven: true });
+
+        alert("Review submitted successfully!");
+
+        // Refresh the rental history to reflect the review submission
+        showRentalHistory(auth.currentUser.uid);
+
+    } catch (error) {
+        console.error("Error submitting buyer review:", error);
+        alert("Failed to submit the review. Please try again.");
+    }
 }
 
 // Function to handle rental cancellation
