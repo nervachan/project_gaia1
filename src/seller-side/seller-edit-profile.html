@@ -14,55 +14,65 @@
     <script type="module" src="logout.js"></script>
 </head>
 <body class="bg-gray-100 pt-16">
-    <header>
-        <nav class="bg-gray-800">
-          <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-            <div class="relative flex h-16 items-center justify-between">
-              
-              <!-- Left Side: Logo and Navigation -->
-              <div class="flex flex-1 items-center justify-between sm:items-stretch sm:justify-start">
-                <div class="flex flex-shrink-0 items-center">
-                  <h3 class="text-gray-100">Project:Gaia Seller Hub</h3>
-                </div>
-                <!-- Mobile Menu Button -->
-                <div class="sm:hidden">
-                  <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                    <span class="sr-only">Open main menu</span>
-                    <i class="fa-solid fa-bars"></i>
-                  </button>
-                </div>
-                <!-- Desktop Navigation -->
-                <div class="hidden sm:ml-6 sm:block">
-                  <div class="flex space-x-4">
-                    <a href="seller-side/seller-hub-main.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 bg-gray-800 text-gray-300 hover:text-white">Home</a>
-                  </div>
-                </div>
-              </div>
-      
-              <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <div class="relative ml-3">
-                  <div class="flex items-center space-x-4">
-                    <!-- Profile Icon Link -->
-                    <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2" >
-                      <!-- Heroicon for Profile -->
-                      <i class="fa-solid fa-user" id="profile-icon"></i>
-                    </a>
-        
-                    <!-- Logout Link -->
-                    <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <!-- Fixed Header -->
+<header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
+  <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-16 items-center justify-between">
+      <!-- Logo Section -->
+      <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+        <div class="flex flex-shrink-0 items-center">
+          <h3 class="text-gray-100">Project:Gaia - Seller Hub</h3>
+        </div>
+      </div>
+
+      <!-- Hamburger Menu Button -->
+      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+        <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+          <span class="sr-only">Open main menu</span>
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block">
+        <div class="flex flex-col sm:flex-row sm:space-x-4">
+          <a href="#" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+          <a href="/project_gaia1/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+        </div>
+      </div>
+
+      <!-- Profile and Logout -->
+      <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+        <div class="relative ml-3">
+          <div class="flex items-center space-x-4">
+            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2">
+              <i class="fa-solid fa-user" id="profile-icon"></i>
+            </a>
+            <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
           </div>
-          <!-- Mobile Menu -->
-          <div id="mobile-menu" class="hidden sm:hidden">
-            <div class="space-y-1 px-2 pt-2 pb-3">
-              <a href="seller-side/seller-hub-main.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Home</a>
-            </div>
-          </div>
-        </nav>
-      </header>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Dropdown -->
+  <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
+    <a href="seller-hub-active-listings.html" class="block px-3 py-2 text-base font-medium text-white hover:bg-gray-700">Home</a>
+    <a href="seller-hub-create-listing.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Create a Listing</a>
+    <a href="seller-hub-pending-items.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Pending Rentals</a>
+    <a href="seller-hub-pending-items.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Inactive Listings</a>
+    <a href="seller-hub-pending-items.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Reviews</a>
+    <a href="seller-hub-reviews.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+  </div>
+</header>
+
+<script>
+  
+  document.getElementById('mobile-menu-button').addEventListener('click', () => {
+    const mobileMenu = document.getElementById('mobile-menu-dropdown');
+    mobileMenu.classList.toggle('hidden');
+  });
+</script>
 
     <!-- Content Section -->
     <main class="mt-20 max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -93,15 +103,7 @@
         </form>
     </main>
 
-    <script>
-        // Toggle mobile menu visibility
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    </script>
+    
 </body>
 </html>
 
