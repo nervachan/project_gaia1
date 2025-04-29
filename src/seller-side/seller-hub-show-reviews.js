@@ -41,8 +41,8 @@ async function fetchUserReviews(userId) {
             reviewDiv.className = "bg-white shadow-md rounded p-6 mb-4";
 
             reviewDiv.innerHTML = `
-                <h3 class="text-xl font-semibold text-gray-800">${reviewData.productName}</h3>
-                <p class="text-gray-600">Rating: ${"⭐".repeat(reviewData.rating)}</p>
+                <h3 class="text-xl font-semibold text-gray-800">${reviewData.listingName}</h3>
+                <p class="text-gray-600">Ordered By: ${reviewData.name}</p>
                 <p class="text-gray-600">${reviewData.reviewText}</p>
             `;
 
