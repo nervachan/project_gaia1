@@ -113,7 +113,7 @@ async function submitBuyerReview(rentalId, sellerId) {
     }
 
     try {
-        // Step 1: Fetch the rental document to get the listingName
+        // Step 1: Fetch the rental document to get the listingName and name
         const rentalRef = doc(db, "rentals", rentalId);
         const rentalSnapshot = await getDoc(rentalRef);
 
@@ -123,15 +123,17 @@ async function submitBuyerReview(rentalId, sellerId) {
         }
 
         const rentalData = rentalSnapshot.data();
-        const listingName = rentalData.listingName; // Fetch the listing name from rental
+        const listingName = rentalData.listingName;  // Fetch the listingName from the rental
+        const name = rentalData.name;  // Fetch the name from the rental
 
-        // Step 2: Store the review in the 'reviews' collection, including the listingName
+        // Step 2: Store the review in the 'reviews' collection, including the listingName, name, and other relevant data
         await setDoc(doc(db, "reviews", rentalId), {
             rentalId,
             sellerId,
-            listingName, // Add the listingName to the review entry
+            listingName,    // Add the listingName to the review entry
+            name,           // Add the name to the review entry
             reviewText,
-            reviewBy: "buyer", // Indicate it's the buyer's review
+            reviewBy: "buyer",  // Indicate it's the buyer's review
             timestamp: new Date(),
         });
 
