@@ -19,7 +19,7 @@ const db = getFirestore(app);
 
 // Modal HTML for displaying reviews
 const reviewModalHTML = `
-    <div id="review-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+    <div id="review-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
         <div class="bg-white p-6 rounded-lg shadow-lg w-1/2">
             <h2 class="text-2xl font-bold" id="review-modal-title">Reviews</h2>
             <div id="review-content" class="mt-4 overflow-y-auto max-h-96">
@@ -74,7 +74,7 @@ document.getElementById('close-review-modal')?.addEventListener('click', () => {
 
 // Modal for listing details
 const listingModalHTML = `
-    <div id="listing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div id="listing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
         <div class="bg-white p-6 rounded-lg">
             <h2 id="modal-title" class="text-xl font-bold"></h2>
             <div id="modal-content"></div>
@@ -114,8 +114,10 @@ document.getElementById('close-modal')?.addEventListener('click', () => {
     modal.classList.add('hidden'); // Hide the listing modal when close button is clicked
 });
 
-// Event listener for the "View Reviews" button inside listing modal
-document.getElementById('view-reviews-button')?.addEventListener('click', () => {
-    const listingId = document.getElementById('view-reviews-button').getAttribute('data-id');
-    showReviews(listingId); // Show reviews for the given listing
+// Use event delegation for the "View Reviews" button
+document.addEventListener('click', (event) => {
+    if (event.target && event.target.id === 'view-reviews-button') {
+        const listingId = event.target.getAttribute('data-id');
+        showReviews(listingId); // Show reviews for the given listing
+    }
 });
