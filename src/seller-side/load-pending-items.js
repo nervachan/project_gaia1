@@ -78,12 +78,12 @@ async function updateItemStatus(docId, newStatus) {
 
             alert("Item has been cancelled and moved to rental history!");
         } else if (newStatus === "relisted") {
-            // Move the document to the rental_history collection
+            // Move the document to the rental_history collection, but retain it in rentals
             const historyRef = doc(db, "rental_history", docId);
             await setDoc(historyRef, { ...itemData, status: "relisted" }); // Update status to "relisted"
 
-            // Delete the document from the rentals collection
-            await deleteDoc(itemRef);
+            // Update the status in the rentals collection
+            await updateDoc(itemRef, { status: "relisted" });
 
             // Query the listed_items collection using the listingName from the rentals collection
             const listedItemsQuery = query(
@@ -104,7 +104,7 @@ async function updateItemStatus(docId, newStatus) {
 
             alert("Item has been relisted and moved to rental history!");
         } else {
-            // Update the status in the rentals collection
+            // Update the status in the rentals collection for other statuses
             await updateDoc(itemRef, { status: newStatus });
             alert(`Item marked as ${newStatus}!`);
         }
@@ -142,9 +142,15 @@ async function fetchUserPendingItems(userId) {
             return;
         }
 
-        // Loop through the documents and display each pending item
+        // Loop through the documents and display each pending item, excluding "relisted" items
         for (const docSnapshot of pendingItemsSnapshot.docs) {
             const itemData = docSnapshot.data();
+
+            // Skip the item if its status is "relisted"
+            if (itemData.status === "relisted") {
+                continue;
+            }
+
             const itemDiv = document.createElement("div");
             itemDiv.className = "bg-white shadow-md rounded p-6 mb-4";
 

@@ -83,12 +83,22 @@ function createRentalHistoryElement(rentalData) {
                     ${isReturned && !reviewGiven ? `
                         <h4 class="text-lg font-semibold text-gray-800">Leave a Review</h4>
                         <textarea id="buyerReviewText-${rentalData.id}" class="w-full p-2 border rounded-md mt-2" placeholder="Write your review..."></textarea>
-                        <button class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4" onclick="submitBuyerReview('${rentalData.id}', '${rentalData.sellerId}')">Submit Review</button>
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4" data-rental-id="${rentalData.id}" data-seller-id="${rentalData.sellerId}">Submit Review</button>
                     ` : ''}
                 </div>
             </div>
         </div>
     `;
+
+    // Add the event listener for the Submit Review button
+    const submitReviewButton = rentalElement.querySelector('button');
+    if (submitReviewButton) {
+        submitReviewButton.addEventListener('click', (e) => {
+            const rentalId = e.target.getAttribute('data-rental-id');
+            const sellerId = e.target.getAttribute('data-seller-id');
+            submitBuyerReview(rentalId, sellerId);
+        });
+    }
 
     return rentalElement;
 }
@@ -103,17 +113,29 @@ async function submitBuyerReview(rentalId, sellerId) {
     }
 
     try {
-        // Store the review in the 'reviews' collection
+        // Step 1: Fetch the rental document to get the listingName
+        const rentalRef = doc(db, "rentals", rentalId);
+        const rentalSnapshot = await getDoc(rentalRef);
+
+        if (!rentalSnapshot.exists()) {
+            alert("Rental document not found!");
+            return;
+        }
+
+        const rentalData = rentalSnapshot.data();
+        const listingName = rentalData.listingName; // Fetch the listing name from rental
+
+        // Step 2: Store the review in the 'reviews' collection, including the listingName
         await setDoc(doc(db, "reviews", rentalId), {
             rentalId,
             sellerId,
+            listingName, // Add the listingName to the review entry
             reviewText,
             reviewBy: "buyer", // Indicate it's the buyer's review
             timestamp: new Date(),
         });
 
-        // Update the rental document to mark that the buyer has submitted a review
-        const rentalRef = doc(db, "rentals", rentalId);
+        // Step 3: Update the rental document to mark that the buyer has submitted a review
         await updateDoc(rentalRef, { reviewGiven: true });
 
         alert("Review submitted successfully!");
@@ -124,6 +146,7 @@ async function submitBuyerReview(rentalId, sellerId) {
             showRentalHistory(user.uid);
         }
     } catch (error) {
+        // Properly handling errors by catching them and showing a message
         console.error("Error submitting buyer review:", error);
         alert("Failed to submit the review. Please try again.");
     }
