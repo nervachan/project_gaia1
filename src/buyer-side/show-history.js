@@ -45,7 +45,14 @@ async function showRentalHistory(userId) {
             return;
         }
 
-        for (const docSnapshot of rentalsSnapshot.docs) {
+        // Sort by timestamp descending if createdAt exists
+        const sortedDocs = rentalsSnapshot.docs.sort((a, b) => {
+            const aTime = a.data().createdAt?.toDate?.() || new Date(0);
+            const bTime = b.data().createdAt?.toDate?.() || new Date(0);
+            return bTime - aTime; // Newest first
+        });
+
+        for (const docSnapshot of sortedDocs) {
             const rentalData = docSnapshot.data();
             rentalData.id = docSnapshot.id; // Attach doc ID for cancellation
             const rentalElement = createRentalHistoryElement(rentalData);
@@ -103,7 +110,6 @@ function createRentalHistoryElement(rentalData) {
     return rentalElement;
 }
 
-// Function to submit the review from the buyer
 async function submitBuyerReview(rentalId, sellerId) {
     const reviewText = document.getElementById(`buyerReviewText-${rentalId}`).value;
 
@@ -113,7 +119,7 @@ async function submitBuyerReview(rentalId, sellerId) {
     }
 
     try {
-        // Step 1: Fetch the rental document to get the listingName and name
+        // Step 1: Fetch the rental document
         const rentalRef = doc(db, "rentals", rentalId);
         const rentalSnapshot = await getDoc(rentalRef);
 
@@ -123,32 +129,31 @@ async function submitBuyerReview(rentalId, sellerId) {
         }
 
         const rentalData = rentalSnapshot.data();
-        const listingName = rentalData.listingName;  // Fetch the listingName from the rental
-        const name = rentalData.name;  // Fetch the name from the rental
+        const { listingName, name, listingId } = rentalData; // 👈 Destructure listingId as well
 
-        // Step 2: Store the review in the 'reviews' collection, including the listingName, name, and other relevant data
+        // Step 2: Store the review in the 'reviews' collection
         await setDoc(doc(db, "reviews", rentalId), {
             rentalId,
             sellerId,
-            listingName,    // Add the listingName to the review entry
-            name,           // Add the name to the review entry
+            listingId,    
+            listingName,
+            name,
             reviewText,
-            reviewBy: "buyer",  // Indicate it's the buyer's review
+            reviewBy: "buyer",
             timestamp: new Date(),
         });
 
-        // Step 3: Update the rental document to mark that the buyer has submitted a review
+        // Step 3: Mark the rental as reviewed
         await updateDoc(rentalRef, { reviewGiven: true });
 
         alert("Review submitted successfully!");
 
-        // Refresh the rental history to reflect the review submission
+        // Step 4: Refresh rental history
         const user = auth.currentUser;
         if (user) {
             showRentalHistory(user.uid);
         }
     } catch (error) {
-        // Properly handling errors by catching them and showing a message
         console.error("Error submitting buyer review:", error);
         alert("Failed to submit the review. Please try again.");
     }
