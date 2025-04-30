@@ -233,18 +233,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     const userId = user.uid;
 
-                    // Prepare the rental data
                     const rentalData = {
                         name: userName,
                         startDate: rentalStartDate,
                         endDate: rentalEndDate,
                         finalPrice: totalPrice,
                         rentPrice: rentPrice,
-                        image: image, // Add the first image
-                        status: 'for preparation', // Add the status
-                        listingName: listingName, // Add the listing name for reference
-                        sellerId: sellerId, // Add the seller ID
-                        buyerId: userId, // Add the logged-in user's UID
+                        image: image,
+                        status: 'for preparation',
+                        listingName: listingName,
+                        sellerId: sellerId,
+                        buyerId: userId,
+                        listingId: listingDoc.id,
+                        createdAt: new Date() 
                     };
 
                     // Push the rental data to the "rentals" collection
