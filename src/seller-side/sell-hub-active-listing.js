@@ -88,20 +88,21 @@ async function fetchUserListings() {
                         <a href="#" class="inline-block py-2 px-6 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 deactivate-btn" data-id="${docSnapshot.id}" data-listing='${JSON.stringify(listingData)}'>
                             Deactivate Listing
                         </a>
-                        <button class="inline-block py-2 px-6 bg-orange-600 text-white rounded-full text-sm hover:bg-orange-700 edit-btn" data-id="${docSnapshot.id}" data-listing='${JSON.stringify(listingData)}'>
-                            Edit Listing
-                        </button>
+                        
                     </div>
                 </div>
             `;
 
+            // <button class="inline-block py-2 px-6 bg-orange-600 text-white rounded-full text-sm hover:bg-orange-700 edit-btn" data-id="${docSnapshot.id}" data-listing='${JSON.stringify(listingData)}'>
+            //                 Edit Listing
+            //             </button>
             listingsContainer.appendChild(itemDiv);
 
             // Add event listener for the "Edit Listing" button
-            const editButton = itemDiv.querySelector(".edit-btn");
-            editButton.addEventListener("click", () => {
-                showEditModal(docSnapshot.id, listingData);
-            });
+            // const editButton = itemDiv.querySelector(".edit-btn");
+            // editButton.addEventListener("click", () => {
+            //     showEditModal(docSnapshot.id, listingData);
+            // });
 
             // Add event listeners for carousel navigation
             if (images.length > 1) {
@@ -137,57 +138,57 @@ async function fetchUserListings() {
 }
 
 // Function to show the edit modal
-function showEditModal(listingId, listingData) {
-    const modal = document.getElementById("edit-modal");
-    const modalContent = modal.querySelector(".modal-content");
+// function showEditModal(listingId, listingData) {
+//     const modal = document.getElementById("edit-modal");
+//     const modalContent = modal.querySelector(".modal-content");
 
-    modalContent.innerHTML = `
-        <h2 class="text-xl font-semibold mb-4">Edit Listing</h2>
-        <form id="edit-listing-form">
-            <label class="block mb-2">Product Name:</label>
-            <input type="text" name="productName" value="${listingData.productName}" class="w-full p-2 border rounded mb-4">
+//     modalContent.innerHTML = `
+//         <h2 class="text-xl font-semibold mb-4">Edit Listing</h2>
+//         <form id="edit-listing-form">
+//             <label class="block mb-2">Product Name:</label>
+//             <input type="text" name="productName" value="${listingData.productName}" class="w-full p-2 border rounded mb-4">
 
-            <label class="block mb-2">Category:</label>
-            <input type="text" name="category" value="${listingData.category}" class="w-full p-2 border rounded mb-4">
+//             <label class="block mb-2">Category:</label>
+//             <input type="text" name="category" value="${listingData.category}" class="w-full p-2 border rounded mb-4">
 
-            <label class="block mb-2">Garment Size:</label>
-            <input type="text" name="garmentSize" value="${listingData.garmentSize || ''}" class="w-full p-2 border rounded mb-4">
+//             <label class="block mb-2">Garment Size:</label>
+//             <input type="text" name="garmentSize" value="${listingData.garmentSize || ''}" class="w-full p-2 border rounded mb-4">
 
-            <label class="block mb-2">Rent Price:</label>
-            <input type="number" name="rentPrice" value="${listingData.rentPrice || ''}" class="w-full p-2 border rounded mb-4">
+//             <label class="block mb-2">Rent Price:</label>
+//             <input type="number" name="rentPrice" value="${listingData.rentPrice || ''}" class="w-full p-2 border rounded mb-4">
 
-            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded">Save Changes</button>
-        </form>
-    `;
+//             <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded">Save Changes</button>
+//         </form>
+//     `;
 
-    modal.classList.remove("hidden");
+//     modal.classList.remove("hidden");
 
     // Handle form submission
-    const form = modal.querySelector("#edit-listing-form");
-    form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+//     const form = modal.querySelector("#edit-listing-form");
+//     form.addEventListener("submit", async (event) => {
+//         event.preventDefault();
 
-        const formData = new FormData(form);
-        const updatedData = Object.fromEntries(formData.entries());
+//         const formData = new FormData(form);
+//         const updatedData = Object.fromEntries(formData.entries());
 
-        try {
-            // Update the listing in Firestore
-            await updateDoc(doc(db, "listed_items", listingId), updatedData);
-            console.log("Listing updated successfully!");
-            modal.classList.add("hidden");
-            fetchUserListings(); // Refresh the listings
-        } catch (error) {
-            console.error("Error updating listing:", error);
-        }
-    });
+//         try {
+//             // Update the listing in Firestore
+//             await updateDoc(doc(db, "listed_items", listingId), updatedData);
+//             console.log("Listing updated successfully!");
+//             modal.classList.add("hidden");
+//             fetchUserListings(); // Refresh the listings
+//         } catch (error) {
+//             console.error("Error updating listing:", error);
+//         }
+//     });
 
-    // Close the modal when clicking outside the content
-    modal.addEventListener("click", (event) => {
-        if (event.target === modal) {
-            modal.classList.add("hidden");
-        }
-    });
-}
+//     // Close the modal when clicking outside the content
+//     modal.addEventListener("click", (event) => {
+//         if (event.target === modal) {
+//             modal.classList.add("hidden");
+//         }
+//     });
+// }
 
 // Listen for authentication state changes
 onAuthStateChanged(auth, (user) => {
