@@ -97,6 +97,7 @@ async function fetchUserListings() {
             //                 Edit Listing
             //             </button>
             listingsContainer.appendChild(itemDiv);
+        
 
             // Add event listener for the "Edit Listing" button
             // const editButton = itemDiv.querySelector(".edit-btn");
