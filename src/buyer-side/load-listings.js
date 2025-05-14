@@ -334,3 +334,12 @@ async function viewReviews(listingId) {
 
   // Load listings when the page is loaded
   window.onload = loadListings;
+
+  
+  // CATEGORY FILTER BUTTONS HANDLER
+document.querySelectorAll('.filter-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const category = button.getAttribute('data-category');
+    loadListings(category);
+  });
+});
