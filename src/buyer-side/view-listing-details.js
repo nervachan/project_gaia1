@@ -44,7 +44,7 @@ async function getShopAddress(sellerId) {
   return shopAddress;
 }
 
-// Fetch and display listing details
+// Updated the fetchListingDetails function to include a carousel for multiple images
 async function fetchListingDetails() {
   try {
     const docRef = doc(db, 'listed_items', listingId);
@@ -57,13 +57,38 @@ async function fetchListingDetails() {
       const shopAddress = await getShopAddress(listing.sellerId);
 
       document.getElementById('listing-title').innerText = listing.productName || 'No title available';
-      document.getElementById('listing-image').innerHTML = listing.images && listing.images.length > 0
-        ? `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-auto object-cover rounded-md">`
-        : '<p class="text-gray-500">No image available</p>';
+
+      const imageContainer = document.getElementById('listing-image');
+      if (listing.images && listing.images.length > 0) {
+        if (listing.images.length === 1) {
+          // Display a single image with uniform size
+          imageContainer.innerHTML = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-cover rounded-md">`;
+        } else {
+          // Create a carousel for multiple images with uniform size
+          let carouselHTML = '<div id="image-carousel" class="relative">';
+          listing.images.forEach((image, index) => {
+            carouselHTML += `
+              <div class="carousel-item ${index === 0 ? 'block' : 'hidden'}">
+                <img src="${image}" alt="${listing.productName}" class="w-full h-full object-cover rounded-md">
+              </div>`;
+          });
+          carouselHTML += `
+            <button class="carousel-control-prev absolute left-2 top-1/2 transform -translate-y-1/2 text-4xl text-white bg-gray-800 rounded-full p-3 hover:bg-gray-700 z-10">&#10094;</button>
+            <button class="carousel-control-next absolute right-2 top-1/2 transform -translate-y-1/2 text-4xl text-white bg-gray-800 rounded-full p-3 hover:bg-gray-700 z-10">&#10095;</button>
+          </div>`;
+          imageContainer.innerHTML = carouselHTML;
+
+          // Add carousel functionality
+          addCarouselFunctionality();
+        }
+      } else {
+        imageContainer.innerHTML = '<p class="text-gray-500">No image available</p>';
+      }
+
       document.getElementById('listing-description').innerText = listing.productDescription || 'No description available';
       document.getElementById('listing-category').innerText = `Category: ${listing.category || 'N/A'}`;
       document.getElementById('listing-rent-price').innerText = listing.rentPrice ? `Rent Price: ${listing.rentPrice}/day` : 'No rent price available';
-      
+
       document.getElementById('listing-shop-address').innerHTML = `
         Shop Address: ${shopAddress}
         <button 
@@ -79,6 +104,51 @@ async function fetchListingDetails() {
     console.error('Error fetching listing details:', error);
     alert('Failed to load listing details. Please try again later.');
   }
+}
+
+// Updated the carousel functionality to ensure buttons are scoped to the image section
+function addCarouselFunctionality() {
+  let currentIndex = 0;
+  const carousel = document.getElementById('image-carousel');
+  const items = carousel.querySelectorAll('.carousel-item');
+
+  // Ensure only the first item is visible initially
+  items.forEach((item, index) => {
+    item.style.display = index === 0 ? 'block' : 'none';
+  });
+
+  // Define the prevSlide function
+  function prevSlide() {
+    items[currentIndex].style.display = 'none';
+    currentIndex = (currentIndex - 1 + items.length) % items.length;
+    items[currentIndex].style.display = 'block';
+  }
+
+  // Define the nextSlide function
+  function nextSlide() {
+    items[currentIndex].style.display = 'none';
+    currentIndex = (currentIndex + 1) % items.length;
+    items[currentIndex].style.display = 'block';
+  }
+
+  // Attach event listeners to the buttons
+  const prevButton = carousel.querySelector('.carousel-control-prev');
+  const nextButton = carousel.querySelector('.carousel-control-next');
+
+  if (prevButton) {
+    prevButton.addEventListener('click', prevSlide);
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener('click', nextSlide);
+  }
+
+  // Apply Tailwind CSS classes to buttons
+  prevButton.className = ' top-1/2 transform -translate-y-1/2 text-4xl text-white bg-gray-800 rounded-full p-3 hover:bg-gray-700 z-10';
+  prevButton.innerHTML = '&#10094;';
+
+  nextButton.className = ' top-1/2 transform -translate-y-1/2 text-4xl text-white bg-gray-800 rounded-full p-3 hover:bg-gray-700 z-10';
+  nextButton.innerHTML = '&#10095;';
 }
 
 // Function to highlight dates with pending rentals

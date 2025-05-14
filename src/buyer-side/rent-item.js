@@ -19,67 +19,8 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Fetch and display listings
-document.addEventListener('DOMContentLoaded', async () => {
-    const listingsContainer = document.getElementById('listings-container');
-    if (!listingsContainer) {
-        console.error('Listings container with id "listings-container" not found.');
-        return;
-    }
 
-    try {
-        const querySnapshot = await getDocs(collection(db, 'listed_items'));
 
-        // Loop through the documents and add them to the page
-        querySnapshot.forEach((doc) => {
-            const listing = doc.data();
-            const listingId = doc.id; // Get the unique ID of the listing
-            const listingElement = document.createElement('div');
-            listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
-
-            // Check if the "images" field exists and is an array
-            let image = '';
-            if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
-                image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-48 object-cover rounded-md">`;
-            } else {
-                image = `<div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-md">
-                            <p class="text-gray-500">No image available</p>
-                         </div>`;
-            }
-
-            listingElement.innerHTML = `
-                ${image}
-                <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
-                <p class="text-gray-700 mt-2">Category: ${listing.category || 'N/A'}</p>
-                ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ${listing.rentPrice}/day</p>` : ''}
-                <button id="rent-button" data-listing-id="${listingId}" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Rent</button>
-            `;
-
-            listingsContainer.appendChild(listingElement);
-        });
-    } catch (error) {
-        console.error('Error fetching listings:', error);
-    }
-});
-
-// Add event listener for the Rent button
-document.addEventListener('click', async (event) => {
-    if (event.target && event.target.id === 'rent-button') {
-        const rentModal = document.getElementById('rentModal');
-        const listingModal = document.getElementById('listing-modal');
-
-        // Get the listing name from the "View Details" modal
-        const listingNameElement = document.getElementById('modal-title');
-        if (!listingNameElement) {
-            console.error('Listing name element with id "modal-title" not found.');
-            return;
-        }
-
-        const listingName = listingNameElement.innerText.trim();
-        if (!listingName) {
-            console.error('Listing name not found in the modal.');
-            return;
-        }
 
         try {
             // Query the "listed_items" collection for the document with the matching productName
@@ -172,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitRentalButton.addEventListener('click', async (event) => {
             event.preventDefault(); // Prevent form submission
 
-            // Get the required input values
+            // Get the required input values from the rental form
             const userName = document.getElementById('userName').value.trim();
             const rentalStartDate = document.getElementById('rentalStartDate').value.trim();
             const rentalEndDate = document.getElementById('rentalEndDate').value.trim();
@@ -188,16 +129,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const rentPrice = parseFloat(rentPriceInput.replace(/[^0-9.]/g, ''));
             const totalPrice = parseFloat(totalPriceElement.replace(/[^0-9.]/g, ''));
 
-            // Get the listing name from the "View Details" modal
-            const listingNameElement = document.getElementById('modal-title');
+            // Get the listing name from the rental form section
+            const listingNameElement = document.getElementById('listing-title');
             if (!listingNameElement) {
-                console.error('Listing name element with id "modal-title" not found.');
+                console.error('Listing name element with id "listing-title" not found.');
                 return;
             }
 
             const listingName = listingNameElement.innerText.trim();
             if (!listingName) {
-                console.error('Listing name not found in the modal.');
+                console.error('Listing name not found in the rental form section.');
                 return;
             }
 
@@ -257,9 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     alert('Rental submitted successfully!');
                     
-                    const rentModal = document.getElementById('rentModal');
-                    if (rentModal) {
-                        rentModal.classList.add('hidden'); // Hide the rent modal
+                    const rentalFormSection = document.getElementById('rental-form-section');
+                    if (rentalFormSection) {
+                        rentalFormSection.classList.add('hidden'); // Hide the rental form section
                     }
                 } else {
                     console.error(`No listing found with the name "${listingName}".`);
