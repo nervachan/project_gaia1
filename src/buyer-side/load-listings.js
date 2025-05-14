@@ -109,7 +109,8 @@ async function loadListings() {
       const viewDetailsButton = listingElement.querySelector('.view-details-btn');
       viewDetailsButton.addEventListener('click', () => {
         const listingId = viewDetailsButton.getAttribute('data-listing-id'); // Get listingId from button
-        showListingDetails(listing, listingId); // Pass listing and listingId to the function
+        // Redirect to another window with the listing ID
+        window.location.href = `view-listing-details.html?listingId=${listingId}`;
       });
     });
   } catch (error) {
@@ -337,9 +338,87 @@ async function viewReviews(listingId) {
 
   
   // CATEGORY FILTER BUTTONS HANDLER
+// Refactored to query Firestore based on category
+
 document.querySelectorAll('.filter-btn').forEach(button => {
-  button.addEventListener('click', () => {
+  button.addEventListener('click', async () => {
     const category = button.getAttribute('data-category');
-    loadListings(category);
+    const listingsContainer = document.getElementById('listing-container');
+
+    // Clear the container before adding new listings
+    listingsContainer.innerHTML = '<p class="text-gray-500 text-center">Loading listings...</p>';
+
+    try {
+      // Query the "listed_items" collection where "category" matches the selected category
+      const listingsQuery = query(
+        collection(db, 'listed_items'),
+        where("category", "==", category),
+        where("isActive", "==", true)
+      );
+      const querySnapshot = await getDocs(listingsQuery);
+
+      // Clear the loading message
+      listingsContainer.innerHTML = '';
+
+      if (querySnapshot.empty) {
+        // Show a message if no listings are found for the selected category
+        listingsContainer.innerHTML = `
+          <p class="text-gray-500 text-center">No listings available for the selected category.</p>
+        `;
+        return;
+      }
+
+      // Loop through the documents and add them to the page
+      querySnapshot.forEach(async (doc) => {
+        const listing = doc.data();
+        const listingId = doc.id; // Get listingId (doc ID)
+
+        const listingElement = document.createElement('div');
+        listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
+
+        // Fetch shop address using sellerId
+        const shopAddress = await getShopAddress(listing);
+
+        // Check if the "images" field exists and is an array
+        let image = '';
+        if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
+          // Use the first image from the array
+          image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-100 object-cover rounded-md">`;
+        } else {
+          // Fallback if no images are available
+          image = `<div class="w-full h-full bg-gray-200 flex items-center justify-center rounded-md">
+                      <p class="text-gray-500">No image available</p>
+                   </div>`;
+        }
+
+        listingElement.innerHTML = `
+          ${image}
+          <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
+          <p class="text-gray-700 mt-2">Category: ${listing.category || 'N/A'}</p>
+          <p class="text-gray-700 mt-2">Size: ${listing.garmentSize || 'N/A'}</p>
+          ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ${listing.rentPrice}/day</p>` : ''}
+          ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ${listing.sellPrice}</p>` : ''}
+          <p class="text-gray-700 mt-2">Shop Address: ${shopAddress}</p>
+          <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 view-details-btn" data-listing-id="${listingId}">
+            View Details
+          </button>
+        `;
+
+        listingsContainer.appendChild(listingElement);
+
+        // Add event listener for 'View Details' button
+        const viewDetailsButton = listingElement.querySelector('.view-details-btn');
+        viewDetailsButton.addEventListener('click', () => {
+          const listingId = viewDetailsButton.getAttribute('data-listing-id'); // Get listingId from button
+          // Redirect to another window with the listing ID
+          window.location.href = `view-listing-details.html?listingId=${listingId}`;
+        });
+      });
+    } catch (error) {
+      console.error('Error loading listings:', error);
+      listingsContainer.innerHTML = `
+        <p class="text-red-500 text-center">Failed to load listings. Please try again later.</p>
+      `;
+    }
   });
 });

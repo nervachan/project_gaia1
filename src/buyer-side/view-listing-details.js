@@ -1,6 +1,6 @@
 // Import the necessary Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
@@ -16,133 +16,160 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Function to show the modal with listing details
-async function showListingDetails(listingId) {
-    const modal = document.getElementById('listing-modal');
-    const modalTitle = document.getElementById('modal-title');
-    const modalContent = document.getElementById('modal-content');
+// Extract listingId from URL query parameters
+const urlParams = new URLSearchParams(window.location.search);
+const listingId = urlParams.get('listingId');
 
-    try {
-        // Fetch the document from Firestore
-        const listingDoc = doc(db, 'listed_items', listingId);
-        const listingSnapshot = await getDoc(listingDoc);
+if (!listingId) {
+  alert('No listing ID provided. Redirecting to listings page.');
+  window.location.href = 'buyer-login.html';
+}
 
-        if (listingSnapshot.exists()) {
-            const listing = listingSnapshot.data();
-            modalTitle.innerText = listing.productName;
+// Function to fetch the shop address
+async function getShopAddress(sellerId) {
+  let shopAddress = 'Not available';
 
-            // Handle images
-            let imagesHtml = '';
-            if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
-                if (listing.images.length === 1) {
-                    // Single image
-                    imagesHtml = `
-                        <div class="w-full h-64 overflow-hidden rounded-md">
-                            <img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain">
-                        </div>
-                    `;
-                } else {
-                    // Carousel for multiple images
-                    imagesHtml = `
-                        <div class="relative w-full h-64 overflow-hidden rounded-md">
-                            <div id="carousel-images" class="flex transition-transform duration-300 ease-in-out">
-                                ${listing.images.map((img, index) => `
-                                    <div class="carousel-item w-full ${index === 0 ? 'block' : 'hidden'}">
-                                        <img src="${img}" alt="${listing.productName}" class="w-full h-full object-contain">
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <button id="prev-image" class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full">&lt;</button>
-                            <button id="next-image" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full">&gt;</button>
-                        </div>
-                    `;
-                }
-            } else {
-                // Fallback if no images are available
-                imagesHtml = `
-                    <div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-md">
-                        <p class="text-gray-500">No image available</p>
-                    </div>
-                `;
-            }
+  if (sellerId) {
+    const sellerDocRef = doc(db, 'user-seller', sellerId);
+    const sellerDocSnap = await getDoc(sellerDocRef);
 
-            // Fetch the shop address using the sellerId
-            let shopAddressHtml = '';
-            if (listing.sellerId) {
-                const sellerDoc = doc(db, 'user_seller', listing.sellerId);
-                const sellerSnapshot = await getDoc(sellerDoc);
+    if (sellerDocSnap.exists()) {
+      const sellerData = sellerDocSnap.data();
+      shopAddress = sellerData.shopaddress || 'Not available';
+    } else {
+      console.warn('Seller document not found for ID:', sellerId);
+    }
+  }
 
-                if (sellerSnapshot.exists()) {
-                    const sellerData = sellerSnapshot.data();
-                    const shopAddress = sellerData.shopaddress || 'No shop address available';
+  return shopAddress;
+}
 
-                    shopAddressHtml = `
-                        <p><strong>Shop Address:</strong> ${shopAddress}</p>
-                        <button class="mt-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" onclick="redirectToGoogleMaps('${shopAddress}')">
-                            View on Google Maps
-                        </button>
-                    `;
-                } else {
-                    shopAddressHtml = '<p class="text-red-500">Shop address not found.</p>';
-                }
-            }
+// Fetch and display listing details
+async function fetchListingDetails() {
+  try {
+    const docRef = doc(db, 'listed_items', listingId);
+    const docSnap = await getDoc(docRef);
 
-            // Populate modal content
-            modalContent.innerHTML = `
-                ${imagesHtml}
-                <p class="mt-4">${listing.productDescription || 'No description available.'}</p>
-                <p><strong>Category:</strong> ${listing.category || 'N/A'}</p>
-                <p><strong>Condition:</strong> ${listing.condition || 'N/A'}</p>
-                ${listing.rentPrice ? `<p><strong>Rent Price:</strong> $${listing.rentPrice}</p>` : ''}
-                ${listing.sellPrice ? `<p><strong>Selling Price:</strong> $${listing.sellPrice}</p>` : ''}
-                ${shopAddressHtml}
-            `;
+    if (docSnap.exists()) {
+      const listing = docSnap.data();
 
-            // Initialize carousel functionality if there are multiple images
-            if (listing.images && listing.images.length > 1) {
-                const carousel = document.getElementById('carousel-images');
-                const items = carousel.querySelectorAll('.carousel-item');
-                let currentIndex = 0;
+      // Fetch shop address using sellerId
+      const shopAddress = await getShopAddress(listing.sellerId);
 
-                document.getElementById('next-image').addEventListener('click', () => {
-                    items[currentIndex].classList.add('hidden');
-                    currentIndex = (currentIndex + 1) % items.length;
-                    items[currentIndex].classList.remove('hidden');
-                });
+      document.getElementById('listing-title').innerText = listing.productName || 'No title available';
+      document.getElementById('listing-image').innerHTML = listing.images && listing.images.length > 0
+        ? `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-auto object-cover rounded-md">`
+        : '<p class="text-gray-500">No image available</p>';
+      document.getElementById('listing-description').innerText = listing.productDescription || 'No description available';
+      document.getElementById('listing-category').innerText = `Category: ${listing.category || 'N/A'}`;
+      document.getElementById('listing-rent-price').innerText = listing.rentPrice ? `Rent Price: ${listing.rentPrice}/day` : 'No rent price available';
+      
+      document.getElementById('listing-shop-address').innerHTML = `
+        Shop Address: ${shopAddress}
+        <button 
+          class="ml-2 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600" 
+          onclick="window.open('https://www.google.com/maps?q=${encodeURIComponent(shopAddress)}', '_blank')">
+          View on Google Maps
+        </button>`;
+    } else {
+      alert('Listing not found. Redirecting to listings page.');
+      window.location.href = 'buyer-login.html';
+    }
+  } catch (error) {
+    console.error('Error fetching listing details:', error);
+    alert('Failed to load listing details. Please try again later.');
+  }
+}
 
-                document.getElementById('prev-image').addEventListener('click', () => {
-                    items[currentIndex].classList.add('hidden');
-                    currentIndex = (currentIndex - 1 + items.length) % items.length;
-                    items[currentIndex].classList.remove('hidden');
-                });
-            }
+// Function to highlight dates with pending rentals
+async function highlightPendingRentalDates(listingId) {
+  try {
+    const rentalsQuery = query(
+      collection(db, 'rentals'),
+      where('listingId', '==', listingId),
+      where('status', '==', 'pending')
+    );
+    const querySnapshot = await getDocs(rentalsQuery);
 
-            modal.classList.remove('hidden'); // Show the modal
-        } else {
-            console.error("No listing found with the provided ID.");
+    const calendarDates = document.querySelectorAll('input[type="date"]');
+
+    querySnapshot.forEach(doc => {
+      const rental = doc.data();
+      const startDate = new Date(rental.startDate.seconds * 1000);
+      const endDate = new Date(rental.endDate.seconds * 1000);
+
+      calendarDates.forEach(dateInput => {
+        const dateValue = new Date(dateInput.value);
+        if (dateValue >= startDate && dateValue <= endDate) {
+          dateInput.classList.add('bg-red-500', 'text-white');
         }
-    } catch (error) {
-        console.error("Error fetching listing details: ", error);
-    }
+      });
+    });
+  } catch (error) {
+    console.error('Error fetching pending rentals:', error);
+  }
 }
 
-// Function to redirect to Google Maps with the shop address
-function redirectToGoogleMaps(shopAddress) {
-    const encodedAddress = encodeURIComponent(shopAddress);
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-    window.open(googleMapsUrl, '_blank');
+// Function to highlight pending dates in Flatpickr calendars
+async function highlightPendingDates(selectedDates, dateStr, instance) {
+  try {
+    const rentalsQuery = query(
+      collection(db, 'rentals'),
+      where('listingId', '==', listingId)
+    );
+    const querySnapshot = await getDocs(rentalsQuery);
+
+    const pendingDates = [];
+
+    querySnapshot.forEach(doc => {
+      const rental = doc.data();
+      const startDate = new Date(rental.startDate.seconds * 1000);
+      const endDate = new Date(rental.endDate.seconds * 1000);
+
+      let currentDate = startDate;
+      while (currentDate <= endDate) {
+        pendingDates.push(currentDate.toISOString().split('T')[0]);
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    });
+
+    instance.config.disable = pendingDates;
+    instance.redraw();
+  } catch (error) {
+    console.error('Error fetching pending rentals:', error);
+  }
 }
 
-// Add event listeners to all view details buttons
-document.addEventListener('click', (event) => {
-    if (event.target.classList.contains('view-details')) {
-        const listingId = event.target.getAttribute('data-id');
-        showListingDetails(listingId); // Show the modal with listing details
-    }
+// Back button functionality
+document.getElementById('back-button').addEventListener('click', () => {
+  window.location.href = 'buyer-login.html';
 });
 
-// Close modal functionality
-document.getElementById('close-modal').addEventListener('click', () => {
-    const modal = document.getElementById('listing-modal');
-    modal.classList.add('hidden'); // Hide the modal
+// Load listing details on page load
+fetchListingDetails().then(() => {
+  highlightPendingRentalDates(listingId);
+});
+
+// Event listener for toggling the rental form
+const rentButton = document.getElementById('rent-button');
+if (rentButton) {
+  rentButton.addEventListener('click', () => {
+    const rentalFormSection = document.getElementById('rental-form-section');
+    if (rentalFormSection) {
+      rentalFormSection.classList.toggle('hidden');
+    }
+  });
+}
+
+// Initialize Flatpickr for start and end date fields
+const startDatePicker = flatpickr("#rental-start-date", {
+  dateFormat: "Y-m-d",
+  onReady: highlightPendingDates,
+  onMonthChange: highlightPendingDates
+});
+
+const endDatePicker = flatpickr("#rental-end-date", {
+  dateFormat: "Y-m-d",
+  onReady: highlightPendingDates,
+  onMonthChange: highlightPendingDates
 });
