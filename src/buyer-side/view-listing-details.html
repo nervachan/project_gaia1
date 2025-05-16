@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script type="module" src="view-listing-details.js"></script>
-    <!--<script type="module" src="rent-item.js"></script>-->
+    <script type="module" src="rent-item.js"></script>
 </head>
 
 <body class="bg-gray-100 pt-16">
@@ -61,6 +61,10 @@
         <div class="mb-4">
           <label for="rental-name" class="block text-gray-700 font-medium mb-2">Name</label>
           <input type="text" id="rental-name" class="w-full border border-gray-300 rounded-lg p-2" placeholder="Enter your name" required />
+        </div>
+        <div class="mb-4">
+          <label for="rental-price" class="block text-gray-700 font-medium mb-2">Rental Price</label>
+          <input type="text" id="rental-price" class="w-full border border-gray-300 rounded-lg p-2" placeholder="Rental Price" readonly />
         </div>
         <div class="mb-4">
           <label for="rental-start-date" class="block text-gray-700 font-medium mb-2">Start Date</label>

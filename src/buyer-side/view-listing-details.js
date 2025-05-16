@@ -6,19 +6,20 @@ const firebaseConfig = {
     apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
     authDomain: "project-gaia1.firebaseapp.com",
     projectId: "project-gaia1",
-    storageBucket: "project-gaia1.firebasestorage.app",
+    storageBucket: "project-gaia1.appspot.com",
     messagingSenderId: "832122601643",
     appId: "1:832122601643:web:1ab91b347704174f52b7ee",
     measurementId: "G-DX2L33NH4H"
 };
 
-// Initialize Firestore
+console.log("Initializing Firebase...");
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Extract listingId from URL query parameters
+console.log("Extracting listingId from URL...");
 const urlParams = new URLSearchParams(window.location.search);
 const listingId = urlParams.get('listingId');
+console.log("listingId:", listingId);
 
 if (!listingId) {
   alert('No listing ID provided. Redirecting to listings page.');
@@ -28,6 +29,7 @@ if (!listingId) {
 // Function to fetch the shop address
 async function getShopAddress(sellerId) {
   let shopAddress = 'Not available';
+  console.log("Fetching shop address for sellerId:", sellerId);
 
   if (sellerId) {
     const sellerDocRef = doc(db, 'user-seller', sellerId);
@@ -36,6 +38,7 @@ async function getShopAddress(sellerId) {
     if (sellerDocSnap.exists()) {
       const sellerData = sellerDocSnap.data();
       shopAddress = sellerData.shopaddress || 'Not available';
+      console.log("Shop address found:", shopAddress);
     } else {
       console.warn('Seller document not found for ID:', sellerId);
     }
@@ -47,11 +50,13 @@ async function getShopAddress(sellerId) {
 // Updated the fetchListingDetails function to include a carousel for multiple images
 async function fetchListingDetails() {
   try {
+    console.log("Fetching listing details for listingId:", listingId);
     const docRef = doc(db, 'listed_items', listingId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       const listing = docSnap.data();
+      console.log("Listing data:", listing);
 
       // Fetch shop address using sellerId
       const shopAddress = await getShopAddress(listing.sellerId);
@@ -63,6 +68,7 @@ async function fetchListingDetails() {
         if (listing.images.length === 1) {
           // Display a single image with uniform size
           imageContainer.innerHTML = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-cover rounded-md">`;
+          console.log("Displayed single image.");
         } else {
           // Create a carousel for multiple images with uniform size
           let carouselHTML = '<div id="image-carousel" class="relative">';
@@ -80,9 +86,11 @@ async function fetchListingDetails() {
 
           // Add carousel functionality
           addCarouselFunctionality();
+          console.log("Displayed image carousel.");
         }
       } else {
         imageContainer.innerHTML = '<p class="text-gray-500">No image available</p>';
+        console.log("No images found for listing.");
       }
 
       document.getElementById('listing-description').innerText = listing.productDescription || 'No description available';
@@ -96,6 +104,7 @@ async function fetchListingDetails() {
           onclick="window.open('https://www.google.com/maps?q=${encodeURIComponent(shopAddress)}', '_blank')">
           View on Google Maps
         </button>`;
+      console.log("Listing details rendered.");
     } else {
       alert('Listing not found. Redirecting to listings page.');
       window.location.href = 'buyer-login.html';
@@ -122,6 +131,7 @@ function addCarouselFunctionality() {
     items[currentIndex].style.display = 'none';
     currentIndex = (currentIndex - 1 + items.length) % items.length;
     items[currentIndex].style.display = 'block';
+    console.log("Carousel: moved to previous image, index:", currentIndex);
   }
 
   // Define the nextSlide function
@@ -129,6 +139,7 @@ function addCarouselFunctionality() {
     items[currentIndex].style.display = 'none';
     currentIndex = (currentIndex + 1) % items.length;
     items[currentIndex].style.display = 'block';
+    console.log("Carousel: moved to next image, index:", currentIndex);
   }
 
   // Attach event listeners to the buttons
@@ -149,11 +160,13 @@ function addCarouselFunctionality() {
 
   nextButton.className = ' top-1/2 transform -translate-y-1/2 text-4xl text-white bg-gray-800 rounded-full p-3 hover:bg-gray-700 z-10';
   nextButton.innerHTML = '&#10095;';
+  console.log("Carousel functionality initialized.");
 }
 
 // Function to highlight dates with pending rentals
 async function highlightPendingRentalDates(listingId) {
   try {
+    console.log("Highlighting pending rental dates for listingId:", listingId);
     const rentalsQuery = query(
       collection(db, 'rentals'),
       where('listingId', '==', listingId),
@@ -175,6 +188,7 @@ async function highlightPendingRentalDates(listingId) {
         }
       });
     });
+    console.log("Pending rental dates highlighted.");
   } catch (error) {
     console.error('Error fetching pending rentals:', error);
   }
@@ -183,6 +197,7 @@ async function highlightPendingRentalDates(listingId) {
 // Function to highlight pending dates in Flatpickr calendars
 async function highlightPendingDates(selectedDates, dateStr, instance) {
   try {
+    console.log("Highlighting pending dates in Flatpickr for listingId:", listingId);
     const rentalsQuery = query(
       collection(db, 'rentals'),
       where('listingId', '==', listingId)
@@ -205,6 +220,7 @@ async function highlightPendingDates(selectedDates, dateStr, instance) {
 
     instance.config.disable = pendingDates;
     instance.redraw();
+    console.log("Flatpickr pending dates disabled:", pendingDates);
   } catch (error) {
     console.error('Error fetching pending rentals:', error);
   }
@@ -212,34 +228,13 @@ async function highlightPendingDates(selectedDates, dateStr, instance) {
 
 // Back button functionality
 document.getElementById('back-button').addEventListener('click', () => {
+  console.log("Back button clicked. Redirecting to listings page.");
   window.location.href = 'buyer-login.html';
 });
 
 // Load listing details on page load
+console.log("Calling fetchListingDetails...");
 fetchListingDetails().then(() => {
+  console.log("fetchListingDetails complete. Calling highlightPendingRentalDates...");
   highlightPendingRentalDates(listingId);
-});
-
-// Event listener for toggling the rental form
-const rentButton = document.getElementById('rent-button');
-if (rentButton) {
-  rentButton.addEventListener('click', () => {
-    const rentalFormSection = document.getElementById('rental-form-section');
-    if (rentalFormSection) {
-      rentalFormSection.classList.toggle('hidden');
-    }
-  });
-}
-
-// Initialize Flatpickr for start and end date fields
-const startDatePicker = flatpickr("#rental-start-date", {
-  dateFormat: "Y-m-d",
-  onReady: highlightPendingDates,
-  onMonthChange: highlightPendingDates
-});
-
-const endDatePicker = flatpickr("#rental-end-date", {
-  dateFormat: "Y-m-d",
-  onReady: highlightPendingDates,
-  onMonthChange: highlightPendingDates
 });
