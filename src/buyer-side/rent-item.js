@@ -19,199 +19,197 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Utility to get listing data by listingId
+async function getListingById(listingId) {
+    const docRef = doc(db, 'listed_items', listingId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return { doc: docSnap.ref, data: docSnap.data(), id: docSnap.id };
+    }
+    return null;
+}
 
+// Only run rental form logic if the form exists
+document.addEventListener('DOMContentLoaded', () => {
+    // Scope: Only rental form
+    const rentalFormSection = document.getElementById('rental-form-section');
+    const rentalForm = document.getElementById('rental-form');
+    if (!rentalFormSection || !rentalForm) return;
 
+    const rentalPriceInput = document.getElementById('rental-price');
+    const rentalStartDate = document.getElementById('rental-start-date');
+    const rentalEndDate = document.getElementById('rental-end-date');
+    const totalPriceElement = document.getElementById('rental-total');
+    const userNameInput = document.getElementById('rental-name');
+
+    // Get listingId from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const listingId = urlParams.get('listingId');
+    let rentPrice = 0;
+    let startDate = null;
+    let endDate = null;
+
+    // Fetch and display rent price using listingId
+    async function fetchAndDisplayRentPrice() {
+        if (!listingId) return;
+        const listing = await getListingById(listingId);
+        if (listing && listing.data.rentPrice) {
+            rentPrice = listing.data.rentPrice;
+            if (rentalPriceInput) rentalPriceInput.value = `${rentPrice}/day`;
+        }
+    }
+
+    // Helper: Get all reserved dates for this listing
+    async function getReservedDates(listingId) {
+        const reservedDates = [];
+        const rentalsQuery = query(
+            collection(db, 'rentals'),
+            where('listingId', '==', listingId)
+        );
+        const querySnapshot = await getDocs(rentalsQuery);
+        querySnapshot.forEach(docSnap => {
+            const rental = docSnap.data();
+            let start = rental.startDate;
+            let end = rental.endDate;
+            if (start && end) {
+                if (typeof start === 'object' && start.seconds) start = new Date(start.seconds * 1000);
+                else start = new Date(start);
+                if (typeof end === 'object' && end.seconds) end = new Date(end.seconds * 1000);
+                else end = new Date(end);
+                let d = new Date(start);
+                while (d <= end) {
+                    reservedDates.push(d.toISOString().split('T')[0]);
+                    d.setDate(d.getDate() + 1);
+                }
+            }
+        });
+        return reservedDates;
+    }
+
+    // Flatpickr initialization and total price calculation
+    async function setupDatePickers() {
+        if (!rentalStartDate || !rentalEndDate) return;
+        const reservedDates = await getReservedDates(listingId);
+
+        // Only initialize if not already initialized
+        if (!rentalStartDate._flatpickr) {
+            flatpickr(rentalStartDate, {
+                dateFormat: "Y-m-d",
+                disable: reservedDates,
+                onChange: (selectedDates) => {
+                    startDate = selectedDates[0];
+                    calculateTotalPrice();
+                }
+            });
+        }
+        if (!rentalEndDate._flatpickr) {
+            flatpickr(rentalEndDate, {
+                dateFormat: "Y-m-d",
+                disable: reservedDates,
+                onChange: (selectedDates) => {
+                    endDate = selectedDates[0];
+                    calculateTotalPrice();
+                }
+            });
+        }
+    }
+
+    function calculateTotalPrice() {
+        if (startDate && endDate && rentPrice) {
+            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            const total = days > 0 ? days * rentPrice : 0;
+            if (totalPriceElement) totalPriceElement.value = `₱${total.toFixed(2)}`;
+        } else if (totalPriceElement) {
+            totalPriceElement.value = "₱0.00";
+        }
+    }
+
+    // Rental button toggle functionality (handled in main page, but safe to keep)
+    const rentButton = document.getElementById('rent-button');
+    if (rentButton) {
+        rentButton.addEventListener('click', () => {
+            if (rentalFormSection) {
+                rentalFormSection.classList.toggle('hidden');
+            }
+        });
+    }
+
+    // Rental form submission
+    rentalForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Validate required fields
+        const userName = userNameInput ? userNameInput.value.trim() : '';
+        const start = rentalStartDate ? rentalStartDate.value.trim() : '';
+        const end = rentalEndDate ? rentalEndDate.value.trim() : '';
+        const priceStr = rentalPriceInput ? rentalPriceInput.value.trim() : '';
+        const totalStr = totalPriceElement ? totalPriceElement.value.trim() : '';
+
+        if (!userName || !start || !end || !priceStr || !totalStr || !listingId) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        // Get numeric values
+        const rentPriceNum = parseFloat(priceStr.replace(/[^0-9.]/g, ''));
+        const totalPriceNum = parseFloat(totalStr.replace(/[^0-9.]/g, ''));
+
+        // Get listing data by listingId
+        const listing = await getListingById(listingId);
+        if (!listing) {
+            alert('Listing not found.');
+            return;
+        }
+
+        // Get image and sellerId
+        const image = listing.data.images && listing.data.images.length > 0 ? listing.data.images[0] : '';
+        const sellerId = listing.data.sellerId || '';
+        if (!image || !sellerId) {
+            alert('Listing data incomplete.');
+            return;
+        }
+
+        // Get logged-in user
+        const user = auth.currentUser;
+        if (!user) {
+            alert('You must be logged in to rent an item.');
+            return;
+        }
+        const userId = user.uid;
+
+        // Prepare rental data
+        const rentalData = {
+            name: userName,
+            startDate: start,
+            endDate: end,
+            finalPrice: totalPriceNum,
+            rentPrice: rentPriceNum,
+            image: image,
+            status: 'for preparation',
+            listingName: listing.data.productName || '',
+            sellerId: sellerId,
+            buyerId: userId,
+            listingId: listing.id,
+            createdAt: new Date()
+        };
 
         try {
-            // Query the "listed_items" collection for the document with the matching productName
-            const q = query(collection(db, 'listed_items'), where('productName', '==', listingName));
-            const querySnapshot = await getDocs(q);
-
-            if (!querySnapshot.empty) {
-                const listingData = querySnapshot.docs[0].data();
-                const rentPrice = listingData.rentPrice;
-
-                if (rentPrice) {
-                    console.log(`Rent Price for listing "${listingName}": ${rentPrice}/day`);
-                    const rentPriceInput = document.getElementById('rentalPrice');
-                    if (rentPriceInput) {
-                        rentPriceInput.value = `${rentPrice}/day`;
-                    }
-
-                    // Initialize Flatpickr for start and end dates
-                    const rentalStartDate = document.getElementById('rentalStartDate');
-                    const rentalEndDate = document.getElementById('rentalEndDate');
-                    const totalPriceElement = document.getElementById('totalPrice');
-
-                    let startDate = null;
-                    let endDate = null;
-
-                    flatpickr(rentalStartDate, {
-                        dateFormat: "Y-m-d",
-                        onChange: (selectedDates) => {
-                            startDate = selectedDates[0];
-                            calculateTotalPrice();
-                        },
-                    });
-
-                    flatpickr(rentalEndDate, {
-                        dateFormat: "Y-m-d",
-                        onChange: (selectedDates) => {
-                            endDate = selectedDates[0];
-                            calculateTotalPrice();
-                        },
-                    });
-
-                    function calculateTotalPrice() {
-                        if (startDate && endDate) {
-                            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-                            if (days > 0) {
-                                const totalPrice = days * rentPrice;
-                                totalPriceElement.innerText = `₱${totalPrice.toFixed(2)}`;
-                            } else {
-                                totalPriceElement.innerText = "₱0.00";
-                            }
-                        }
-                    }
-                } else {
-                    console.error(`Rent price not found for listing "${listingName}".`);
-                }
-            } else {
-                console.error(`No listing found with the name "${listingName}".`);
-            }
+            // Add rental to Firestore
+            await addDoc(collection(db, 'rentals'), rentalData);
+            // Set listing as inactive
+            await updateDoc(listing.doc, { isActive: false });
+            alert('Rental submitted successfully!');
+            rentalForm.reset();
+            if (totalPriceElement) totalPriceElement.value = "₱0.00";
         } catch (error) {
-            console.error('Error fetching listing data:', error);
+            console.error('Error submitting rental:', error);
+            alert('Failed to submit rental.');
         }
+    });
 
-        if (rentModal) {
-            rentModal.classList.remove('hidden'); // Show the rent modal
-        }
-
-        if (listingModal) {
-            listingModal.classList.add('hidden'); // Close the listing modal
-        }
-    }
-});
-
-// Add event listener for the Close button in the Rent modal
-document.addEventListener('DOMContentLoaded', () => {
-    const closeRentButton = document.getElementById('close-rent');
-    if (closeRentButton) {
-        closeRentButton.addEventListener('click', () => {
-            const rentModal = document.getElementById('rentModal');
-            if (rentModal) {
-                rentModal.classList.add('hidden'); // Hide the rent modal
-            }
-        });
-    } else {
-        console.error('Close button with id "close-rent" not found.');
-    }
-
-    // Add event listener for the "Submit Rental" button
-    const submitRentalButton = document.getElementById('rent-item-btn');
-    if (submitRentalButton) {
-        submitRentalButton.addEventListener('click', async (event) => {
-            event.preventDefault(); // Prevent form submission
-
-            // Get the required input values from the rental form
-            const userName = document.getElementById('userName').value.trim();
-            const rentalStartDate = document.getElementById('rentalStartDate').value.trim();
-            const rentalEndDate = document.getElementById('rentalEndDate').value.trim();
-            const rentPriceInput = document.getElementById('rentalPrice').value.trim();
-            const totalPriceElement = document.getElementById('totalPrice').innerText.trim();
-
-            if (!userName || !rentalStartDate || !rentalEndDate || !rentPriceInput || !totalPriceElement) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-
-            // Extract the numeric value from the rent price
-            const rentPrice = parseFloat(rentPriceInput.replace(/[^0-9.]/g, ''));
-            const totalPrice = parseFloat(totalPriceElement.replace(/[^0-9.]/g, ''));
-
-            // Get the listing name from the rental form section
-            const listingNameElement = document.getElementById('listing-title');
-            if (!listingNameElement) {
-                console.error('Listing name element with id "listing-title" not found.');
-                return;
-            }
-
-            const listingName = listingNameElement.innerText.trim();
-            if (!listingName) {
-                console.error('Listing name not found in the rental form section.');
-                return;
-            }
-
-            try {
-                // Query the "listed_items" collection for the document with the matching productName
-                const q = query(collection(db, 'listed_items'), where('productName', '==', listingName));
-                const querySnapshot = await getDocs(q);
-
-                if (!querySnapshot.empty) {
-                    const listingDoc = querySnapshot.docs[0];
-                    const listingData = listingDoc.data();
-
-                    // Get the first image from the listing
-                    const image = listingData.images && listingData.images.length > 0 ? listingData.images[0] : null;
-
-                    if (!image) {
-                        console.error('No image found for the listing.');
-                        return;
-                    }
-
-                    // Get the sellerId from the listing
-                    const sellerId = listingData.sellerId;
-                    if (!sellerId) {
-                        console.error('Seller ID not found for the listing.');
-                        return;
-                    }
-
-                    // Get the logged-in user's UID
-                    const user = auth.currentUser;
-                    if (!user) {
-                        alert('You must be logged in to rent an item.');
-                        return;
-                    }
-                    const userId = user.uid;
-
-                    const rentalData = {
-                        name: userName,
-                        startDate: rentalStartDate,
-                        endDate: rentalEndDate,
-                        finalPrice: totalPrice,
-                        rentPrice: rentPrice,
-                        image: image,
-                        status: 'for preparation',
-                        listingName: listingName,
-                        sellerId: sellerId,
-                        buyerId: userId,
-                        listingId: listingDoc.id,
-                        createdAt: new Date() 
-                    };
-
-                    // Push the rental data to the "rentals" collection
-                    await addDoc(collection(db, 'rentals'), rentalData);
-
-                    // Update the "isActive" field of the listing to false
-                    const listingDocRef = listingDoc.ref; // Reference to the listing document
-                    await updateDoc(listingDocRef, { isActive: false });
-
-                    alert('Rental submitted successfully!');
-                    
-                    const rentalFormSection = document.getElementById('rental-form-section');
-                    if (rentalFormSection) {
-                        rentalFormSection.classList.add('hidden'); // Hide the rental form section
-                    }
-                } else {
-                    console.error(`No listing found with the name "${listingName}".`);
-                }
-            } catch (error) {
-                console.error('Error submitting rental:', error);
-            }
-        });
-    } else {
-        console.error('Submit Rental button with id "rent-item-btn" not found.');
-    }
+    // Initialize
+    fetchAndDisplayRentPrice();
+    setupDatePickers();
 });
 
 // Ensure the user is authenticated
