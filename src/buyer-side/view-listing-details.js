@@ -105,6 +105,15 @@ async function fetchListingDetails() {
           View on Google Maps
         </button>`;
       console.log("Listing details rendered.");
+
+      // Inject rentalPrice into id="rental-price"
+      const rentalPriceInput = document.getElementById('rental-price');
+      if (rentalPriceInput && listing.rentPrice) {
+        rentalPriceInput.value = `${listing.rentPrice}/day`;
+        console.log('[Event] rentalPrice injected:', rentalPriceInput.value);
+      }
+
+      currentListingSellerId = listing.sellerId; // Store sellerId
     } else {
       alert('Listing not found. Redirecting to listings page.');
       window.location.href = 'buyer-login.html';
@@ -231,6 +240,159 @@ document.getElementById('back-button').addEventListener('click', () => {
   console.log("Back button clicked. Redirecting to listings page.");
   window.location.href = 'buyer-login.html';
 });
+
+//Open rent form when rent button is clicked
+const rentButton = document.getElementById('rent-button');
+const rentalFormSection = document.getElementById('rental-form-section');
+if (rentButton && rentalFormSection) {
+  rentButton.addEventListener('click', () => {
+    rentalFormSection.classList.remove('hidden');
+    console.log('[Event] Rent button clicked. Rental form section opened.');
+  });
+}
+
+// Initialize flatpickr for rental start and end date inputs
+document.addEventListener('DOMContentLoaded', async () => {
+  const rentalStartDate = document.getElementById('rental-start-date');
+  const rentalEndDate = document.getElementById('rental-end-date');
+  const rentalPriceInput = document.getElementById('rental-price');
+  const totalPriceElement = document.getElementById('rental-total');
+
+  let startDateValue = null;
+  let endDateValue = null;
+  let rentPriceValue = 0;
+
+  // Helper to extract numeric rent price
+  function getRentPrice() {
+    if (rentalPriceInput && rentalPriceInput.value) {
+      const match = rentalPriceInput.value.match(/([\d.]+)/);
+      return match ? parseFloat(match[1]) : 0;
+    }
+    return 0;
+  }
+
+  // Calculate and inject total price
+  function calculateTotalPrice() {
+    if (startDateValue && endDateValue) {
+      const days = Math.ceil((endDateValue - startDateValue) / (1000 * 60 * 60 * 24));
+      rentPriceValue = getRentPrice();
+      const total = days > 0 ? days * rentPriceValue : 0;
+      if (totalPriceElement) totalPriceElement.value = `₱${total.toFixed(2)}`;
+    } else if (totalPriceElement) {
+      totalPriceElement.value = "₱0.00";
+    }
+  }
+
+  // Fetch reserved (pending) dates for this listing
+  async function getPendingDates() {
+    const pendingDates = [];
+    try {
+      const rentalsQuery = query(
+        collection(db, 'rentals'),
+        where('listingId', '==', listingId),
+        
+      );
+      const querySnapshot = await getDocs(rentalsQuery);
+      querySnapshot.forEach(docSnap => {
+        const rental = docSnap.data();
+        let start = rental.startDate;
+        let end = rental.endDate;
+        if (start && end) {
+          if (typeof start === 'object' && start.seconds) start = new Date(start.seconds * 1000);
+          else start = new Date(start);
+          if (typeof end === 'object' && end.seconds) end = new Date(end.seconds * 1000);
+          else end = new Date(end);
+          let d = new Date(start);
+          while (d <= end) {
+            pendingDates.push(d.toISOString().split('T')[0]);
+            d.setDate(d.getDate() + 1);
+          }
+        }
+      });
+    } catch (err) {
+      console.error('[Flatpickr] Error fetching pending dates:', err);
+    }
+    return pendingDates;
+  }
+
+  if (window.flatpickr && rentalStartDate && rentalEndDate) {
+    const pendingDates = await getPendingDates();
+
+    flatpickr(rentalStartDate, {
+      dateFormat: "Y-m-d",
+      // Do not use disable, just color the days
+      onDayCreate: function(dObj, dStr, fp, dayElem) {
+        const dateStr = dayElem.dateObj.toISOString().split('T')[0];
+        if (pendingDates.includes(dateStr)) {
+          dayElem.classList.add('bg-red-500', 'text-white');
+          dayElem.style.pointerEvents = 'none'; // Prevent selection
+        }
+      },
+      onChange: function(selectedDates, dateStr, instance) {
+        startDateValue = selectedDates[0];
+        calculateTotalPrice();
+        console.log('[Flatpickr] Start date selected:', dateStr);
+      }
+    });
+    flatpickr(rentalEndDate, {
+      dateFormat: "Y-m-d",
+      // Do not use disable, just color the days
+      onDayCreate: function(dObj, dStr, fp, dayElem) {
+        const dateStr = dayElem.dateObj.toISOString().split('T')[0];
+        if (pendingDates.includes(dateStr)) {
+          dayElem.classList.add('bg-red-500', 'text-white');
+          dayElem.style.pointerEvents = 'none'; // Prevent selection
+        }
+      },
+      onChange: function(selectedDates, dateStr, instance) {
+        endDateValue = selectedDates[0];
+        calculateTotalPrice();
+        console.log('[Flatpickr] End date selected:', dateStr);
+      }
+    });
+    console.log('[Flatpickr] Initialized on rental-start-date and rental-end-date with pending dates:', pendingDates);
+  }
+});
+
+// Fetch rental form data on submit
+const rentalForm = document.getElementById('rental-form');
+let currentListingSellerId = null; // Store sellerId for use in form submission
+
+if (rentalForm) {
+  rentalForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // Fetch values from form inputs
+    const userName = document.getElementById('rental-name')?.value?.trim() || '';
+    const startDate = document.getElementById('rental-start-date')?.value?.trim() || '';
+    const endDate = document.getElementById('rental-end-date')?.value?.trim() || '';
+    const rentPrice = document.getElementById('rental-price')?.value?.trim() || '';
+    const totalPrice = document.getElementById('rental-total')?.value?.trim() || '';
+
+    const rentalFormData = {
+      userName,
+      startDate,
+      endDate,
+      rentPrice,
+      totalPrice,
+      listingId, 
+      sellerId: currentListingSellerId 
+    };
+
+    console.log('[Event] Rental form submitted. Data:', rentalFormData);
+
+    // Push to Firestore "rentals" collection
+    try {
+      const { addDoc, collection } = await import("https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js");
+      await addDoc(collection(db, 'rentals'), rentalFormData);
+      console.log('[Firestore] Rental data added to rentals collection.');
+      alert('Rental submitted successfully!');
+      rentalForm.reset();
+    } catch (error) {
+      console.error('[Firestore] Error adding rental:', error);
+      alert('Failed to submit rental.');
+    }
+  });
+}
 
 // Load listing details on page load
 console.log("Calling fetchListingDetails...");

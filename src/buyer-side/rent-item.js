@@ -16,6 +16,7 @@ const firebaseConfig = {
 
 // Initialize Firebase only if no apps are already initialized
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+console.log('[Firebase] Initialized app:', app.name || app.options.projectId);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
@@ -31,6 +32,7 @@ async function getListingById(listingId) {
 
 // Only run rental form logic if the form exists
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('[Event] DOMContentLoaded');
     // Scope: Only rental form
     const rentalFormSection = document.getElementById('rental-form-section');
     const rentalForm = document.getElementById('rental-form');
@@ -52,15 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch and display rent price using listingId
     async function fetchAndDisplayRentPrice() {
         if (!listingId) return;
+        console.log('[Event] Fetching rent price for listingId:', listingId);
         const listing = await getListingById(listingId);
         if (listing && listing.data.rentPrice) {
             rentPrice = listing.data.rentPrice;
             if (rentalPriceInput) rentalPriceInput.value = `${rentPrice}/day`;
+            console.log('[Event] Rent price fetched:', rentPrice);
         }
     }
 
     // Helper: Get all reserved dates for this listing
     async function getReservedDates(listingId) {
+        console.log('[Event] Fetching reserved dates for listingId:', listingId);
         const reservedDates = [];
         const rentalsQuery = query(
             collection(db, 'rentals'),
@@ -99,8 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 onChange: (selectedDates) => {
                     startDate = selectedDates[0];
                     calculateTotalPrice();
+                    console.log('[Event] Start date selected:', startDate);
                 }
             });
+            console.log('[Event] rentalStartDate flatpickr initialized');
         }
         if (!rentalEndDate._flatpickr) {
             flatpickr(rentalEndDate, {
@@ -109,8 +116,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 onChange: (selectedDates) => {
                     endDate = selectedDates[0];
                     calculateTotalPrice();
+                    console.log('[Event] End date selected:', endDate);
                 }
             });
+            console.log('[Event] rentalEndDate flatpickr initialized');
         }
     }
 
@@ -130,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rentButton.addEventListener('click', () => {
             if (rentalFormSection) {
                 rentalFormSection.classList.toggle('hidden');
+                console.log('[Event] Rent button clicked. Form section toggled.');
             }
         });
     }
@@ -137,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Rental form submission
     rentalForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        console.log('[Event] Rental form submitted');
 
         // Validate required fields
         const userName = userNameInput ? userNameInput.value.trim() : '';
@@ -147,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!userName || !start || !end || !priceStr || !totalStr || !listingId) {
             alert('Please fill in all required fields.');
+            console.log('[Error] Rental form validation failed');
             return;
         }
 
@@ -158,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const listing = await getListingById(listingId);
         if (!listing) {
             alert('Listing not found.');
+            console.log('[Error] Listing not found for listingId:', listingId);
             return;
         }
 
@@ -166,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sellerId = listing.data.sellerId || '';
         if (!image || !sellerId) {
             alert('Listing data incomplete.');
+            console.log('[Error] Listing data incomplete');
             return;
         }
 
@@ -173,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = auth.currentUser;
         if (!user) {
             alert('You must be logged in to rent an item.');
+            console.log('[Error] User not logged in');
             return;
         }
         const userId = user.uid;
@@ -199,22 +214,28 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set listing as inactive
             await updateDoc(listing.doc, { isActive: false });
             alert('Rental submitted successfully!');
+            console.log('[Success] Rental submitted:', rentalData);
             rentalForm.reset();
             if (totalPriceElement) totalPriceElement.value = "₱0.00";
         } catch (error) {
             console.error('Error submitting rental:', error);
             alert('Failed to submit rental.');
+            console.log('[Error] Rental submission failed');
         }
     });
 
     // Initialize
     fetchAndDisplayRentPrice();
     setupDatePickers();
+    console.log('[Event] Rent form logic initialized');
 });
 
 // Ensure the user is authenticated
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         console.warn('No user is logged in.');
+        console.log('[Auth] No user logged in');
+    } else {
+        console.log('[Auth] User logged in:', user.uid);
     }
 });
