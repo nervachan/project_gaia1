@@ -155,15 +155,15 @@ async function fetchUserPendingItems(userId) {
             itemDiv.className = "bg-white shadow-md rounded p-6 mb-4";
 
             // Use the "image" field directly from the rentals collection
-            const imageUrl = itemData.image || "";
+            const imageUrl = itemData.listingImage || "";
 
             // Populate item HTML
             itemDiv.innerHTML = `
                 <h3 class="text-xl font-semibold text-gray-800">${itemData.listingName}</h3>
-                <p class="text-gray-600">Price: ₱${itemData.finalPrice}</p>
+                <p class="text-gray-600">Price:${itemData.totalPrice}</p>
                 <p class="text-gray-600">Start Day of Rental: ${itemData.startDate}</p>
                 <p class="text-gray-600">End Day of Rental: ${itemData.endDate}</p>
-                <p class="text-gray-600">Name of Reserver: ${itemData.name}</p>
+                <p class="text-gray-600">Name of Reserver: ${itemData.userName}</p>
                 <p class="text-gray-600">Status: ${itemData.status}</p>
                 ${imageUrl ? `<img src="${imageUrl}" alt="Product Image" class="w-full h-auto mt-4 rounded">` : ""}
             `;
