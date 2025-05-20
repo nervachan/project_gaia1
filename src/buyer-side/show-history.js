@@ -37,7 +37,7 @@ async function showRentalHistory(userId) {
     rentalHistoryContainer.innerHTML = ''; // Clear previous content
 
     try {
-        const rentalsQuery = query(collection(db, "rentals"), where('buyerId', '==', userId));
+        const rentalsQuery = query(collection(db, "rentals"), where('userUid', '==', userId));
         const rentalsSnapshot = await getDocs(rentalsQuery);
 
         if (rentalsSnapshot.empty) {
@@ -69,7 +69,7 @@ function createRentalHistoryElement(rentalData) {
     const rentalElement = document.createElement('div');
     rentalElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg', 'mb-4');
 
-    const imageUrl = rentalData.image || '';
+    const imageUrl = rentalData.listingImage || '';
     const isReturned = rentalData.status.toLowerCase() === 'returned';
     const reviewGiven = rentalData.reviewGiven || false;
 
@@ -82,7 +82,8 @@ function createRentalHistoryElement(rentalData) {
                 <h3 class="text-xl font-semibold text-gray-900">${rentalData.listingName}</h3>
                 <p class="text-gray-700 mt-2">Start Date: ${rentalData.startDate}</p>
                 <p class="text-gray-700 mt-2">End Date: ${rentalData.endDate}</p>
-                <p class="text-gray-700 mt-2">Price: ₱${rentalData.finalPrice}</p>
+                <p class="text-gray-700 mt-2">Rent Price: ₱${rentalData.rentPrice}</p>
+                <p class="text-gray-700 mt-2">Total Price: ${rentalData.totalPrice}</p>
                 <p class="text-gray-700 mt-2">Status: ${rentalData.status}</p>
 
                 <!-- Show the review form if item is returned and no review is given -->

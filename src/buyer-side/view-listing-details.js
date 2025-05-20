@@ -1,6 +1,7 @@
 // Import the necessary Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
@@ -15,6 +16,7 @@ const firebaseConfig = {
 console.log("Initializing Firebase...");
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth();
 
 console.log("Extracting listingId from URL...");
 const urlParams = new URLSearchParams(window.location.search);
@@ -25,6 +27,17 @@ if (!listingId) {
   alert('No listing ID provided. Redirecting to listings page.');
   window.location.href = 'buyer-login.html';
 }
+
+// Ensure user session is retained and redirect if not logged in
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log('[Auth] User is logged in:', user.uid);
+  } else {
+    console.log('[Auth] No user is logged in. Redirecting to login.');
+    alert('You must be logged in to view this page. Redirecting to login.');
+    window.location.href = 'buyer-login.html';
+  }
+});
 
 // Function to fetch the shop address
 async function getShopAddress(sellerId) {
@@ -336,7 +349,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     flatpickr(rentalEndDate, {
       dateFormat: "Y-m-d",
-      // Do not use disable, just color the days
+     
       onDayCreate: function(dObj, dStr, fp, dayElem) {
         const dateStr = dayElem.dateObj.toISOString().split('T')[0];
         if (pendingDates.includes(dateStr)) {
@@ -368,6 +381,29 @@ if (rentalForm) {
     const rentPrice = document.getElementById('rental-price')?.value?.trim() || '';
     const totalPrice = document.getElementById('rental-total')?.value?.trim() || '';
 
+    // Get logged in user's UID
+    let userUid = null;
+    try {
+      userUid = auth.currentUser ? auth.currentUser.uid : null;
+    } catch (authErr) {
+      console.warn('[Auth] Could not get user UID:', authErr);
+    }
+
+    // Fetch listing name and image[0]
+    let listingName = '';
+    let listingImage = '';
+    try {
+      const docRef = doc(db, 'listed_items', listingId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const listing = docSnap.data();
+        listingName = listing.productName || '';
+        listingImage = (listing.images && listing.images.length > 0) ? listing.images[0] : '';
+      }
+    } catch (listingErr) {
+      console.warn('[Firestore] Could not fetch listing for rental form:', listingErr);
+    }
+
     const rentalFormData = {
       userName,
       startDate,
@@ -375,18 +411,22 @@ if (rentalForm) {
       rentPrice,
       totalPrice,
       listingId, 
-      sellerId: currentListingSellerId 
+      sellerId: currentListingSellerId,
+      userUid, // Add UID to Firestore
+      status:'for preparation', // Default status
+      listingName, // Add listing name
+      listingImage // Add listing image index 0
     };
 
     console.log('[Event] Rental form submitted. Data:', rentalFormData);
 
     // Push to Firestore "rentals" collection
     try {
-      const { addDoc, collection } = await import("https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js");
       await addDoc(collection(db, 'rentals'), rentalFormData);
       console.log('[Firestore] Rental data added to rentals collection.');
       alert('Rental submitted successfully!');
       rentalForm.reset();
+      location.reload(); // Reload the page to reflect changes
     } catch (error) {
       console.error('[Firestore] Error adding rental:', error);
       alert('Failed to submit rental.');
