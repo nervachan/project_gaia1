@@ -11,11 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script type="module" src="load-listings.js"></script>
     <script type="module" src="search-items.js"></script>
-    <script src="index.js"></script>
-   
-
     
-
 </head>
 <body class="bg-grey-100 pt-16">
 <!-- Fixed Header -->
@@ -41,7 +37,9 @@
       <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block">
         <div class="flex flex-col sm:flex-row sm:space-x-4">
           <a href="#" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
-          <a href="howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a>         
+          <a href="buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a> 
+          <a href="registration/register.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Register</a> 
+                  
         </div>
       </div>
 
@@ -72,7 +70,29 @@
   });
 </script>
 
+<!-- Intro Modal -->
+<div id="page-load-modal-overlay" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+  <div class="relative p-8 rounded-lg shadow-lg flex flex-col items-center overflow-hidden bg-cover bg-center w-full max-w-xl min-h-[20vh]" style="background-image: url('images/index_bg.png');">
+    <div class="absolute inset-0 bg-white bg-opacity-60 z-0"></div>
+    <div class="relative z-10 flex flex-col items-center">
+      <h2 class="text-2xl font-bold mb-4 mt-6">Welcome To Project:Gaia! </h2>
+      <p class="mb-6 text-lg text-gray-900">Rent High Quality Couture Clothing in an affordable price!</p>
+      <button id="close-page-load-modal" class="px-8 py-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Get Started</button>
+    </div>
+  </div>
+</div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const closeBtn = document.getElementById('close-page-load-modal');
+    const modalOverlay = document.getElementById('page-load-modal-overlay');
+    if (closeBtn && modalOverlay) {
+      closeBtn.onclick = function() {
+        modalOverlay.style.display = 'none';
+      };
+    }
+  });
+</script>
 
 <div class="searchBox flex items-center bg-grey-200 p-4 rounded-lg shadow-lg mx-auto mt-8">
   <input id="searchInput" class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" placeholder="Search something">
@@ -108,9 +128,6 @@
   <button class="filter-btn bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" data-category="for children (male)">Children (Male)</button>
   <button class="filter-btn bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700" data-category="for children (female)">Children (Female)</button>
 </div>
-
-
-        
 
 <!-- Listings Container -->
 <div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8">
@@ -149,12 +166,5 @@
       </div>
   </div>
 </footer>
-
-
-
-
-
-
-
 </body>
 </html>
