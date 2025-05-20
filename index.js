@@ -1,24 +1,26 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
+document.addEventListener('DOMContentLoaded', function() {
+    // Create modal overlay using Tailwind classes
+    const modalOverlay = document.createElement('div');
+    modalOverlay.id = 'page-load-modal-overlay';
+    modalOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+    // Create modal content using Tailwind classes and add background image
+    const modalContent = document.createElement('div');
+    modalContent.className = 'relative p-8 rounded-lg shadow-lg flex flex-col items-center overflow-hidden bg-cover bg-center w-full max-w-xl min-h-[60vh]';
+    modalContent.style.backgroundImage = "url('images/index_bg.png')";
+    modalContent.innerHTML = `
+        <div class="absolute inset-0 bg-white bg-opacity-80 z-0"></div>
+        <div class="relative z-10 flex flex-col items-center">
+            <h2 class="text-2xl font-bold mb-4">Welcome!</h2>
+            <p class="mb-6 text-gray-700">This is a page load modal. Click below to continue.</p>
+            <button id="close-page-load-modal" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Close</button>
+        </div>
+    `;
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
-  authDomain: "project-gaia1.firebaseapp.com",
-  projectId: "project-gaia1",
-  storageBucket: "project-gaia1.firebasestorage.app",
-  messagingSenderId: "832122601643",
-  appId: "1:832122601643:web:1ab91b347704174f52b7ee",
-  measurementId: "G-DX2L33NH4H"
-};
+    modalOverlay.appendChild(modalContent);
+    document.body.appendChild(modalOverlay);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
+    document.getElementById('close-page-load-modal').onclick = function() {
+        modalOverlay.remove();
+    };
+});

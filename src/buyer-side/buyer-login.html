@@ -22,7 +22,7 @@
     
 
 </head>
-<body class="bg-gray-100 pt-16"> <!-- Added padding to body to avoid overlap with fixed header -->
+<body class="bg-grey-100 pt-16"> <!-- Added padding to body to avoid overlap with fixed header -->
   
 <!-- Fixed Header -->
 <header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
@@ -86,7 +86,7 @@
 
 
 
-<div class="searchBox flex items-center bg-gray-100 p-4 rounded-lg shadow-lg">
+<div class="searchBox flex items-center bg-grey-200 p-4 rounded-lg shadow-lg mx-auto mt-8">
   <input id="searchInput" class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" placeholder="Search something">
   <button id="searchButton" class="searchButton p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-r-lg flex items-center justify-center">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 29 29" fill="none">
@@ -114,7 +114,7 @@
   </button>
 </div>
 <!-- Filter Buttons -->
-<div class="flex items-justify gap-2 px-4 mt-4 ">
+<div class="flex justify-center items-center gap-2 px-4 mt-4">
   <button class="filter-btn bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-category="for men">Male</button>
   <button class="filter-btn bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700" data-category="for women">Female</button>
   <button class="filter-btn bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" data-category="for children (male)">Children (Male)</button>
@@ -125,42 +125,42 @@
         
 
 <!-- Listings Container -->
-<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8">
   <!-- Placeholder content will be replaced with listings -->
-  <p class="text-center text-gray-500">Loading your listings...</p>
+  <p class="text-center text-gray-500 mb-8">Loading your listings...</p>
 </div>
 
-    <footer class="bg-gray-800 text-white py-6">
-      <div class="container mx-auto px-4">
-          <div class="flex flex-col md:flex-row justify-between">
-              <!-- Navigation Links -->
-              <div class="mb-4 md:mb-0">
-                  
-              </div>
-  
-              <!-- Social Media Icons -->
-              <div class="mb-4 md:mb-0">
-                  <h3 class="text-lg font-semibold">Follow Project:Gaia!</h3>
-                  <div class="flex space-x-4 mt-2">
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
-                  </div>
-              </div>
+<footer class="bg-gray-800 text-white py-6 mt-8">
+  <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between">
+          <!-- Navigation Links -->
+          <div class="mb-4 md:mb-0">
+              
           </div>
-  
-          <!-- Copyright Notice -->
-          <div class="mt-6 border-t border-gray-700 pt-4 text-center">
-              <p class="text-sm">© 2024 Project:Gaia. All rights reserved.</p>
-          </div>
-  
-          <!-- Accessibility Links -->
-          <div class="mt-4 text-center">
-              <a href="/accessibility" class="text-gray-400 hover:text-white">Accessibility Statement</a>
+
+          <!-- Social Media Icons -->
+          <div class="mb-4 md:mb-0">
+              <h3 class="text-lg font-semibold">Follow Project:Gaia!</h3>
+              <div class="flex space-x-4 mt-2">
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+              </div>
           </div>
       </div>
-  </footer>
+
+      <!-- Copyright Notice -->
+      <div class="mt-6 border-t border-gray-700 pt-4 text-center">
+          <p class="text-sm">© 2024 Project:Gaia. All rights reserved.</p>
+      </div>
+
+      <!-- Accessibility Links -->
+      <div class="mt-4 text-center">
+          <a href="/accessibility" class="text-gray-400 hover:text-white">Accessibility Statement</a>
+      </div>
+  </div>
+</footer>
 
 <!-- Listing Details Modal -->
 <div id="listing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

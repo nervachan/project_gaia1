@@ -1,29 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Couture Rentals</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project:Gaia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script type="module" src="load-listings.js"></script>
+    <script type="module" src="search-items.js"></script>
+    <script src="index.js"></script>
+   
+
+    
+
 </head>
+<body class="bg-grey-100 pt-16">
+<!-- Fixed Header -->
+<header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
+  <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-16 items-center justify-between">
+      <!-- Logo Section -->
+      <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+        <div class="flex flex-shrink-0 items-center">
+          <h3 class="text-gray-100">Project:Gaia</h3>
+        </div>
+      </div>
 
-<body class="bg-gray-50">
+      <!-- Hamburger Menu Button -->
+      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+        <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+          <span class="sr-only">Open main menu</span>
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
 
-  <!-- Hero Section -->
-  <section class="bg-cover bg-center text-white h-screen flex flex-col justify-center items-center text-center px-6"
-    style="background-image: url('images/index_bg.png');">
-    <h1 class="text-6xl font-extrabold leading-tight mb-6">Project:Gaia</h1>
-    <h3 class="text-5xl font-extrabold leading-tight mb-6">Find Your Perfect Couture Look</h3>
-    <p class="text-lg mb-6">Rent the finest couture pieces for any occasion.</p>
-    <div class="flex justify-center gap-6">
-      <!-- Login Button -->
-      <a href="../src/login-out/login.html" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300">Log In</a>
-      <!-- Sign Up Button -->
-      <a href="../src/registration/register.html" class="inline-block bg-gray-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-gray-700 transition duration-300">Sign Up</a>
+      <!-- Navigation Links -->
+      <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block">
+        <div class="flex flex-col sm:flex-row sm:space-x-4">
+          <a href="#" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+          <a href="howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a>         
+        </div>
+      </div>
+
+      <!-- Profile and Logout -->
+      <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+        <div class="relative ml-3">
+          <div class="flex items-center space-x-4">
+            
+            <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="login">Login</a>
+          </div>
+        </div>
+      </div>
     </div>
-  </section>
+  </nav>
+
+  <!-- Mobile Menu Dropdown -->
+  <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
+    <a href="#" class="block px-3 py-2 text-base font-medium text-white hover:bg-gray-700">Home</a>
+    <a href="howitworks.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">How It Works</a>
+  </div>
+</header>
+
+<script>
+  // filepath: /workspaces/project_gaia1/src/buyer-side/buyer-login.js
+  document.getElementById('mobile-menu-button').addEventListener('click', () => {
+    const mobileMenu = document.getElementById('mobile-menu-dropdown');
+    mobileMenu.classList.toggle('hidden');
+  });
+</script>
+
+
+
+<div class="searchBox flex items-center bg-grey-200 p-4 rounded-lg shadow-lg mx-auto mt-8">
+  <input id="searchInput" class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" placeholder="Search something">
+  <button id="searchButton" class="searchButton p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-r-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 29 29" fill="none">
+          <g clip-path="url(#clip0_2_17)">
+              <g filter="url(#filter0_d_2_17)">
+                  <path d="M23.7953 23.9182L19.0585 19.1814M19.0585 19.1814C19.8188 18.4211 20.4219 17.5185 20.8333 16.5251C21.2448 15.5318 21.4566 14.4671 21.4566 13.3919C21.4566 12.3167 21.2448 11.252 20.8333 10.2587C20.4219 9.2653 19.8188 8.36271 19.0585 7.60242C18.2982 6.84214 17.3956 6.23905 16.4022 5.82759C15.4089 5.41612 14.3442 5.20435 13.269 5.20435C12.1938 5.20435 11.1291 5.41612 10.1358 5.82759C9.1424 6.23905 8.23981 6.84214 7.47953 7.60242C5.94407 9.13789 5.08145 11.2204 5.08145 13.3919C5.08145 15.5634 5.94407 17.6459 7.47953 19.1814C9.01499 20.7168 11.0975 21.5794 13.269 21.5794C15.4405 21.5794 17.523 20.7168 19.0585 19.1814Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" shape-rendering="crispEdges"></path>
+              </g>
+          </g>
+          <defs>
+              <filter id="filter0_d_2_17" x="-0.418549" y="3.70435" width="29.7139" height="29.7139" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                  <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+                  <feOffset dy="4"></feOffset>
+                  <feGaussianBlur stdDeviation="2"></feGaussianBlur>
+                  <feComposite in2="hardAlpha" operator="out"></feComposite>
+                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
+                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2_17"></feBlend>
+                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2_17" result="shape"></feBlend>
+              </filter>
+              <clipPath id="clip0_2_17">
+                  <rect width="28.0702" height="28.0702" fill="white" transform="translate(0.403503 0.526367)"></rect>
+              </clipPath>
+          </defs>
+      </svg>
+  </button>
+</div>
+<!-- Filter Buttons -->
+<div class="flex justify-center items-center gap-2 px-4 mt-4">
+  <button class="filter-btn bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-category="for men">Male</button>
+  <button class="filter-btn bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700" data-category="for women">Female</button>
+  <button class="filter-btn bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" data-category="for children (male)">Children (Male)</button>
+  <button class="filter-btn bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700" data-category="for children (female)">Children (Female)</button>
+</div>
+
+
+        
+
+<!-- Listings Container -->
+<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8">
+  <!-- Placeholder content will be replaced with listings -->
+  <p class="text-center text-gray-500 mb-8">Loading your listings...</p>
+</div>
+
+<footer class="bg-gray-800 text-white py-6 mt-8">
+  <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between">
+          <!-- Navigation Links -->
+          <div class="mb-4 md:mb-0">
+              
+          </div>
+
+          <!-- Social Media Icons -->
+          <div class="mb-4 md:mb-0">
+              <h3 class="text-lg font-semibold">Follow Project:Gaia!</h3>
+              <div class="flex space-x-4 mt-2">
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+              </div>
+          </div>
+      </div>
+
+      <!-- Copyright Notice -->
+      <div class="mt-6 border-t border-gray-700 pt-4 text-center">
+          <p class="text-sm">© 2024 Project:Gaia. All rights reserved.</p>
+      </div>
+
+      <!-- Accessibility Links -->
+      <div class="mt-4 text-center">
+          <a href="/accessibility" class="text-gray-400 hover:text-white">Accessibility Statement</a>
+      </div>
+  </div>
+</footer>
+
+
+
+
+
+
 
 </body>
-
 </html>
