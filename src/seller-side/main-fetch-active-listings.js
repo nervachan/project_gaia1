@@ -41,8 +41,8 @@ async function fetchActiveListings() {
         // Query the "listed_items" collection for active listings
         const listingsQuery = query(
             collection(db, "listed_items"),
-            where("sellerId", "==", userId),
-            where("isActive", "==", true)
+            where("sellerId", "==", userId)
+            
         );
         const listingsSnapshot = await getDocs(listingsQuery);
 
@@ -143,8 +143,8 @@ async function fetchPendingListings() {
     }
 }
 
-// Function to fetch and display inactive listings
-async function fetchInactiveListings() {
+// Function to fetch and display total earnings from rentals
+async function fetchTotalEarnings() {
     const user = auth.currentUser;
 
     if (!user) {
@@ -163,46 +163,36 @@ async function fetchInactiveListings() {
     inactiveListingsContainer.innerHTML = "<li>Loading...</li>";
 
     try {
-        // Query the "listed_items" collection for inactive listings
-        const inactiveQuery = query(
-            collection(db, "inactive_listings"),
-            where("sellerId", "==", userId),
-            
+        // Query the "rentals" collection for rentals by this seller
+        const rentalsQuery = query(
+            collection(db, "rentals"),
+            where("sellerId", "==", userId)
         );
-        const inactiveSnapshot = await getDocs(inactiveQuery);
+        const rentalsSnapshot = await getDocs(rentalsQuery);
 
         inactiveListingsContainer.innerHTML = ""; // Clear loading text
 
-        if (inactiveSnapshot.empty) {
-            inactiveListingsContainer.innerHTML = "<li>No inactive listings found.</li>";
+        if (rentalsSnapshot.empty) {
+            inactiveListingsContainer.innerHTML = "<li>No rentals found.</li>";
             return;
         }
 
-        // Counter for inactive listings
-        let inactiveListingsCount = 0;
-
-        // Loop through the inactive listings and display them
-        inactiveSnapshot.forEach((docSnapshot) => {
-            const listingData = docSnapshot.data();
-            const listingItem = document.createElement("li");
-            listingItem.className = "text-red-800 hover:underline cursor-pointer";
-            listingItem.textContent = listingData.productName;
-
-            // Increment the counter
-            inactiveListingsCount++;
-
-            // Append the listing item to the container
-            inactiveListingsContainer.appendChild(listingItem);
+        // Sum up totalPrice from all rentals
+        let totalEarnings = 0;
+        rentalsSnapshot.forEach((docSnapshot) => {
+            const rentalData = docSnapshot.data();
+            const price = Number(rentalData.totalPrice) || 0;
+            totalEarnings += price;
         });
 
-        // Display the total count of inactive listings
-        const countElement = document.createElement("p");
-        countElement.className = "text-gray-700 font-semibold mb-4";
-        countElement.textContent = `Total Inactive Listings: ${inactiveListingsCount}`;
-        inactiveListingsContainer.prepend(countElement); // Add the count before the list
+        // Display the total earnings
+        const earningsElement = document.createElement("p");
+        earningsElement.className = "text-gray-700 font-semibold mb-4";
+        earningsElement.textContent = `Total Earnings from Rentals: $${totalEarnings.toFixed(2)}`;
+        inactiveListingsContainer.appendChild(earningsElement);
     } catch (error) {
-        console.error("Error fetching inactive listings:", error);
-        inactiveListingsContainer.innerHTML = "<li>Error loading inactive listings. Please try again later.</li>";
+        console.error("Error fetching rentals:", error);
+        inactiveListingsContainer.innerHTML = "<li>Error loading rental earnings. Please try again later.</li>";
     }
 }
 
@@ -266,7 +256,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         fetchActiveListings();
         fetchPendingListings();
-        fetchInactiveListings();
+        fetchTotalEarnings();
         fetchRentalHistory();
     } else {
         console.warn("User is not logged in.");
