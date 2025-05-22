@@ -88,22 +88,19 @@ async function fetchUserListings() {
                         <a href="#" class="inline-block py-2 px-6 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 deactivate-btn" data-id="${docSnapshot.id}" data-listing='${JSON.stringify(listingData)}'>
                             Deactivate Listing
                         </a>
-                        
+                        <button class="inline-block py-2 px-6 bg-orange-600 text-white rounded-full text-sm hover:bg-orange-700 edit-btn" data-id="${docSnapshot.id}">
+                            Edit Listing
+                        </button>
                     </div>
                 </div>
             `;
-
-            // <button class="inline-block py-2 px-6 bg-orange-600 text-white rounded-full text-sm hover:bg-orange-700 edit-btn" data-id="${docSnapshot.id}" data-listing='${JSON.stringify(listingData)}'>
-            //                 Edit Listing
-            //             </button>
             listingsContainer.appendChild(itemDiv);
-        
 
             // Add event listener for the "Edit Listing" button
-            // const editButton = itemDiv.querySelector(".edit-btn");
-            // editButton.addEventListener("click", () => {
-            //     showEditModal(docSnapshot.id, listingData);
-            // });
+            const editButton = itemDiv.querySelector(".edit-btn");
+            editButton.addEventListener("click", () => {
+                window.location.href = `seller-edit-listing.html?id=${docSnapshot.id}`;
+            });
 
             // Add event listeners for carousel navigation
             if (images.length > 1) {
