@@ -1,7 +1,5 @@
-// Import Firebase libraries and initialize Firestore
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, collection, getDocs, getDoc, query, where, updateDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Firebase configuration and initialization
 const firebaseConfig = {
@@ -14,10 +12,9 @@ const firebaseConfig = {
     measurementId: "G-DX2L33NH4H"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
+
 
 
 // Helper: Get listing ID from URL (?id=...)
@@ -34,11 +31,11 @@ function populateEditForm(data) {
 
     // Product Name
     const nameInput = form.querySelector('#product-name');
-    if (nameInput) nameInput.value = data.productName || data.productName || '';
+    if (nameInput) nameInput.value = data.productName || data.product_name || '';
 
     // Product Description
     const descInput = form.querySelector('#product-description');
-    if (descInput) descInput.value = data.productDescription || data.productDescription || '';
+    if (descInput) descInput.value = data.productDescription || data.product_description || '';
 
     // Category
     const categoryInput = form.querySelector('#category');
