@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project:Gaia</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <script type="module" src="view-profile.js"></script>
+    <script type="module" src="logout.js"></script>
+  </head>
+
+<body class="bg-blue-400 font-sans">
+   <!-- Fixed Header -->
+   <header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
+    <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="relative flex h-16 items-center justify-between">
+            <!-- Logo Section -->
+            <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                <div class="flex flex-shrink-0 items-center">
+                    <h3 class="text-gray-100">Project:Gaia</h3>
+                </div>
+            </div>
+
+            <!-- Hamburger Menu Button -->
+            <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <span class="sr-only">Open main menu</span>
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block">
+                <div class="flex flex-col sm:flex-row sm:space-x-4">
+                    <a href="buyer-login.html" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+                    <a href="#" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a>
+                    <a href="History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+                    <a href="/project_gaia1/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+                </div>
+            </div>
+
+            <!-- Profile and Logout -->
+            <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <div class="relative ml-3">
+                    <div class="flex items-center space-x-4">
+                        <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2">
+                            <i class="fa-solid fa-user" id="profile-icon"></i>
+                        </a>
+                        <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
+        <a href="buyer-login.html" class="block px-3 py-2 text-base font-medium text-white hover:bg-gray-700">Home</a>
+        <a href="#" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">How It Works</a>
+        <a href="History.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+        <a href="/project_gaia1/src/ai/AI.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+    </div>
+</header>
+
+<script>
+    // filepath: /workspaces/project_gaia1/src/buyer-side/History.js
+    document.getElementById('mobile-menu-button').addEventListener('click', () => {
+        const mobileMenu = document.getElementById('mobile-menu-dropdown');
+        mobileMenu.classList.toggle('hidden');
+    });
+</script>
+  
+
+    <!-- Main Content -->
+    <main class="mt-32 px-5">
+        <h1 id="title-text" class="text-3xl text-center font-bold text-gray-800 mb-12">How does Project:Gaia work?</h1>
+
+        <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Look for the item needed and Reserve</h3>
+                <p class="text-sm text-gray-600">Start by browsing our website to find the item you're interested in renting. Take your time to compare options and select the perfect item that meets your needs.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Go to the shop to Pick up Reserved item</h3>
+                <p class="text-sm text-gray-600">Once reservation is done online, head to the designated shop location for pickup. Make sure to bring any necessary identification or confirmation details to ensure a smooth collection process.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Wear and Enjoy!</h3>
+                <p class="text-sm text-gray-600">After picking up the reserved item, It's time to enjoy! Use it as planned, whether it's for a special event, a casual outing, or any other occasion. Make the most of your rental and have fun!</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Return on Time</h3>
+                <p class="text-sm text-gray-600">When you're finished, please return the item to the shop by the agreed-upon date and time. Timely returns help the shops maintain inventory and provide great service to all clients. If you need an extension, reach out to the shop you reserved from in advance to see if it is possible.</p>
+            </div>
+        </div>
+    </main>
+
+    <!--Profile Modal -->
+<div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden z-20">
+  <div class="bg-white p-8 rounded-lg shadow-xl w-1/3">
+    <h2 class="text-2xl font-semibold text-gray-800">User Profile</h2>
+    <div id="user-profile-info" class="mt-4">
+      <!-- User Info will be injected here -->
+    </div>
+    <div class="mt-4 flex justify-between">
+      <button id="close-profile" class="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
+        Close
+      </button>
+      <a href="buyer-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+        Edit Profile
+      </a>
+    </div>
+  </div>
+</div>
+   
+
+</body>
+
+</html>
