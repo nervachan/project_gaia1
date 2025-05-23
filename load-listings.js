@@ -1,12 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
-import {
-    getFirestore, collection, query, where, getDocs, getDoc, doc, addDoc
-} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import {
-    getAuth, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import {getFirestore, collection, query, where, getDocs, getDoc, doc, addDoc} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import {getAuth, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -110,7 +106,7 @@ async function loadListings() {
       viewDetailsButton.addEventListener('click', () => {
         const listingId = viewDetailsButton.getAttribute('data-listing-id'); // Get listingId from button
         // Redirect to another window with the listing ID
-        window.location.href = `view-listing-details.html?listingId=${listingId}`;
+        window.location.href = `/src/buyer-side/view-listing-details.html?listingId=${listingId}`;
       });
     });
   } catch (error) {
