@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project:Gaia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script type="module" src="load-listings.js"></script>
+    <script type="module" src="logout.js"></script>
+    
+    <script type="module" src="auth-persistence-checker.js"></script>
+  
+    <script type="module" src="view-profile.js"></script>
+    
+    <script type="module" src="search-items.js"></script>
+   
+
+    
+
+</head>
+<body class="bg-grey-100 pt-16"> <!-- Added padding to body to avoid overlap with fixed header -->
+  
+<!-- Fixed Header -->
+<header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
+  <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-16 items-center justify-between">
+      <!-- Logo Section -->
+      <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+        <div class="flex flex-shrink-0 items-center">
+          <h3 class="text-gray-100">Project:Gaia</h3>
+        </div>
+      </div>
+
+      <!-- Hamburger Menu Button -->
+      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+        <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+          <span class="sr-only">Open main menu</span>
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block">
+        <div class="flex flex-col sm:flex-row sm:space-x-4">
+          <a href="#" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
+          <a href="howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a>
+          <a href="History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+          <a href="/project_gaia1/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+        </div>
+      </div>
+
+      <!-- Profile and Logout -->
+      <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+        <div class="relative ml-3">
+          <div class="flex items-center space-x-4">
+            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md p-2">
+              <i class="fa-solid fa-user" id="profile-icon"></i>
+            </a>
+            <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Dropdown -->
+  <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
+    <a href="#" class="block px-3 py-2 text-base font-medium text-white hover:bg-gray-700">Home</a>
+    <a href="howitworks.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">How It Works</a>
+    <a href="History.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+    <a href="/project_gaia1/src/ai/AI.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+  </div>
+</header>
+
+<script>
+  // filepath: /workspaces/project_gaia1/src/buyer-side/buyer-login.js
+  document.getElementById('mobile-menu-button').addEventListener('click', () => {
+    const mobileMenu = document.getElementById('mobile-menu-dropdown');
+    mobileMenu.classList.toggle('hidden');
+  });
+</script>
+
+
+
+<div class="searchBox flex items-center bg-grey-200 p-4 rounded-lg shadow-lg mx-auto mt-8">
+  <input id="searchInput" class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" placeholder="Search something">
+  <button id="searchButton" class="searchButton p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-r-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 29 29" fill="none">
+          <g clip-path="url(#clip0_2_17)">
+              <g filter="url(#filter0_d_2_17)">
+                  <path d="M23.7953 23.9182L19.0585 19.1814M19.0585 19.1814C19.8188 18.4211 20.4219 17.5185 20.8333 16.5251C21.2448 15.5318 21.4566 14.4671 21.4566 13.3919C21.4566 12.3167 21.2448 11.252 20.8333 10.2587C20.4219 9.2653 19.8188 8.36271 19.0585 7.60242C18.2982 6.84214 17.3956 6.23905 16.4022 5.82759C15.4089 5.41612 14.3442 5.20435 13.269 5.20435C12.1938 5.20435 11.1291 5.41612 10.1358 5.82759C9.1424 6.23905 8.23981 6.84214 7.47953 7.60242C5.94407 9.13789 5.08145 11.2204 5.08145 13.3919C5.08145 15.5634 5.94407 17.6459 7.47953 19.1814C9.01499 20.7168 11.0975 21.5794 13.269 21.5794C15.4405 21.5794 17.523 20.7168 19.0585 19.1814Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" shape-rendering="crispEdges"></path>
+              </g>
+          </g>
+          <defs>
+              <filter id="filter0_d_2_17" x="-0.418549" y="3.70435" width="29.7139" height="29.7139" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                  <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+                  <feOffset dy="4"></feOffset>
+                  <feGaussianBlur stdDeviation="2"></feGaussianBlur>
+                  <feComposite in2="hardAlpha" operator="out"></feComposite>
+                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
+                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2_17"></feBlend>
+                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2_17" result="shape"></feBlend>
+              </filter>
+              <clipPath id="clip0_2_17">
+                  <rect width="28.0702" height="28.0702" fill="white" transform="translate(0.403503 0.526367)"></rect>
+              </clipPath>
+          </defs>
+      </svg>
+  </button>
+</div>
+<!-- Filter Buttons -->
+<div class="flex justify-center items-center gap-2 px-4 mt-4">
+  <button class="filter-btn bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-category="for men">Male</button>
+  <button class="filter-btn bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700" data-category="for women">Female</button>
+  <button class="filter-btn bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" data-category="for children (male)">Children (Male)</button>
+  <button class="filter-btn bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700" data-category="for children (female)">Children (Female)</button>
+</div>
+
+
+        
+
+<!-- Listings Container -->
+<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8">
+  <!-- Placeholder content will be replaced with listings -->
+  <p class="text-center text-gray-500 mb-8">Loading your listings...</p>
+</div>
+
+<footer class="bg-gray-800 text-white py-6 mt-8">
+  <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between">
+          <!-- Navigation Links -->
+          <div class="mb-4 md:mb-0">
+              
+          </div>
+
+          <!-- Social Media Icons -->
+          <div class="mb-4 md:mb-0">
+              <h3 class="text-lg font-semibold">Follow Project:Gaia!</h3>
+              <div class="flex space-x-4 mt-2">
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                  <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+              </div>
+          </div>
+      </div>
+
+      <!-- Copyright Notice -->
+      <div class="mt-6 border-t border-gray-700 pt-4 text-center">
+          <p class="text-sm">© 2024 Project:Gaia. All rights reserved.</p>
+      </div>
+
+      <!-- Accessibility Links -->
+      <div class="mt-4 text-center">
+          <a href="/accessibility" class="text-gray-400 hover:text-white">Accessibility Statement</a>
+      </div>
+  </div>
+</footer>
+
+<!-- Listing Details Modal -->
+<div id="listing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90%] overflow-y-auto">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 id="modal-title" class="text-xl font-semibold text-gray-800">Listing Details</h2>
+            <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="modal-image-container" class="p-2"></div>
+        <div id="modal-description" class="p-2"></div>
+        <div id="modal-category" class="p-2"></div>
+        <div id="modal-rent-price" class="p-2"></div>
+        <div id="modal-sell-price" class="p-2"></div>
+        <div id="modal-shop-address" class="p-2"></div>
+        <div id="modal-footer" class="p-4 border-t border-gray-200 flex justify-end">
+          <button id="close-modal-footer" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Close</button>
+        </div>
+        
+    </div>
+</div>
+
+<!--RENT Modal Structure -->
+<div id="rentModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+      <div class="flex justify-between items-center">
+          <h5 class="text-xl font-semibold" id="rentModalLabel">Rental Information</h5>
+          <button id="close-rent" class="text-gray-500 hover:text-gray-700">&times;</button>
+      </div>
+      <form id="rentalForm" class="mt-4">
+          <div class="mb-4">
+              <label for="userName" class="block text-sm font-medium text-gray-700">Name</label>
+              <input type="text" id="userName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required>
+          </div>
+          <div class="mb-4">
+              <label for="rentalPrice" class="block text-sm font-medium text-gray-700">Price per Day</label>
+              <input type="text" id="rentalPrice" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" readonly>
+          </div>
+          <div class="mb-4">
+              <label for="rentalStartDate" class="block text-sm font-medium text-gray-700">Start Date</label>
+              <input type="text" id="rentalStartDate" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required>
+          </div>
+          <div class="mb-4">
+              <label for="rentalEndDate" class="block text-sm font-medium text-gray-700">End Date</label>
+              <input type="text" id="rentalEndDate" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500" required>
+          </div>
+          <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700">Total Price</label>
+              <p id="totalPrice" class="text-lg font-semibold">₱0.00</p>
+          </div>
+          <div class="flex justify-end">
+              <button type="submit"  id="rent-item-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Submit Rental</button>
+          </div>
+      </form>
+  </div>
+</div>
+
+
+
+<!--Profile Modal -->
+<div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden z-20">
+  <div class="bg-white p-8 rounded-lg shadow-xl w-1/3">
+    <h2 class="text-2xl font-semibold text-gray-800">User Profile</h2>
+    <div id="user-profile-info" class="mt-4">
+      <!-- User Info will be injected here -->
+    </div>
+    <div class="mt-4 flex justify-between">
+      <button id="close-profile" class="bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-700">
+        Close
+      </button>
+      <a href="buyer-edit-profile.html" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+        Edit Profile
+      </a>
+    </div>
+  </div>
+</div>
+
+  <!-- signed-in name script -->
+<!-- <script>
+  // Retrieve the username from localStorage
+const username = localStorage.getItem('username');
+
+// Check if the username exists
+if (username) {
+    // Display the welcome message
+    document.getElementById('welcome-message').textContent = `Hello!`;
+} else {
+    // If no username is found, redirect to the login page
+    window.location.href = 'client-login.html'; // Change this to your desired page
+}
+</script> -->
+
+  <!--listing script -->
+  <!-- <script>
+    // Function to load and display listings from localStorage
+    function loadListings() {
+        const listingsContainer = document.getElementById('listing-container');
+        const listings = JSON.parse(localStorage.getItem('listings')) || [];
+
+        // Clear the container before adding new listings
+        listingsContainer.innerHTML = '';
+
+        // Loop through the listings and add them to the page
+        listings.forEach(listing => {
+            const listingElement = document.createElement('div');
+            listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
+
+            // If the listing has an image, display it
+            const image = listing.image ? `<img src="${listing.image}" alt="${listing.productName}" class="w-full h-48 object-cover rounded-md">` : '';
+            
+            listingElement.innerHTML = `
+                ${image}
+                <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
+                <p class="text-gray-600 mt-2">${listing.productDescription}</p>
+                <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
+                <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
+                ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listing.rentPrice}</p>` : ''}
+                ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: $${listing.sellPrice}</p>` : ''}
+                <button id="view-details" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">View Details</button>
+            `;
+
+            listingsContainer.appendChild(listingElement);
+
+            // Add event listener for 'View Details' button
+        const viewDetailsButton = document.getElementById(`view-details`);
+        viewDetailsButton.addEventListener('click', () => {
+            // Redirect to listing-page.html with the index or a unique identifier as a query parameter
+            window.location.href = `/src/listing-page.html`;
+          });
+        });
+    }
+
+    // Load listings when the page is loaded
+    window.onload = loadListings;
+</script> -->
+
+
+
+
+</body>
+</html>

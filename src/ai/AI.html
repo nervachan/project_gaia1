@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Image Generator</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="" />
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <!-- Navigation Bar -->
+    <nav class="bg-gray-800 text-white shadow-md">
+      <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+          
+          <!-- Left: Logo/Brand -->
+          <div class="flex items-center">
+            <h3 class="text-gray-100 text-lg font-semibold">Project:Gaia</h3>
+          </div>
+          
+          <!-- Right: Navigation Links -->
+          <div class="flex space-x-4">
+            <a href="/src/buyer-side/buyer-login.html" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white">Home</a>
+            <a href="#" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Become a lender</a>
+            <a href="/src/buyer-side/History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
+            <a href="/src/watch-list.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch List</a>
+            <a href="/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+          </div>
+    
+        </div>
+      </div>
+    </nav>
+    
+
+    <div class="container mx-auto p-4">
+      <!-- Header -->
+      <header class="header flex items-center justify-between my-6">
+        <div class="logo-wrapper flex items-center space-x-2">
+          <div class="logo text-gray-800 text-2xl">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <h1 class="text-xl font-bold">AI Image Generator</h1>
+        </div>
+        <button class="theme-toggle text-gray-400 cursor-not-allowed" disabled>
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </header>
+
+      <!-- Main Content -->
+      <div class="main-content bg-white p-6 rounded-lg shadow">
+        <form action="#" class="prompt-form space-y-6">
+          <div class="prompt-container flex items-start space-x-2">
+            <textarea
+              class="prompt-input w-full p-3 border border-gray-300 rounded resize-none"
+              placeholder="Describe your imagination in detail..."
+              spellcheck="false"
+              autofocus
+              required
+            ></textarea>
+            <button type="button" class="prompt-btn bg-gray-800 text-white px-3 py-2 rounded hover:bg-gray-800" title="Get Random Prompt">
+              <i class="fa-solid fa-dice"></i>
+            </button>
+          </div>
+
+          <div class="prompt-actions grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="select-wrapper">
+              <select class="custom-select w-full p-2 border border-gray-300 rounded" id="model-select" required>
+                <option value="black-forest-labs/FLUX.1-dev" selected>FLUX.1-dev</option>
+                <option value="black-forest-labs/FLUX.1-schnell">FLUX.1-schnell</option>
+                <option value="stabilityai/stable-diffusion-xl-base-1.0">Stable Diffusion XL</option>
+                <option value="runwayml/stable-diffusion-v1-5">Stable Diffusion v1.5</option>
+                <option value="stabilityai/stable-diffusion-3-medium-diffusers">Stable Diffusion 3</option>
+              </select>
+            </div>
+
+            <div class="select-wrapper">
+              <select class="custom-select w-full p-2 border border-gray-300 rounded" id="count-select" required>
+                <option value="1" selected >1 Image</option>
+                <option value="2">2 Images</option>
+                <option value="3">3 Images</option>
+                <option value="4">4 Images</option>
+              </select>
+            </div>
+
+            <div class="select-wrapper">
+              <select class="custom-select w-full p-2 border border-gray-300 rounded" id="ratio-select" required>
+                <option value="1/1" selected>Square (1:1)</option>
+                <option value="16/9">Landscape (16:9)</option>
+                <option value="9/16">Portrait (9:16)</option>
+              </select>
+            </div>
+
+            <button type="submit" class="generate-btn bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-800 flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-wand-sparkles"></i>
+              <span>Generate</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="gallery-grid mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+      </div>
+    </div>
+
+    <script src="ai.js"></script>
+  </body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Listing - Project:Gaia</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <script type="module" src="sell-hub-edit-listing.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body class="bg-gray-100">
+   
+
+    <div class="flex">
+
+        <!-- Main Content -->
+        <div class="flex-auto">
+            <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8 mt-8">
+                <h1 class="text-3xl font-semibold text-gray-900 mb-6">Edit Listing</h1>
+                <!-- Form Content -->
+                <form action="#" method="POST" id="editListingForm">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label for="product-name" class="text-gray-700 text-lg">Product Name</label>
+                            <span class="text-sm text-gray-500">e.g., Mountain Province-weaved gown</span>
+                        </div>
+                        <input id="product-name" type="text" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter product name" value="">
+                        <div class="flex items-center justify-between">
+                            <label for="product-description" class="text-gray-700 text-lg">Product Description</label>
+                            <span class="text-sm text-gray-500">Describe your product in detail</span>
+                        </div>
+                        <textarea id="product-description" rows="5" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter a detailed product description"></textarea>
+                    </div>
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label for="category" class="text-gray-700 text-lg">Category</label>
+                            <span class="text-sm text-gray-500">Select a category for your product</span>
+                        </div>
+                        <select id="category" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled>Select category</option>
+                            <option value="for men">For Men</option>
+                            <option value="for women">For Women</option>
+                            <option value="for children (male)">For Child(Male)</option>
+                            <option value="for children (female)">For Child(Female)</option>
+                        </select>
+                        <div class="flex items-center justify-between">
+                            <label for="size" class="text-gray-700 text-lg">Size</label>
+                            <span class="text-sm text-gray-500">Select the size of the product</span>
+                        </div>
+                        <select id="size" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled>Select size</option>
+                            <option value="small">Small (S)</option>
+                            <option value="medium">Medium (M)</option>
+                            <option value="large">Large (L)</option>
+                            <option value="x-large">Extra Large (XL)</option>
+                        </select>
+                    </div>
+                    <div id="rent-select">
+                        <div class="mt-6 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <label for="rent-price" class="text-gray-700 text-lg"> Rent Price</label>
+                                <span class="text-sm text-gray-500">What will be the renting price?</span>
+                            </div>
+                            <input id="rent-price" type="number" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter rent price" min="0" value="">
+                        </div>
+                    </div>
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label for="photos" class="text-gray-700 text-lg">Current Photos</label>
+                            
+                        </div>
+                       
+                        <div id="current-photos" class="flex flex-wrap gap-2 mt-2">
+                            <!-- Existing photos will be shown here by JS -->
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-between">
+                        <button id="deleteListingButton" type="button" class="py-3 px-6 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            Delete Listing
+                        </button>
+                        <button id="saveChangesButton" type="button" class="py-3 px-6 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex-auto justify-center items-center hidden flex">
+                <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <h2 class="text-xl font-semibold text-gray-800">Confirm Changes</h2>
+                    <p class="text-gray-600 mt-4">Are you sure you want to save these changes?</p>
+                    <div class="mt-6 flex justify-end space-x-4">
+                        <button id="cancelButton" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Cancel</button>
+                        <button id="confirmButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</body>
+</html>
