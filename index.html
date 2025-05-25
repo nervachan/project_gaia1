@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script type="module" src="load-listings.js"></script>
+    <script type="module" src="index-load-listings.js"></script>
     <script type="module" src="search-items.js"></script>
+    <script type="module" src="loginHandler.js"></script>
     
 </head>
 <body class="bg-grey-100 pt-16">
@@ -167,3 +168,92 @@
 </footer>
 </body>
 </html>
+
+<!-- Login Modal Overlay -->
+<div id="login-modal-overlay" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+  <div class="relative">
+    <form class="bg-white dark:bg-grey-800 shadow-2xl rounded-2xl overflow-hidden border-4 border-grey-800 dark:border-grey-800 " id="login-form">
+      <div class="px-8 py-10 md:px-10">
+        <button type="button" id="close-login-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white text-2xl">&times;</button>
+        <h2
+          class="text-4xl font-extrabold text-center text-zinc-800 dark:text-white"
+        >
+          Welcome Back!
+        </h2>
+        <p class="text-center text-zinc-600 dark:text-zinc-400 mt-3">
+          We missed you, sign in to continue.
+        </p>
+        <div class="mt-10">
+          <div class="relative">
+            <label
+              class="block mb-3 text-sm font-medium text-zinc-600 dark:text-zinc-200"
+              for="username"
+              >Username</label
+            >
+            <input
+              placeholder="Username"
+              class="block w-full px-4 py-3 mt-2 text-zinc-800 bg-white border-2 rounded-lg dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-opacity-50 focus:outline-none focus:ring focus:ring-blue-400"
+              name="username"
+              id="username"
+              type="text"
+            />
+          </div>
+          <div class="mt-6">
+            <label
+              class="block mb-3 text-sm font-medium text-zinc-600 dark:text-zinc-200"
+              for="password"
+              >Password</label
+            >
+            <input
+              placeholder="••••••••"
+              class="block w-full px-4 py-3 mt-2 text-zinc-800 bg-white border-2 rounded-lg dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-opacity-50 focus:outline-none focus:ring focus:ring-blue-400"
+              name="password"
+              id="password"
+              type="password"
+            />
+          </div>
+          <div class="mt-10">
+            <button
+              class="w-full px-4 py-3 tracking-wide text-white transition-colors duration-200 transform bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg hover:from-blue-700 hover:to-cyan-700 focus:outline-none focus:ring-4 focus:ring-blue-400 dark:focus:ring-blue-800"
+              type="submit" 
+            >
+              Let's Go
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="px-8 py-4 bg-blue-200 dark:bg-zinc-800">
+        <div class="text-sm text-blue-900 dark:text-blue-300 text-center">
+          Don't have an account?
+          <a class="font-medium underline" href="/project-gaia1/src/registration/register.html">Sign up</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  // Show modal when "Login" is clicked
+  document.addEventListener('DOMContentLoaded', function() {
+    const loginBtn = document.getElementById('login');
+    const loginModal = document.getElementById('login-modal-overlay');
+    const closeModalBtn = document.getElementById('close-login-modal');
+
+    if (loginBtn && loginModal) {
+      loginBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        loginModal.classList.remove('hidden');
+      });
+    }
+    if (closeModalBtn && loginModal) {
+      closeModalBtn.addEventListener('click', function() {
+        loginModal.classList.add('hidden');
+      });
+    }
+    // Optional: Close modal when clicking outside the form
+    loginModal && loginModal.addEventListener('click', function(e) {
+      if (e.target === loginModal) {
+        loginModal.classList.add('hidden');
+      }
+    });
+  });
+</script>

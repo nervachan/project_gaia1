@@ -21,16 +21,16 @@ const auth = getAuth(app);
 
 // Function to log the user out using Firebase Authentication
 function logoutUser() {
-    // Sign the user out using Firebase Auth
-    signOut(auth)  // Use `signOut` from the modular SDK
-      .then(() => {
-        // Redirect the user to index.html after successful logout
-        window.location.href = '/project_gaia1/src/login-out/logout.html';  // Adjust path if necessary
-      })
-      .catch((error) => {
-        // Handle any errors that occur during logout
-        console.error('Error during logout:', error);
-      });
+  // Sign the user out using Firebase Auth
+  signOut(auth)
+    .then(() => {
+    // Redirect the user to index.html after successful logout
+    window.location.href = '/project_gaia1/index.html';  // Adjust path if necessary
+    })
+    .catch((error) => {
+    // Handle any errors that occur during logout
+    console.error('Error during logout:', error);
+    });
 }
   
 // Attach the logoutUser function to the logout link with ID 'logout'
