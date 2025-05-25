@@ -262,10 +262,17 @@ async function highlightPendingDates(selectedDates, dateStr, instance) {
   }
 }
 
-// Back button functionality
+// Back button functionality with conditional redirect
 document.getElementById('back-button').addEventListener('click', () => {
-  console.log("Back button clicked. Redirecting to listings page.");
-  window.location.href = 'buyer-login.html';
+  console.log("Back button clicked.");
+  // Check if there is a referrer and if it contains 'index.html'
+  if (document.referrer && document.referrer.includes('index.html')) {
+    console.log("Redirecting to index.html");
+    window.location.href = 'index.html';
+  } else {
+    console.log("Redirecting to buyer-login.html");
+    window.location.href = 'buyer-login.html';
+  }
 });
 
 //Open rent form when rent button is clicked
