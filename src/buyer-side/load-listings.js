@@ -347,26 +347,26 @@ document.querySelectorAll('.filter-btn').forEach(button => {
   button.addEventListener('click', () => {
     const category = button.getAttribute('data-category');
     const listingsContainer = document.getElementById('listing-container');
-    const listingCards = listingsContainer.querySelectorAll('div.bg-white');
+    const allCards = listingsContainer.querySelectorAll('div.bg-white');
 
-    let anyVisible = false;
+    let found = false;
 
-    listingCards.forEach(card => {
-      const categoryText = card.querySelector('p.text-gray-700.mt-2')?.textContent || '';
-      if (category === 'All' || categoryText.includes(category)) {
+    allCards.forEach(card => {
+      const categoryText = card.querySelector('p.text-gray-700.mt-2');
+      if (category === 'all' || (categoryText && categoryText.textContent.includes(category))) {
         card.style.display = '';
-        anyVisible = true;
+        found = true;
       } else {
         card.style.display = 'none';
       }
     });
 
-    // Show message if no cards are visible
-    let noResultsMsg = listingsContainer.querySelector('.no-results-msg');
-    if (!anyVisible) {
+    // Show message if no cards match (except for 'all')
+    let noResultsMsg = listingsContainer.querySelector('.no-results-message');
+    if (!found && category !== 'all') {
       if (!noResultsMsg) {
         noResultsMsg = document.createElement('p');
-        noResultsMsg.className = 'no-results-msg text-gray-500 text-center';
+        noResultsMsg.className = 'no-results-message text-gray-500 text-center';
         noResultsMsg.textContent = 'No listings available for the selected category.';
         listingsContainer.appendChild(noResultsMsg);
       }
@@ -375,3 +375,4 @@ document.querySelectorAll('.filter-btn').forEach(button => {
     }
   });
 });
+
