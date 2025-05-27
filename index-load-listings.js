@@ -349,7 +349,7 @@ document.querySelectorAll('.filter-btn').forEach(button => {
 
     allCards.forEach(card => {
       const categoryText = card.querySelector('p.text-gray-700.mt-2');
-      if (categoryText && categoryText.textContent.includes(category)) {
+      if (category === 'all' || (categoryText && categoryText.textContent.includes(category))) {
         card.style.display = '';
         found = true;
       } else {
@@ -357,9 +357,9 @@ document.querySelectorAll('.filter-btn').forEach(button => {
       }
     });
 
-    // Show message if no cards match
+    // Show message if no cards match (except for 'all')
     let noResultsMsg = listingsContainer.querySelector('.no-results-message');
-    if (!found) {
+    if (!found && category !== 'all') {
       if (!noResultsMsg) {
         noResultsMsg = document.createElement('p');
         noResultsMsg.className = 'no-results-message text-gray-500 text-center';
