@@ -32,10 +32,24 @@ if (!listingId) {
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log('[Auth] User is logged in:', user.uid);
+    // Enable rent button if present
+    const rentButton = document.getElementById('rent-button');
+    if (rentButton) {
+      rentButton.disabled = false;
+      rentButton.classList.remove('bg-gray-400', 'cursor-not-allowed', 'opacity-50');
+      rentButton.classList.add('bg-blue-500', 'hover:bg-blue-600', 'cursor-pointer');
+      rentButton.removeAttribute('title');
+    }
   } else {
     console.log('[Auth] No user is logged in. Redirecting to login.');
-    alert('You must be logged in to view this page. Redirecting to login.');
-    window.location.href = 'buyer-login.html';
+    // Grey out rent button if present and add hover message
+    const rentButton = document.getElementById('rent-button');
+    if (rentButton) {
+      rentButton.disabled = true;
+      rentButton.classList.remove('bg-blue-500', 'hover:bg-blue-600', 'cursor-pointer');
+      rentButton.classList.add('bg-gray-400', 'cursor-not-allowed', 'opacity-50');
+      rentButton.setAttribute('title', 'Please log in to rent this item.');
+    }
   }
 });
 
@@ -248,10 +262,17 @@ async function highlightPendingDates(selectedDates, dateStr, instance) {
   }
 }
 
-// Back button functionality
+// Back button functionality with conditional redirect
 document.getElementById('back-button').addEventListener('click', () => {
-  console.log("Back button clicked. Redirecting to listings page.");
-  window.location.href = 'buyer-login.html';
+  console.log("Back button clicked.");
+  // Check if there is a referrer and if it contains 'index.html'
+  if (document.referrer && document.referrer.includes('index.html')) {
+    console.log("Redirecting to index.html");
+    window.location.href = '/project_gaia1/index.html';
+  } else {
+    console.log("Redirecting to buyer-login.html");
+    window.location.href = 'buyer-login.html';
+  }
 });
 
 //Open rent form when rent button is clicked
@@ -440,3 +461,53 @@ fetchListingDetails().then(() => {
   console.log("fetchListingDetails complete. Calling highlightPendingRentalDates...");
   highlightPendingRentalDates(listingId);
 });
+
+/**
+ * Fetch and display reviews for the current listingId.
+ */
+async function fetchAndDisplayReviews() {
+  try {
+    const reviewsContainer = document.getElementById('reviews-list');
+    if (!reviewsContainer) {
+      console.warn('[Reviews] No #reviews-section element found.');
+      return;
+    }
+
+    // Query reviews where listingId matches
+    const reviewsQuery = query(
+      collection(db, 'reviews'),
+      where('listingId', '==', listingId)
+    );
+    const querySnapshot = await getDocs(reviewsQuery);
+
+    if (querySnapshot.empty) {
+      reviewsContainer.innerHTML = '<p class="text-gray-500">No reviews yet for this listing.</p>';
+      return;
+    }
+
+    let reviewsHTML = '';
+    querySnapshot.forEach(docSnap => {
+      const review = docSnap.data();
+      reviewsHTML += `
+        <div class="mb-4 p-4 border rounded bg-gray-50">
+          <div class="font-semibold">${review.userName || 'Anonymous'}</div>
+          <div class="text-yellow-500">${'★'.repeat(review.rating || 0)}${'☆'.repeat(5 - (review.rating || 0))}</div>
+          <div class="text-gray-700 mt-1">${review.comment || ''}</div>
+          <div class="text-xs text-gray-400 mt-1">${review.createdAt ? new Date(review.createdAt.seconds * 1000).toLocaleString() : ''}</div>
+        </div>
+      `;
+    });
+
+    // Inject the fetched reviews HTML into the reviews-section div
+    reviewsContainer.innerHTML = reviewsHTML;
+  } catch (error) {
+    console.error('[Reviews] Error fetching reviews:', error);
+    const reviewsContainer = document.getElementById('reviews-list');
+    if (reviewsContainer) {
+      reviewsContainer.innerHTML = '<p class="text-red-500">Failed to load reviews.</p>';
+    }
+  }
+}
+
+// Call fetchAndDisplayReviews on page load
+document.addEventListener('DOMContentLoaded', fetchAndDisplayReviews);
