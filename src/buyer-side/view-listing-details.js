@@ -268,7 +268,7 @@ document.getElementById('back-button').addEventListener('click', () => {
   // Check if there is a referrer and if it contains 'index.html'
   if (document.referrer && document.referrer.includes('index.html')) {
     console.log("Redirecting to index.html");
-    window.location.href = 'index.html';
+    window.location.href = '/project_gaia1/index.html';
   } else {
     console.log("Redirecting to buyer-login.html");
     window.location.href = 'buyer-login.html';
