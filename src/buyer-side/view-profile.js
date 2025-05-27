@@ -20,37 +20,44 @@ document.addEventListener("DOMContentLoaded", function () {
   const db = getFirestore(app);
   const auth = getAuth(); // Initialize Firebase Authentication
 
-  // Function to open the modal and display user info from Firestore
-  async function openProfileModal(email) {
-    const modal = document.getElementById("profile-modal");
-    const userProfileInfo = document.getElementById("user-profile-info");
+// Function to open the modal and display user info from Firestore
+window.openProfileModal=async function () {
+  const modal = document.getElementById("profile-modal");
+  const userProfileInfo = document.getElementById("user-profile-info");
 
-    try {
-      // Query Firestore for the user document matching the 'email' field
-      const q = query(collection(db, "user-buyer"), where("email", "==", email)); // Querying based on the 'email' field
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        // Assuming there's only one user with the provided email
-        const userDoc = querySnapshot.docs[0]; // Get the first matched document
-        const user = userDoc.data();
-
-        // Populate the modal with the user's data from Firestore
-        userProfileInfo.innerHTML = `
-          <p><strong>Name:</strong> ${user.username}</p>
-          <p><strong>Email:</strong> ${user.email}</p>
-          <p><strong>Account Type:</strong> ${user.role}</p>
-        `;
-
-        // Show the modal
-        modal.classList.remove("hidden");
-      } else {
-        console.error("User document not found!");
-      }
-    } catch (error) {
-      console.error("Error fetching user data: ", error);
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("No user is currently signed in.");
+      return;
     }
+    const loggedInUid = user.uid;
+
+    // Query Firestore for the user document where 'uid' field matches the logged-in user's uid
+    const userQuery = query(
+      collection(db, "user-buyer"),
+      where("uid", "==", loggedInUid)
+    );
+    const querySnapshot = await getDocs(userQuery);
+
+    if (!querySnapshot.empty) {
+      const userDoc = querySnapshot.docs[0]; // assuming only one match
+      const userData = userDoc.data();
+
+      userProfileInfo.innerHTML = `
+        <p><strong>Name:</strong> ${userData.username}</p>
+        <p><strong>Email:</strong> ${userData.email}</p>
+        <p><strong>Account Type:</strong> ${userData.role}</p>
+      `;
+
+      modal.classList.remove("hidden");
+    } else {
+      console.error("User document not found for UID:", loggedInUid);
+    }
+  } catch (error) {
+    console.error("Error fetching user data: ", error);
   }
+}
 
   // Function to close the modal
   document.getElementById("close-profile").addEventListener("click", function () {
