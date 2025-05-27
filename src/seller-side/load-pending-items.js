@@ -167,19 +167,25 @@ async function fetchUserPendingItems(userId) {
                 <p class="text-gray-600">Status: ${itemData.status}</p>
                 ${imageUrl ? `<img src="${imageUrl}" alt="Product Image" class="w-full h-auto mt-4 rounded">` : ""}
             `;
+            // Create a container for the action buttons (flex row)
+            const buttonContainer = document.createElement("div");
+            // Make the button container always stick to the bottom of the card and keep buttons in line
+            buttonContainer.className = "flex flex-row gap-2 justify-end items-center mt-4";
+
+            // Ensure the card is a flex column and fills height for alignment
+            itemDiv.style.display = "flex";
+            itemDiv.style.flexDirection = "column";
+            itemDiv.style.height = "100%";
 
             // Create the dynamic button based on the status
             const button = document.createElement("button");
-            button.className = "bg-blue-500 text-white px-4 py-2 rounded mt-4";
+            button.className = "bg-blue-500 text-white px-4 py-2 rounded";
 
             // Set button text and functionality based on the current status
             if (itemData.status === "picked up") {
                 button.textContent = "Mark as Returned";
                 button.onclick = () => updateItemStatus(docSnapshot.id, "returned");
             } else if (itemData.status === "returned") {
-                button.textContent = "Relist Item";
-                button.onclick = () => updateItemStatus(docSnapshot.id, "relisted");
-            } else if (itemData.status === "cancelled") {
                 button.textContent = "Relist Item";
                 button.onclick = () => updateItemStatus(docSnapshot.id, "relisted");
             } else {
@@ -189,8 +195,18 @@ async function fetchUserPendingItems(userId) {
 
             // Add a "Cancel Item" button
             const cancelButton = document.createElement("button");
-            cancelButton.className = "bg-red-500 text-white px-4 py-2 rounded mt-4 ml-2";
+            cancelButton.className = "bg-red-500 text-white px-4 py-2 rounded";
             cancelButton.textContent = "Cancel Item";
+
+            // Push the button container to the bottom of the card
+            buttonContainer.style.marginTop = "auto";
+
+            // Append both buttons to the container
+            buttonContainer.appendChild(button);
+            buttonContainer.appendChild(cancelButton);
+
+            // Append the button container to the itemDiv, after the content
+            itemDiv.appendChild(buttonContainer);
 
             // Add click event listener to the "Cancel Item" button
             cancelButton.onclick = async () => {
