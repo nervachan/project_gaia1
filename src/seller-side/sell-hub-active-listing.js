@@ -77,20 +77,22 @@ async function fetchUserListings() {
             }
 
             itemDiv.innerHTML = `
-                ${carouselHtml}
-                <div class="p-4">
-                    <br>
-                    <p class="text-gray-700 mt-2">${listingData.category}</p>
-                    <h3 class="text-xl font-semibold text-gray-800">${listingData.productName}</h3>
-                    ${listingData.garmentSize ? `<p class="text-gray-700 mt-2">Garment Size: ${listingData.garmentSize}</p>` : ''}
-                    ${listingData.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listingData.rentPrice}</p>` : ''}
-                    <div class="flex justify-between mt-4">
-                        <a href="#" class="inline-block py-2 px-6 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 deactivate-btn" data-id="${docSnapshot.id}" data-listing='${JSON.stringify(listingData)}'>
-                            Deactivate Listing
-                        </a>
-                        <button class="inline-block py-2 px-6 bg-orange-600 text-white rounded-full text-sm hover:bg-orange-700 edit-btn" data-id="${docSnapshot.id}">
-                            Edit Listing
-                        </button>
+                <div class="flex flex-col h-full">
+                    ${carouselHtml}
+                    <div class="p-4 flex-1 flex flex-col">
+                        <br>
+                        <p class="text-gray-700 mt-2">${listingData.category}</p>
+                        <h3 class="text-xl font-semibold text-gray-800">${listingData.productName}</h3>
+                        ${listingData.garmentSize ? `<p class="text-gray-700 mt-2">Garment Size: ${listingData.garmentSize}</p>` : ''}
+                        ${listingData.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: $${listingData.rentPrice}</p>` : ''}
+                        <div class="mt-auto flex justify-between pt-4">
+                            <a href="#" class="inline-block py-2 px-3 bg-blue-600 text-white rounded-full text-sm hover:bg-blue-700 deactivate-btn" data-id="${docSnapshot.id}" data-listing='${JSON.stringify(listingData)}'>
+                                Deactivate Listing
+                            </a>
+                            <button class="inline-block py-2 px-6 bg-orange-600 text-white rounded-full text-sm hover:bg-orange-700 edit-btn" data-id="${docSnapshot.id}">
+                                Edit Listing
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
