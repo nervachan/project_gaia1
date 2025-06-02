@@ -62,10 +62,10 @@
 
   <!-- Mobile Menu Dropdown -->
   <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
-    <a href="/project_gaia1/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Home</a>
-          <a href="/project_gaia1/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Browse</a> 
-    <a href="/project_gaia1/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Home</a>
-          <a href="/project_gaia1/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Browse</a> 
+    <a href="#intro" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Home</a>
+          <a href="#browse" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Browse</a> 
+    <a href="#how-it-works" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Home</a>
+          <a href="/project_gaia1/src/registration/register.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Browse</a> 
 </header>
 
 <script>
@@ -76,7 +76,7 @@
   });
 </script>
 
-<div class="bg-gray-200 rounded-md w-full h-full flex items-center justify-center m-4" id="intro">
+<div class=" rounded-md w-full h-full flex items-center justify-center mb-48" id="intro">
   <div class="flex w-full h-full">
     <div class="flex flex-col justify-center flex-1">
       <h1 class="text-4xl font-bold text-center text-gray-800">
@@ -86,10 +86,15 @@
         <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition">Browse Rentals</button>
         <button class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900 transition">List Item</button>
       </div>
+      <div class="flex items-center justify-center flex-1 sm:hidden">
+        <div class="w-full h-full  rounded-md flex items-center justify-center">
+          <img src="/images/herosection.png" alt="Sample" class="w-full h-full object-cover rounded-md sm:pt-16" />
+        </div>
     </div>
-    <div class="flex items-center justify-center flex-1">
+    </div>
+    <div class="flex items-center justify-center flex-1 hidden sm:flex">
       <div class="w-full h-full  rounded-md flex items-center justify-center">
-        <img src="/images/herosection.png" alt="Sample" class="w-full h-full object-cover rounded-md pt-16" />
+        <img src="/images/herosection.png" alt="Sample" class="w-full h-full object-cover rounded-md sm:pt-16" />
       </div>
     </div>
   </div>
