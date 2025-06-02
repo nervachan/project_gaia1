@@ -38,9 +38,9 @@
       <!-- Navigation Links -->
       <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block absolute left-0 top-0 h-full items-center">
         <div class="flex flex-col sm:flex-row sm:space-x-1 h-full items-center">
-          <a href="/project_gaia1/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Home</a>
-          <a href="/project_gaia1/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Browse</a> 
-          <a href="/project_gaia1/src/buyer-side/howitworks.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">How It Works</a> 
+          <a href="#intro" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Home</a>
+          <a href="#browse" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Browse</a> 
+          <a href="#how-it-works" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">How It Works</a> 
           <a href="/project_gaia1/src/registration/register.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Register</a> 
         </div>
       </div>
@@ -76,15 +76,15 @@
   });
 </script>
 
-<div class="bg-gray-200 rounded-md w-full h-full flex items-center justify-center m-4">
+<div class="bg-gray-200 rounded-md w-full h-full flex items-center justify-center m-4" id="intro">
   <div class="flex w-full h-full">
     <div class="flex flex-col justify-center flex-1">
       <h1 class="text-2xl font-bold text-center text-gray-800">
-        Rent Formal & Traditional Wear in Minutes
+        Rent Formal & Traditional Wear in <span class="px-3 bg-red-500">Minutes</span>
       </h1>
       <div class="flex justify-center mt-4 gap-2">
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Browse Listings</button>
-        <button class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition">How It Works</button>
+        <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition">Browse Rentals</button>
+        <button class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900 transition">List Item</button>
       </div>
     </div>
     <div class="flex items-center justify-center flex-1">
@@ -96,7 +96,7 @@
 </div>
 
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto mt-12">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto mt-12" id="browse">
   <!-- Formal Wear -->
   <div class="relative rounded-xl overflow-hidden shadow-lg">
     <img src="/images/FormalWear.png" alt="Formal Wear" class="w-full h-64 object-cover bg-gray-100">
@@ -104,7 +104,7 @@
       <span class="text-lg font-semibold text-gray-900">Formal Wear</span>
       <p class="text-sm text-gray-900 mt-1">Timeless suits, gowns, and tuxedos for graduations, galas, and special nights.</p>
       <div class="flex justify-end mt-2">
-        <a href="/project_gaia1/src/buyer-side/rent-formal.html" class="text-blue-600 font-semibold flex items-center hover:underline">
+        <a href="/project_gaia1/src/buyer-side/rent-formal.html" class="text-red-600 font-semibold flex items-center hover:underline">
           Rent Now
           <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -120,7 +120,7 @@
       <span class="text-lg font-semibold text-gray-900">Cultural Wear</span>
       <p class="text-sm text-gray-900 mt-1">Celebrate heritage with barongs, ternos, and regional attire authentic and event-ready.</p>
       <div class="flex justify-end mt-2">
-        <a href="/project_gaia1/src/buyer-side/rent-formal.html" class="text-blue-600 font-semibold flex items-center hover:underline">
+        <a href="/project_gaia1/src/buyer-side/rent-formal.html" class="text-red-600 font-semibold flex items-center hover:underline">
           Rent Now
           <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -136,7 +136,7 @@
       <span class="text-lg font-semibold text-gray-900">Specialty Wear</span>
       <p class="text-sm text-gray-900 mt-1">Rent themed, cosplay, or standout pieces for unique events.</p>
       <div class="flex justify-end mt-2">
-        <a href="/project_gaia1/src/buyer-side/rent-formal.html" class="text-blue-600 font-semibold flex items-center hover:underline">
+        <a href="/project_gaia1/src/buyer-side/rent-formal.html" class="text-red-600 font-semibold flex items-center hover:underline">
           Rent Now
           <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -152,7 +152,7 @@
       <span class="text-lg font-semibold text-gray-900">Wedding Wear</span>
       <p class="text-sm text-gray-900 mt-1">Curated gowns and suits for the big day — all in one place.</p>
       <div class="flex justify-end mt-2">
-        <a href="/project_gaia1/src/buyer-side/rent-formal.html" class="text-blue-600 font-semibold flex items-center hover:underline">
+        <a href="/project_gaia1/src/buyer-side/rent-formal.html" class="text-red-600 font-semibold flex items-center hover:underline">
           Rent Now
           <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -174,218 +174,272 @@
     </a>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="featured-items">
-    <!-- Item 1 -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-      <img src="/images/barong1.png" alt="Classic Barong Tagalog" class="w-full h-64 object-cover">
-      <div class="p-4 flex-1 flex flex-col">
-        <h3 class="font-semibold text-lg text-gray-900">Classic Barong Tagalog</h3>
-        <p class="text-xs text-gray-500 mt-1">Traditional & Cultural Wear, L</p>
-        <div class="mt-2 mb-4">
-          <span class="font-bold text-lg text-gray-900">₱500.00</span>
-          <span class="text-xs text-gray-500">/day</span>
-        </div>
-        <button class="mt-auto bg-red-500 text-white w-full py-2 rounded-md hover:bg-red-600 transition">Rent Now</button>
+    
+    
+    
+   
+  </div>
+</div>
+
+<!-- HOW IT WORKS Section -->
+<div class="max-w-7xl mx-auto mt-20 mb-12 px-4"id="how-it-works" >
+  <div class="flex items-center justify-between mb-8">
+    <h2 class="text-3xl font-bold text-gray-900">HOW IT WORKS</h2>
+    <a href="#" class="flex items-center text-gray-700 hover:text-red-500 font-medium text-base">
+      Rent Now
+      <button class="ml-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </a>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Step 1 -->
+    <div class="bg-white rounded-xl shadow-md p-8 flex flex-col">
+      <span class="text-5xl font-extrabold text-red-500 mb-2">01</span>
+      <h3 class="text-xl font-bold text-gray-900 mb-2">Browse &amp; Discover</h3>
+      <p class="text-gray-600 text-sm">
+        Explore a curated collection of formal, cultural, specialty, and wedding wear — all in one place.
+      </p>
+    </div>
+    <!-- Step 2 -->
+    <div class="bg-white rounded-xl shadow-md p-8 flex flex-col">
+      <span class="text-5xl font-extrabold text-red-500 mb-2">02</span>
+      <h3 class="text-xl font-bold text-gray-900 mb-2">Book with Ease</h3>
+      <p class="text-gray-600 text-sm">
+        Choose your dates, check availability, and reserve your outfit instantly.
+      </p>
+    </div>
+    <!-- Step 3 -->
+    <div class="bg-white rounded-xl shadow-md p-8 flex flex-col">
+      <span class="text-5xl font-extrabold text-red-500 mb-2">03</span>
+      <h3 class="text-xl font-bold text-gray-900 mb-2">Wear &amp; Return</h3>
+      <p class="text-gray-600 text-sm">
+        Pick it up or have it delivered. Look your best, then return hassle-free.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto mt-20 mb-12 px-4 flex flex-col md:flex-row gap-12 items-start">
+  <!-- Left Side: Title & Description -->
+  <div class="md:w-1/2">
+    <h2 class="text-4xl font-bold text-gray-900 mb-2">WHY CHOOSE <span class="text-red-500">PROJECT GAIA?</span></h2>
+    <p class="text-gray-700 mt-4">
+      Project GAIA simplifies the way Baguio rents.<br>
+      We’re building a trusted space where style meets convenience — digitizing the city’s fragmented rental scene and bringing formal, cultural, and specialty wear to your fingertips.
+    </p>
+  </div>
+  <!-- Right Side: Features List -->
+  <div class="md:w-1/2 flex flex-col gap-8">
+    <!-- Feature 1 -->
+    <div class="flex items-start gap-4">
+      <div class="bg-red-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mt-1">
+        <i class="fa-solid fa-check text-xl"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-lg text-gray-900">Curated for Style &amp; Occasion</h3>
+        <p class="text-gray-600 text-sm">
+          Every piece is selected with intention — from sleek tuxedos to heritage garments — so you can rent confidently for any event, big or small.
+        </p>
       </div>
     </div>
-    <!-- Item 2 -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-      <div class="relative">
-        <img src="/images/weddingdress1.png" alt="Glitter Tulle Lace Wedding Dress" class="w-full h-64 object-cover">
-        <button class="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-2 text-gray-500 hover:text-red-500">
-          <i class="fa-regular fa-heart"></i>
-        </button>
+    <!-- Feature 2 -->
+    <div class="flex items-start gap-4">
+      <div class="bg-red-500 text-white rounded-lg w-10 h-10 flex items-center justify-center mt-1">
+        <i class="fa-solid fa-check text-xl"></i>
       </div>
-      <div class="p-4 flex-1 flex flex-col">
-        <h3 class="font-semibold text-lg text-gray-900">Glitter Tulle Lace Wedding Dress</h3>
-        <p class="text-xs text-gray-500 mt-1">Weddings & Entourage, S</p>
-        <div class="mt-2 mb-4">
-          <span class="font-bold text-lg text-gray-900">₱2,500.00</span>
-          <span class="text-xs text-gray-500">/day</span>
-        </div>
-        <button class="mt-auto bg-red-500 text-white w-full py-2 rounded-md hover:bg-red-600 transition">Rent Now</button>
+      <div>
+        <h3 class="font-bold text-lg text-gray-900">Affordable. Flexible. Smart.</h3>
+        <p class="text-gray-600 text-sm">
+          Why buy when you can rent smarter? Save money, skip the hassle, and access quality outfits exactly when you need them.
+        </p>
       </div>
     </div>
-    <!-- Item 3 -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-      <img src="/images/cordillera1.png" alt="Traditional Cordilleran Attire" class="w-full h-64 object-cover">
-      <div class="p-4 flex-1 flex flex-col">
-        <h3 class="font-semibold text-lg text-gray-900">Traditional Cordilleran Attire</h3>
-        <p class="text-xs text-gray-500 mt-1">Traditional & Cultural Wear, M</p>
-        <div class="mt-2 mb-4">
-          <span class="font-bold text-lg text-gray-900">₱860.00</span>
-          <span class="text-xs text-gray-500">/day</span>
-        </div>
-        <button class="mt-auto bg-red-500 text-white w-full py-2 rounded-md hover:bg-red-600 transition">Rent Now</button>
+    <!-- Feature 3 -->
+    <div class="flex items-start gap-4">
+      <div class="bg-red-500 text-white rounded-lg w-12 h-10 flex items-center justify-center mt-1">
+        <i class="fa-solid fa-check text-xl"></i>
       </div>
-    </div>
-    <!-- Item 4 -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
-      <img src="/images/navybluesuit1.png" alt="Navy Blue Suit & Tie" class="w-full h-64 object-cover">
-      <div class="p-4 flex-1 flex flex-col">
-        <h3 class="font-semibold text-lg text-gray-900">Navy Blue Suit & Tie</h3>
-        <p class="text-xs text-gray-500 mt-1">Formal Wear, L</p>
-        <div class="mt-2 mb-4">
-          <span class="font-bold text-lg text-gray-900">₱600.00</span>
-          <span class="text-xs text-gray-500">/day</span>
-        </div>
-        <button class="mt-auto bg-red-500 text-white w-full py-2 rounded-md hover:bg-red-600 transition">Rent Now</button>
+      <div>
+        <h3 class="font-bold text-lg text-gray-900">Rooted in the Local Community</h3>
+        <p class="text-gray-600 text-sm">
+          We spotlight Baguio’s rental owners and tailors, empowering local fashion and making their collections visible, bookable, and accessible — all in one place.
+        </p>
       </div>
     </div>
   </div>
 </div>
 
-<div class="searchBox flex items-center bg-grey-200 p-4 rounded-lg shadow-lg mx-auto mt-8">
-  <input id="searchInput" class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" placeholder="Search something">
-  <button id="searchButton" class="searchButton p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-r-lg flex items-center justify-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 29 29" fill="none">
-          <g clip-path="url(#clip0_2_17)">
-              <g filter="url(#filter0_d_2_17)">
-                  <path d="M23.7953 23.9182L19.0585 19.1814M19.0585 19.1814C19.8188 18.4211 20.4219 17.5185 20.8333 16.5251C21.2448 15.5318 21.4566 14.4671 21.4566 13.3919C21.4566 12.3167 21.2448 11.252 20.8333 10.2587C20.4219 9.2653 19.8188 8.36271 19.0585 7.60242C18.2982 6.84214 17.3956 6.23905 16.4022 5.82759C15.4089 5.41612 14.3442 5.20435 13.269 5.20435C12.1938 5.20435 11.1291 5.41612 10.1358 5.82759C9.1424 6.23905 8.23981 6.84214 7.47953 7.60242C5.94407 9.13789 5.08145 11.2204 5.08145 13.3919C5.08145 15.5634 5.94407 17.6459 7.47953 19.1814C9.01499 20.7168 11.0975 21.5794 13.269 21.5794C15.4405 21.5794 17.523 20.7168 19.0585 19.1814Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" shape-rendering="crispEdges"></path>
-              </g>
-          </g>
-          <defs>
-              <filter id="filter0_d_2_17" x="-0.418549" y="3.70435" width="29.7139" height="29.7139" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                  <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
-                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
-                  <feOffset dy="4"></feOffset>
-                  <feGaussianBlur stdDeviation="2"></feGaussianBlur>
-                  <feComposite in2="hardAlpha" operator="out"></feComposite>
-                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
-                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2_17"></feBlend>
-                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2_17" result="shape"></feBlend>
-              </filter>
-              <clipPath id="clip0_2_17">
-                  <rect width="28.0702" height="28.0702" fill="white" transform="translate(0.403503 0.526367)"></rect>
-              </clipPath>
-          </defs>
-      </svg>
-  </button>
-</div>
-<!-- Filter Buttons -->
-<div class="flex justify-center items-center gap-2 px-4 mt-4">
-  <button class="filter-btn bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700" data-category="all">All</button>
-  <button class="filter-btn bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" data-category="for men">Male</button>
-  <button class="filter-btn bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700" data-category="for women">Female</button>
-  <button class="filter-btn bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700" data-category="for children (male)">Children (Male)</button>
-  <button class="filter-btn bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700" data-category="for children (female)">Children (Female)</button>
-</div>
-
-<!-- Listings Container -->
-<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8">
-  <!-- Placeholder content will be replaced with listings -->
-  <p class="text-center text-gray-500 mb-8">Loading your listings...</p>
-</div>
-
-<footer class="bg-gray-800 text-white py-6 mt-8">
-  <div class="container mx-auto px-4">
-      <div class="flex flex-col md:flex-row justify-between">
-          <!-- Navigation Links -->
-          <div class="mb-4 md:mb-0">
-              
-          </div>
-
-          
+<div class="max-w-7xl mx-auto mt-20 mb-12 px-4">
+  <h2 class="text-4xl font-bold text-gray-900 mb-2">
+    HEAR FROM OUR <span class="relative inline-block">
+      <span class="bg-red-500 bg-opacity-60 px-1">CUSTOMERS</span>
+    </span>
+  </h2>
+  <p class="text-gray-500 mb-6">
+    Real people. Real events. Real stories.<br>
+    Discover how Project GAIA helped Baguio locals show up in style — without the stress or the splurge.
+  </p>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Testimonial 1 -->
+    <div class="bg-white rounded-xl shadow-md p-6 flex flex-col">
+      <div class="flex items-center mb-2">
+        <span class="text-yellow-400">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </span>
       </div>
-
-      <!-- Copyright Notice -->
-      <div class="mt-6 border-t border-gray-700 pt-4 text-center">
-          <p class="text-sm">© 2024 Project:Gaia. All rights reserved.</p>
+      <p class="text-gray-800 mb-4">“Ang dali maghanap ng gown! I booked mine in just 5 minutes!”</p>
+      <div class="flex items-center mt-auto pt-2">
+        <img src="/images/user1.jpg" alt="Juan Dela Cruz" class="w-10 h-10 rounded-full mr-3 object-cover border-2 border-gray-200">
+        <span class="font-semibold text-gray-900">Juan Dela Cruz</span>
       </div>
-
-      <!-- Accessibility Links -->
-      <div class="mt-4 text-center">
-       
+    </div>
+    <!-- Testimonial 2 -->
+    <div class="bg-white rounded-xl shadow-md p-6 flex flex-col">
+      <div class="flex items-center mb-2">
+        <span class="text-yellow-400">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </span>
       </div>
+      <p class="text-gray-800 mb-4">“Saved me so much time and money — no need to go shop to shop.”</p>
+      <div class="flex items-center mt-auto pt-2">
+        <img src="/images/user2.jpg" alt="Maria Lopez" class="w-10 h-10 rounded-full mr-3 object-cover border-2 border-gray-200">
+        <span class="font-semibold text-gray-900">Maria Lopez</span>
+      </div>
+    </div>
+    <!-- Testimonial 3 -->
+    <div class="bg-white rounded-xl shadow-md p-6 flex flex-col">
+      <div class="flex items-center mb-2">
+        <span class="text-yellow-400">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </span>
+      </div>
+      <p class="text-gray-800 mb-4">“Super smooth ng process. Parang online shopping, pero rentals!”</p>
+      <div class="flex items-center mt-auto pt-2">
+        <img src="/images/user3.jpg" alt="Andrea Santos" class="w-10 h-10 rounded-full mr-3 object-cover border-2 border-gray-200">
+        <span class="font-semibold text-gray-900">Andrea Santos</span>
+      </div>
+    </div>
+    <!-- Testimonial 4 -->
+    <div class="bg-white rounded-xl shadow-md p-6 flex flex-col">
+      <div class="flex items-center mb-2">
+        <span class="text-yellow-400">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </span>
+      </div>
+      <p class="text-gray-800 mb-4">“Hindi ko akalain na may ganito sa Baguio. Sulit!”</p>
+      <div class="flex items-center mt-auto pt-2">
+        <img src="/images/user4.jpg" alt="Mark Reyes" class="w-10 h-10 rounded-full mr-3 object-cover border-2 border-gray-200">
+        <span class="font-semibold text-gray-900">Mark Reyes</span>
+      </div>
+    </div>
+    <!-- Testimonial 5 -->
+    <div class="bg-white rounded-xl shadow-md p-6 flex flex-col">
+      <div class="flex items-center mb-2">
+        <span class="text-yellow-400">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </span>
+      </div>
+      <p class="text-gray-800 mb-4">“GAIA helped me find the perfect Barong for my brother’s wedding.”</p>
+      <div class="flex items-center mt-auto pt-2">
+        <img src="/images/user5.jpg" alt="Liza Ramos" class="w-10 h-10 rounded-full mr-3 object-cover border-2 border-gray-200">
+        <span class="font-semibold text-gray-900">Liza Ramos</span>
+      </div>
+    </div>
+    <!-- Testimonial 6 -->
+    <div class="bg-white rounded-xl shadow-md p-6 flex flex-col">
+      <div class="flex items-center mb-2">
+        <span class="text-yellow-400">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </span>
+      </div>
+      <p class="text-gray-800 mb-4">“Affordable, hassle-free, at ang daming choices!”</p>
+      <div class="flex items-center mt-auto pt-2">
+        <img src="/images/user6.jpg" alt="Paolo Mendoza" class="w-10 h-10 rounded-full mr-3 object-cover border-2 border-gray-200">
+        <span class="font-semibold text-gray-900">Paolo Mendoza</span>
+      </div>
+    </div>
   </div>
-</footer>
+</div>
+
+
+<div class="max-w-7xl mx-auto mt-20 mb-12 px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+  <!-- For Renters -->
+  <div class="relative rounded-xl overflow-hidden shadow-lg border-2 border-blue-400 bg-white">
+    <img src="/images/renter_splash.jpg" alt="For Renters" class="w-full h-72 object-cover opacity-80">
+    <div class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-40">
+      <h3 class="text-3xl font-bold text-white mb-2">For Renters</h3>
+      <p class="text-white text-base mb-6 text-center max-w-xs">Find the perfect outfit for any occasion.</p>
+      <a href="/project_gaia1/src/buyer-side/howitworks.html" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-md font-semibold transition">Browse Listings</a>
+    </div>
+  </div>
+  <!-- For Rentees -->
+  <div class="relative rounded-xl overflow-hidden shadow-lg border-2 border-pink-300 bg-white">
+    <img src="/images/rentee_splash.jpg" alt="For Rentees" class="w-full h-72 object-cover opacity-70">
+    <div class="absolute inset-0 flex flex-col items-center justify-center bg-white bg-opacity-40">
+      <h3 class="text-3xl font-bold text-black mb-2">For Rentees</h3>
+      <p class="text-black text-base mb-6 text-center max-w-xs">Turn your wardrobe into extra income.</p>
+      <a href="/project_gaia1/src/registration/register.html" class="bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-md font-semibold transition">List your Item</a>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Footer Section -->
+<div class="w-full border-t border-gray-200 mt-20">
+  <footer class="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between">
+    <!-- Left: Navigation Links -->
+    <div class="flex flex-col md:flex-row md:space-x-8 items-center">
+      <a href="#" class="text-sm text-gray-700 hover:underline mb-2 md:mb-0">Home</a>
+      <a href="#" class="text-sm text-gray-700 hover:underline mb-2 md:mb-0">Browse</a>
+      <a href="#" class="text-sm text-gray-700 hover:underline mb-2 md:mb-0">How it Works</a>
+      <a href="#" class="text-sm text-gray-700 hover:underline">For Owners</a>
+    </div>
+    <!-- Center: Logo/Brand -->
+    <div class="my-4 md:my-0">
+      <span class="font-semibold text-black text-base tracking-wide">PROJECT GAIA</span>
+    </div>
+    <!-- Right: Social Icons -->
+    <div class="flex space-x-4">
+      <a href="#" aria-label="Facebook" class="text-black hover:text-blue-600 text-xl">
+        <i class="fab fa-facebook"></i>
+      </a>
+      <a href="#" aria-label="Instagram" class="text-black hover:text-pink-500 text-xl">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="#" aria-label="Email" class="text-black hover:text-red-500 text-xl">
+        <i class="fas fa-envelope"></i>
+      </a>
+    </div>
+  </footer>
+  <div class="text-center text-xs text-gray-500 py-4">
+    © 2025 Project GAIA. All rights reserved.
+  </div>
+</div>
+</div>
 </body>
 </html>
 
-<!-- Login Modal Overlay -->
-<div id="login-modal-overlay" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-  <div class="relative">
-    <form class="bg-white dark:bg-grey-800 shadow-2xl rounded-2xl overflow-hidden border-4 border-grey-800 dark:border-grey-800 " id="login-form">
-      <div class="px-8 py-10 md:px-10">
-        <button type="button" id="close-login-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white text-2xl">&times;</button>
-        <h2
-          class="text-4xl font-extrabold text-center text-zinc-800 dark:text-white"
-        >
-          Welcome Back!
-        </h2>
-        <p class="text-center text-zinc-600 dark:text-zinc-400 mt-3">
-          We missed you, sign in to continue.
-        </p>
-        <div class="mt-10">
-          <div class="relative">
-            <label
-              class="block mb-3 text-sm font-medium text-zinc-600 dark:text-zinc-200"
-              for="username"
-              >Username</label
-            >
-            <input
-              placeholder="Username"
-              class="block w-full px-4 py-3 mt-2 text-zinc-800 bg-white border-2 rounded-lg dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-opacity-50 focus:outline-none focus:ring focus:ring-blue-400"
-              name="username"
-              id="username"
-              type="text"
-            />
-          </div>
-          <div class="mt-6">
-            <label
-              class="block mb-3 text-sm font-medium text-zinc-600 dark:text-zinc-200"
-              for="password"
-              >Password</label
-            >
-            <input
-              placeholder="••••••••"
-              class="block w-full px-4 py-3 mt-2 text-zinc-800 bg-white border-2 rounded-lg dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-opacity-50 focus:outline-none focus:ring focus:ring-blue-400"
-              name="password"
-              id="password"
-              type="password"
-            />
-          </div>
-          <div class="mt-10">
-            <button
-              class="w-full px-4 py-3 tracking-wide text-white transition-colors duration-200 transform bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg hover:from-blue-700 hover:to-cyan-700 focus:outline-none focus:ring-4 focus:ring-blue-400 dark:focus:ring-blue-800"
-              type="submit" 
-            >
-              Let's Go
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="px-8 py-4 bg-blue-200 dark:bg-zinc-800">
-        <div class="text-sm text-blue-900 dark:text-blue-300 text-center">
-          Don't have an account?
-          <a class="font-medium underline" href="/project-gaia1/src/registration/register.html">Sign up</a>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-<script>
-  // Show modal when "Login" is clicked
-  document.addEventListener('DOMContentLoaded', function() {
-    const loginBtn = document.getElementById('login');
-    const loginModal = document.getElementById('login-modal-overlay');
-    const closeModalBtn = document.getElementById('close-login-modal');
-
-    if (loginBtn && loginModal) {
-      loginBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        loginModal.classList.remove('hidden');
-      });
-    }
-    if (closeModalBtn && loginModal) {
-      closeModalBtn.addEventListener('click', function() {
-        loginModal.classList.add('hidden');
-      });
-    }
-    // Optional: Close modal when clicking outside the form
-    loginModal && loginModal.addEventListener('click', function(e) {
-      if (e.target === loginModal) {
-        loginModal.classList.add('hidden');
-      }
-    });
-  });
-</script>

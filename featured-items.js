@@ -87,7 +87,7 @@ async function loadListings() {
           : `<span class="text-xs text-gray-500">No rent price</span>`
         }
         </div>
-        <button class="mt-auto bg-blue-500 text-white w-full py-2 rounded-md hover:bg-blue-600 transition view-details-btn" data-listing-id="${listingId}">
+        <button class="mt-auto bg-red-600 text-white w-full py-2 rounded-md hover:bg-blue-600 transition view-details-btn" data-listing-id="${listingId}">
         View Details
         </button>
       </div>
