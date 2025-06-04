@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Seller Login - Project Gaia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="seller-loginhandler.js"></script>
+</head>
+<body class="m-0 font-sans bg-gray-100 text-gray-900">
+    <div class="flex min-h-screen flex-col md:flex-row">
+        <div class="flex-1.2 bg-gradient-to-r from-white via-white to-gray-200 flex flex-col justify-center items-start md:items-start px-12 py-16 md:py-20 md:px-16 text-left md:text-left">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2 leading-tight">
+                Seller Login<br><br>
+                <span class="bg-red-600 text-white px-2 rounded font-extrabold tracking-wide highlight">Project Gaia</span>
+            </h1>
+            <p class="mt-4 mb-8 text-gray-700 text-base md:text-lg">
+                Access your seller dashboard to list formal & traditional wear for rent.<br>
+                Manage your items, track rentals, and connect with customers.
+            </p>
+        </div>
+        <div class="flex-1 bg-cover bg-center min-w-[350px] flex items-center justify-center" style="background-image: url('/images/seller-login.png');">
+            <form class="bg-white/95 p-9 pt-9 pb-7 rounded-xl shadow-lg w-full max-w-xs flex flex-col gap-4" id="login-form">
+            <h2 class="text-xl font-semibold text-center mb-3">Sign In</h2>
+            <div>
+                <label for="username" class="block text-base font-medium text-gray-800 mb-1">Username</label>
+                <input type="text" id="username" name="username" required autocomplete="username"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:border-red-600 mb-3" />
+            </div>
+            <div>
+                <label for="password" class="block text-base font-medium text-gray-800 mb-1">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:border-red-600 mb-3" />
+            </div>
+            <button type="submit"
+                class="bg-red-600 hover:bg-red-800 text-white rounded-md py-3 font-semibold text-lg transition-colors duration-200" >Login</button>
+            <div class="flex justify-between mt-2 text-sm">
+                <a href="#" class="text-red-600 hover:underline">Forgot Password?</a>
+                <a href="#" class="text-red-600 hover:underline">Register</a>
+            </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
