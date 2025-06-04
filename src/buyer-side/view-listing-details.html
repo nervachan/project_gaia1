@@ -16,17 +16,39 @@
 <body class="bg-gray-100 pt-16">
 
 <!-- Fixed Header -->
-<header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
+<header class="bg-white top-0 fixed left-0 w-full z-10 shadow-md">
   <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
     <div class="relative flex h-16 items-center justify-between">
-      <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-        <div class="flex flex-shrink-0 items-center">
-          <h3 class="text-gray-100">Project:Gaia</h3>
+      <!-- Logo Section (Centered & Responsive) -->
+      <div class="flex-1 flex items-center justify-center sm:justify-center">
+        <div class="flex-shrink-0 flex items-center"></div>
+          <h3 class="text-black text-xl font-bold">Project:Gaia</h3>
         </div>
+      </div>
+
+      <!-- Hamburger Menu Button -->
+      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+        <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+          <span class="sr-only">Open main menu</span>
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block absolute left-0 top-0 h-full items-center">
+        
+      </div>
+      
+      
       </div>
     </div>
   </nav>
-</header>
+
+  <!-- Mobile Menu Dropdown -->
+  <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
+    
+   </div>     
+  </header>
 
 <!-- Listing Details Container -->
 <div class="container mx-auto px-4 py-8">

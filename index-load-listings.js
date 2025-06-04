@@ -21,6 +21,31 @@ const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth();
 
+// Batch fetch all seller shop addresses for a set of sellerIds
+async function getShopAddressesForListings(listings) {
+  const sellerIds = Array.from(new Set(
+    listings.map(l => l.sellerId).filter(Boolean)
+  ));
+  const shopAddressMap = {};
+
+  if (sellerIds.length === 0) return shopAddressMap;
+
+  // Batch fetch all seller docs in parallel
+  await Promise.all(
+    sellerIds.map(async (sellerId) => {
+      const sellerDocRef = doc(db, 'user-seller', sellerId);
+      const sellerDocSnap = await getDoc(sellerDocRef);
+      if (sellerDocSnap.exists()) {
+        const sellerData = sellerDocSnap.data();
+        shopAddressMap[sellerId] = sellerData.shopaddress || 'Not available';
+      } else {
+        shopAddressMap[sellerId] = 'Not available';
+      }
+    })
+  );
+  return shopAddressMap;
+}
+
 // Function to fetch the shop address
 async function getShopAddress(listing) {
     let shopAddress = 'Not available';
@@ -43,60 +68,68 @@ async function getShopAddress(listing) {
   // Function to load and display listings from Firestore
 async function loadListings() {
   const listingsContainer = document.getElementById('listing-container');
-
-  // Clear the container before adding new listings
-  listingsContainer.innerHTML = '<p class="text-gray-500 text-center">Loading listings...</p>';
+  listingsContainer.innerHTML = '<div class="flex items-center justify-center h-32"><p class="text-gray-500 text-center">Loading listings...</p></div>';
 
   try {
     // Query the "listed_items" collection where "isActive" is true
     const listingsQuery = query(collection(db, 'listed_items'), where("isActive", "==", true));
     const querySnapshot = await getDocs(listingsQuery);
 
-    // Clear the loading message
     listingsContainer.innerHTML = '';
 
     if (querySnapshot.empty) {
-      // Show a message if no active listings are found
       listingsContainer.innerHTML = `
         <p class="text-gray-500 text-center">No active listings available at the moment.</p>
       `;
       return;
     }
 
-    // Loop through the documents and add them to the page
-    querySnapshot.forEach(async (doc) => {
-      const listing = doc.data();
-      const listingId = doc.id; // Get listingId (doc ID)
+    // Gather all listings and their IDs
+    const listingsArr = [];
+    querySnapshot.forEach(docSnap => {
+      const listing = docSnap.data();
+      listing._id = docSnap.id;
+      listingsArr.push(listing);
+    });
 
+    // Batch fetch all shop addresses
+    const shopAddressMap = await getShopAddressesForListings(listingsArr);
+
+    // Render all listings
+    listingsArr.forEach(listing => {
+      const listingId = listing._id;
       const listingElement = document.createElement('div');
-      listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
+      // Make card smaller: reduce padding, set max-width, adjust image height
+      listingElement.classList.add('bg-white', 'p-2', 'rounded-lg', 'shadow-lg', 'max-w-xs', 'w-full', 'mx-auto');
 
-      // Fetch shop address using sellerId
-      const shopAddress = await getShopAddress(listing);
+      // Use the batch-fetched shop address
+      const shopAddress = listing.sellerId ? shopAddressMap[listing.sellerId] || 'Not available' : 'Not available';
 
       // Check if the "images" field exists and is an array
       let image = '';
       if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
-        // Use the first image from the array
         image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-100 object-cover rounded-md">`;
       } else {
-        // Fallback if no images are available
-        image = `<div class="w-full h-full bg-gray-200 flex items-center justify-center rounded-md">
+        image = `<div class="w-40 h-40 bg-gray-200 flex items-center justify-center rounded-md">
                     <p class="text-gray-500">No image available</p>
                  </div>`;
       }
 
       listingElement.innerHTML = `
         ${image}
-        <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
-        <p class="text-gray-700 mt-2">Category: ${listing.category || 'N/A'}</p>
-        <p class="text-gray-700 mt-2">Size: ${listing.garmentSize || 'N/A'}</p>
-        ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ${listing.rentPrice}/day</p>` : ''}
-        ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ${listing.sellPrice}</p>` : ''}
-        <p class="text-gray-700 mt-2">Shop Address: ${shopAddress}</p>
-        <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 view-details-btn" data-listing-id="${listingId}">
-          View Details
-        </button>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 mt-2">${listing.productName}</h3>
+          <p class="text-gray-700 mt-1">Category: ${listing.category || 'N/A'}</p>
+          <p class="text-gray-700 mt-1">Size: ${listing.garmentSize || 'N/A'}</p>
+          ${listing.rentPrice ? `<p class="text-gray-700 mt-1">Rent Price: ${listing.rentPrice}/day</p>` : ''}
+          ${listing.sellPrice ? `<p class="text-gray-700 mt-1">Selling Price: ${listing.sellPrice}</p>` : ''}
+          <p class="text-gray-700 mt-1">Shop Address: ${shopAddress}</p>
+        </div>
+        <div>
+          <button class="mt-3 bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 view-details-btn" data-listing-id="${listingId}">
+            View Details
+          </button>
+        </div>
       `;
 
       listingsContainer.appendChild(listingElement);
@@ -104,8 +137,7 @@ async function loadListings() {
       // Add event listener for 'View Details' button
       const viewDetailsButton = listingElement.querySelector('.view-details-btn');
       viewDetailsButton.addEventListener('click', () => {
-        const listingId = viewDetailsButton.getAttribute('data-listing-id'); // Get listingId from button
-        // Redirect to another window with the listing ID
+        const listingId = viewDetailsButton.getAttribute('data-listing-id');
         window.location.href = `/src/buyer-side/view-listing-details.html?listingId=${listingId}`;
       });
     });
@@ -154,17 +186,17 @@ async function showListingDetails(listing, listingId) {
   if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
       if (listing.images.length === 1) {
           modalImageContainer.innerHTML = `
-              <div class="w-full h-full overflow-hidden rounded-md">
-                  <img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain">
+                <div class="w-full h-full flex items-center justify-center overflow-hidden rounded-md bg-white">
+                  <img src="${listing.images[0]}" alt="${listing.productName}" class="max-h-full max-w-full object-contain">
               </div>
           `;
       } else {
           modalImageContainer.innerHTML = `
-              <div class="relative w-full h-full overflow-hidden rounded-md">
-                  <div id="carousel-images" class="flex transition-transform duration-300 ease-in-out">
+              <div class="relative w-full h-full flex items-center justify-center overflow-hidden rounded-md bg-white">
+                  <div id="carousel-images" class="flex transition-transform duration-300 ease-in-out w-full h-full">
                       ${listing.images.map((img, index) => `
-                          <div class="carousel-item w-full ${index === 0 ? 'block' : 'hidden'}">
-                              <img src="${img}" alt="${listing.productName}" class="w-full h-full object-contain">
+                          <div class="carousel-item w-full h-full ${index === 0 ? 'block' : 'hidden'} flex items-center justify-center">
+                              <img src="${img}" alt="${listing.productName}" class="max-h-full max-w-full object-contain">
                           </div>
                       `).join('')}
                   </div>
@@ -175,7 +207,7 @@ async function showListingDetails(listing, listingId) {
       }
   } else {
       modalImageContainer.innerHTML = `
-          <div class="w-full h-auto bg-gray-200 flex items-center justify-center rounded-md">
+          <div class="w-full h-full bg-gray-200 flex items-center justify-center rounded-md">
               <p class="text-gray-500">No image available</p>
           </div>
       `;

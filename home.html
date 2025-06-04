@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/output.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" /> 
-  
+  <script type="module" src="index-load-listings.js"></script>
   <script type="module" src="/src/index-show-listings.js"></script>
   
   
@@ -19,205 +19,104 @@
 </head>
 <body class="bg-gray-100">
   
-  
-  <header>
-    <nav class="bg-gray-800">
-        <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-          <div class="relative flex h-16 items-center justify-between">
-            <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-              <!-- Mobile menu button-->
-              <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
-                <span class="absolute -inset-0.5"></span>
-                <span class="sr-only">Open main menu</span>
-                <!--
-                  Icon when menu is closed.
-      
-                  Menu open: "hidden", Menu closed: "block"
-                -->
-                <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-                <!--
-                  Icon when menu is open
-      
-                  Menu open: "block", Menu closed: "hidden"
-                -->
-                <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-              <div class="flex flex-shrink-0 items-center">
-                <h3 class="text-gray-100">Project:Gaia</h3>
-              </div>
-              <div class="hidden sm:ml-6 sm:block">
-                <div class="flex space-x-4">
-                  <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                  <a href="../index.html" class="rounded-md  hover:bg-gray-700  px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
-                  <a href="../src/howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">How does it work?</a>
-                  <a href="../src/register.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Register</a>
-                  
-                </div>
-              </div>
-            </div>
-            <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              <button id="notification-btn"type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                <span class="absolute -inset-1.5"></span>
-                <span class="sr-only">View notifications</span>
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                </svg>
-              </button>
-      
-              <!-- Profile dropdown -->
-              <div class="relative ml-3">
-                <div>
-                  <a href="/src/login.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Login</a>
-                </div>
-      
-                <!--
-                  Dropdown menu, show/hide based on menu state.
-      
-                  Entering: "transition ease-out duration-100"
-                    From: "transform opacity-0 scale-95"
-                    To: "transform opacity-100 scale-100"
-                  Leaving: "transition ease-in duration-75"
-                    From: "transform opacity-100 scale-100"
-                    To: "transform opacity-0 scale-95"
-                -->
-                
-              </div>
-            </div>
-          </div>
+ <!-- Fixed Header -->
+<header class="bg-white top-0 fixed left-0 w-full z-10 shadow-md">
+  <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-16 items-center justify-between">
+      <!-- Logo Section (Centered & Responsive) -->
+      <div class="flex-1 flex items-center justify-center sm:justify-center">
+        <div class="flex-shrink-0 flex items-center"></div>
+          <h3 class="text-black text-xl font-bold">Project:Gaia</h3>
         </div>
-      
-      
-</header>
-
-
-<div class="searchBox flex items-center bg-gray-100 p-4 rounded-lg shadow-lg">
-  <input class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" name="" placeholder="Search something">
-  <button class="searchButton p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-r-lg flex items-center justify-center" href="#">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 29 29" fill="none">
-          <g clip-path="url(#clip0_2_17)">
-              <g filter="url(#filter0_d_2_17)">
-                  <path d="M23.7953 23.9182L19.0585 19.1814M19.0585 19.1814C19.8188 18.4211 20.4219 17.5185 20.8333 16.5251C21.2448 15.5318 21.4566 14.4671 21.4566 13.3919C21.4566 12.3167 21.2448 11.252 20.8333 10.2587C20.4219 9.2653 19.8188 8.36271 19.0585 7.60242C18.2982 6.84214 17.3956 6.23905 16.4022 5.82759C15.4089 5.41612 14.3442 5.20435 13.269 5.20435C12.1938 5.20435 11.1291 5.41612 10.1358 5.82759C9.1424 6.23905 8.23981 6.84214 7.47953 7.60242C5.94407 9.13789 5.08145 11.2204 5.08145 13.3919C5.08145 15.5634 5.94407 17.6459 7.47953 19.1814C9.01499 20.7168 11.0975 21.5794 13.269 21.5794C15.4405 21.5794 17.523 20.7168 19.0585 19.1814Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" shape-rendering="crispEdges"></path>
-              </g>
-          </g>
-          <defs>
-              <filter id="filter0_d_2_17" x="-0.418549" y="3.70435" width="29.7139" height="29.7139" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                  <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
-                  <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
-                  <feOffset dy="4"></feOffset>
-                  <feGaussianBlur stdDeviation="2"></feGaussianBlur>
-                  <feComposite in2="hardAlpha" operator="out"></feComposite>
-                  <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>ß
-                  <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2_17"></feBlend>
-                  <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2_17" result="shape"></feBlend>
-              </filter>
-              <clipPath id="clip0_2_17">
-                  <rect width="28.0702" height="28.0702" fill="white" transform="translate(0.403503 0.526367)"></rect>
-              </clipPath>
-          </defs>
-      </svg>
-  </button>
-</div>
-
- <!-- Notification Modal -->
- <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-  <div class="bg-white rounded-lg w-96 p-6 shadow-lg">
-      <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-semibold text-gray-700">Notifications</h2>
-          <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
       </div>
-      <div class="space-y-4">
-          <div class="flex items-center">
-              <div class="w-2.5 h-2.5 bg-green-500 rounded-full mr-2"></div>
-              <p class="text-sm text-gray-600">Your gown rental has been confirmed.</p>
-          </div>
-          <div class="flex items-center">
-              <div class="w-2.5 h-2.5 bg-yellow-500 rounded-full mr-2"></div>
-              <p class="text-sm text-gray-600">Payment reminder: Your payment is due in 2 days.</p>
-          </div>
-          <div class="flex items-center">
-              <div class="w-2.5 h-2.5 bg-blue-500 rounded-full mr-2"></div>
-              <p class="text-sm text-gray-600">New gown styles have been added to the collection.</p>
-          </div>
+
+      <!-- Hamburger Menu Button -->
+      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+        <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+          <span class="sr-only">Open main menu</span>
+          <i class="fa-solid fa-bars"></i>
+        </button>
       </div>
-  </div>
-</div>
+
+      <!-- Navigation Links -->
+      <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block absolute left-0 top-0 h-full items-center">
+        <div class="flex flex-col sm:flex-row sm:space-x-1 h-full items-center">
+          <a href="/index.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Home</a>
+          <a href="/project_gaia1/src/registration/register.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Register</a> 
+        </div>
+      </div>
+      <!-- Header Login Button (Right Side) -->
+      <div class="hidden sm:flex items-center absolute right-1 top-0 h-full pr-4">
+        <a 
+          href="#" 
+          id="login"
+          class=" hover:bg-gray-700 text-black px-8 py-3 rounded-md text-sm font-medium transition"
+        >
+          Login
+        </a>
+      </div>
+
+      
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Dropdown -->
+  <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
+    <a href="#intro" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Home</a>
+  
+    <a href="/project_gaia1/src/registration/register.html" class="rounded-md px-3 py-2 text-xs font-medium hover:bg-gray-700 text-black hover:text-black">Register</a> 
+   </div>     
+  </header>
+
+<script>
+  // filepath: /workspaces/project_gaia1/src/buyer-side/buyer-login.js
+  document.getElementById('mobile-menu-button').addEventListener('click', () => {
+    const mobileMenu = document.getElementById('mobile-menu-dropdown');
+    mobileMenu.classList.toggle('hidden');
+  });
+</script>
+
+
+
+
 
 
         
 
 <!-- Listings Container -->
-<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+<div id="listing-container" class="mt-20 pl-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
   <!-- Listings will be dynamically injected here -->
 </div>
 
-    <footer class="bg-gray-800 text-white py-6">
-      <div class="container mx-auto px-4">
-          <div class="flex flex-col md:flex-row justify-between">
-              <!-- Navigation Links -->
-              <div class="mb-4 md:mb-0">
-                  <h3 class="text-lg font-semibold">Quick Links</h3>
-                  <ul class="mt-2 space-y-2">
-                      <li><a href="/src/about-page.html" class="text-gray-400 hover:text-white">About</a></li>
-                      <li><a href="/privacy" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
-                      <li><a href="/terms" class="text-gray-400 hover:text-white">Terms of Service</a></li>
-                      <li><a href="/faq" class="text-gray-400 hover:text-white">FAQs</a></li>
-                  </ul>
-              </div>
-  
-              <!-- Social Media Icons -->
-              <div class="mb-4 md:mb-0">
-                  <h3 class="text-lg font-semibold">Follow Us</h3>
-                  <div class="flex space-x-4 mt-2">
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
-                      <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
-                  </div>
-              </div>
-          </div>
-  
-          <!-- Copyright Notice -->
-          <div class="mt-6 border-t border-gray-700 pt-4 text-center">
-              <p class="text-sm">© 2024 Project:Gaia. All rights reserved.</p>
-          </div>
-  
-          <!-- Accessibility Links -->
-          <div class="mt-4 text-center">
-              <a href="/src/admin-login.html" class="text-gray-400 hover:text-white">Admin Login</a>
-          </div>
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+      <div class="bg-white rounded-lg shadow-lg w-80 p-6 relative">
+        <button id="close-modal" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h2 class="text-lg font-bold mb-4 text-center">Login As</h2>
+        <div class="flex flex-col gap-4">
+          <a href="/project_gaia1/src/buyer-side/buyer-login.html" class="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 text-center font-medium">Buyer</a>
+          <a href="/project_gaia1/src/seller-side/seller-login.html" class="bg-green-600 text-white py-2 rounded hover:bg-green-700 text-center font-medium">Seller</a>
+        </div>
       </div>
-  </footer>
-
-  <!-- View Detils Modal Structure -->
-<div id="listing-modal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
-  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h3 id="modal-title" class="text-xl font-semibold text-gray-800 mb-4"></h3>
-      <div id="modal-content" class="text-gray-600 mb-4"></div>
-      <button id="close-modal" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Close</button>
-  </div>
-</div>
- 
-
-
-
-<!-- MODAL FOR NOTIFICATION
-<script>
-  document.getElementById('notification-btn').addEventListener('click', function() {
-      document.getElementById('notification-modal').classList.remove('hidden');
-  });
-
-  document.getElementById('close-modal').addEventListener('click', function() {
-      document.getElementById('notification-modal').classList.add('hidden');
-  });
-  document.getElementById('view-details').addEventListener('click',function(){
-      window.location.href = 'src/listing-page.html'
-    });
-</script> -->
+    </div>
+    <script>
+      // Show modal on Login button click
+      document.getElementById('login').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('login-modal').classList.remove('hidden');
+      });
+      // Close modal on close button click or outside click
+      document.getElementById('close-modal').addEventListener('click', function() {
+        document.getElementById('login-modal').classList.add('hidden');
+      });
+      document.getElementById('login-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.add('hidden');
+        }
+      });
+    </script>
 </body>
 </html>

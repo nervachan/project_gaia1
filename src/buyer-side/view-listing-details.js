@@ -106,8 +106,10 @@ async function fetchListingDetails() {
               </div>`;
           });
           carouselHTML += `
-            <button class="carousel-control-prev absolute left-2 top-1/2 transform -translate-y-1/2 text-4xl text-white bg-gray-800 rounded-full p-3 hover:bg-gray-700 z-10">&#10094;</button>
-            <button class="carousel-control-next absolute right-2 top-1/2 transform -translate-y-1/2 text-4xl text-white bg-gray-800 rounded-full p-3 hover:bg-gray-700 z-10">&#10095;</button>
+            <div class="flex justify-center gap-10">
+              <button class="carousel-control-prev absolute left-2 top-1/2 transform -translate-y-1/2 text-4xl text-white bg-gray-800 rounded-full p-3 hover:bg-gray-700 z-10">&#10094;</button>
+              <button class="carousel-control-next absolute right-2 top-1/2 transform -translate-y-1/2 text-4xl text-white bg-gray-800 rounded-full p-3 hover:bg-gray-700 z-10">&#10095;</button>
+            </div>
           </div>`;
           imageContainer.innerHTML = carouselHTML;
 
