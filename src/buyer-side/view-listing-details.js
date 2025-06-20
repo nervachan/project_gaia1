@@ -262,15 +262,14 @@ async function highlightPendingDates(selectedDates, dateStr, instance) {
   }
 }
 
-// Back button functionality with conditional redirect
+// Back button functionality: redirect based on authentication state
 document.getElementById('back-button').addEventListener('click', () => {
   console.log("Back button clicked.");
-  // Check if there is a referrer and if it contains 'index.html'
-  if (document.referrer && document.referrer.includes('index.html')) {
-    console.log("Redirecting to index.html");
+  if (!auth.currentUser) {
+    console.log("No user logged in. Redirecting to index.html");
     window.location.href = '/project_gaia1/index.html';
   } else {
-    console.log("Redirecting to buyer-login.html");
+    console.log("User is logged in. Redirecting to buyer-login.html");
     window.location.href = 'buyer-login.html';
   }
 });
