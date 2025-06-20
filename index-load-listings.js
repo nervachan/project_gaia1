@@ -106,11 +106,7 @@ async function loadListings() {
       viewDetailsButton.addEventListener('click', () => {
         const listingId = viewDetailsButton.getAttribute('data-listing-id'); // Get listingId from button
         // Redirect to another window with the listing ID
-<<<<<<< HEAD
-        window.location.href = `project_gaia1/src/buyer-side/view-listing-details.html?listingId=${listingId}`;
-=======
         window.location.href = `/project_gaia1/src/buyer-side/view-listing-details.html?listingId=${listingId}`;
->>>>>>> 4d0ffa4b0e42ef774ee7a71d3e9d1ff7b6062aa3
       });
     });
   } catch (error) {
