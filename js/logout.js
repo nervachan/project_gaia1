@@ -25,7 +25,7 @@ function logoutUser() {
   signOut(auth)
     .then(() => {
     // Redirect the user to index.html after successful logout
-    window.location.href = '/project_gaia1/index.html';  // Adjust path if necessary
+    window.location.href = 'index.html';  // Adjust path if necessary
     })
     .catch((error) => {
     // Handle any errors that occur during logout

@@ -267,7 +267,7 @@ document.getElementById('back-button').addEventListener('click', () => {
   console.log("Back button clicked.");
   if (!auth.currentUser) {
     console.log("No user logged in. Redirecting to index.html");
-    window.location.href = '/project_gaia1/index.html';
+    window.location.href = 'index.html';
   } else {
     console.log("User is logged in. Redirecting to buyer-login.html");
     window.location.href = 'buyer-login.html';
