@@ -24,11 +24,7 @@
           
           <!-- Right: Navigation Links -->
           <div class="flex space-x-4">
-            <a href="/src/buyer-side/buyer-login.html" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white">Home</a>
-            <a href="#" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Become a lender</a>
-            <a href="/src/buyer-side/History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
-            <a href="/src/watch-list.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Watch List</a>
-            <a href="/src/ai/AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+            <button id="home-btn" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white">Home</button>
           </div>
     
         </div>
@@ -106,5 +102,16 @@
     </div>
 
     <script src="ai.js"></script>
+    <script>
+      // Return to previous page when Home is pressed
+      document.getElementById('home-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (window.history.length > 1) {
+          window.history.back();
+        }
+        // No fallback redirect
+      });
+    </script>
   </body>
+</html>
 </html>
