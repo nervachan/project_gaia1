@@ -15,6 +15,7 @@
     
 </head>
 <body class="bg-grey-100 pt-16">
+<!-- ================= HEADER SECTION ================= -->
 <!-- Fixed Header -->
 <header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
   <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -39,7 +40,6 @@
         <div class="flex flex-col sm:flex-row sm:space-x-4">
           <a href="howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a> 
           <a href="register.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Register</a> 
-                  
         </div>
       </div>
 
@@ -47,7 +47,6 @@
       <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
         <div class="relative ml-3">
           <div class="flex items-center space-x-4">
-            
             <a href="login.html" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white" id="login">Login</a>
           </div>
         </div>
@@ -58,18 +57,18 @@
   <!-- Mobile Menu Dropdown -->
   <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
     <a href="howitworks.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">How It Works</a>
-     <a href="register.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Register</a> 
+    <a href="register.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Register</a>
   </div>
 </header>
 
 <script>
-  // filepath: /workspaces/project_gaia1/src/buyer-side/buyer-login.js
   document.getElementById('mobile-menu-button').addEventListener('click', () => {
     const mobileMenu = document.getElementById('mobile-menu-dropdown');
     mobileMenu.classList.toggle('hidden');
   });
 </script>
 
+<!-- ================= INTRO MODAL SECTION ================= -->
 <!-- Intro Modal -->
 <div id="page-load-modal-overlay" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
   <div class="relative p-8 rounded-lg shadow-lg flex flex-col items-center overflow-hidden bg-cover bg-center w-full max-w-xl min-h-[20vh]" style="background-image: url('images/index_bg.png');">
@@ -94,6 +93,7 @@
   });
 </script>
 
+<!-- ================= SEARCH BOX SECTION ================= -->
 <div class="searchBox flex items-center bg-grey-200 p-4 rounded-lg shadow-lg mx-auto mt-8">
   <input id="searchInput" class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" placeholder="Search something">
   <button id="searchButton" class="searchButton p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-r-lg flex items-center justify-center">
@@ -130,6 +130,7 @@
   <button class="filter-btn bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700" data-category="for children (female)">Children (Female)</button>
 </div>
 
+<!-- ================= MAIN CONTENT SECTION ================= -->
 <!-- Listings Container -->
 <div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8">
   <!-- Placeholder content will be replaced with listings -->

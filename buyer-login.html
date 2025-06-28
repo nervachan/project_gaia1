@@ -24,6 +24,7 @@
 </head>
 <body class="bg-grey-100 pt-16"> <!-- Added padding to body to avoid overlap with fixed header -->
   
+<!-- ================= HEADER SECTION ================= -->
 <!-- Fixed Header -->
 <header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
   <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -73,17 +74,14 @@
     <a href="AI.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
   </div>
 </header>
-
 <script>
-  // filepath: /workspaces/project_gaia1/src/buyer-side/buyer-login.js
   document.getElementById('mobile-menu-button').addEventListener('click', () => {
     const mobileMenu = document.getElementById('mobile-menu-dropdown');
     mobileMenu.classList.toggle('hidden');
   });
 </script>
 
-
-
+<!-- ================= SEARCH BOX SECTION ================= -->
 <div class="searchBox flex items-center bg-grey-200 p-4 rounded-lg shadow-lg mx-auto mt-8">
   <input id="searchInput" class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" placeholder="Search something">
   <button id="searchButton" class="searchButton p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-r-lg flex items-center justify-center">
