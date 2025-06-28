@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 <body class="bg-gray-100">
+    <!-- ================= HEADER SECTION ================= -->
     <header class="bg-gray-800 text-white top-0 left-0 w-full z-10 shadow-md">
         <nav class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div class="relative flex h-16 items-center justify-between">
@@ -52,19 +53,20 @@
           </div>
         </nav>
       
-        <!-- Mobile Menu Dropdown -->
+        <!-- Mobile Menu Dropdown (includes sidebar links) -->
         <div id="mobile-menu-dropdown" class="hidden sm:hidden bg-gray-800">
-          <a href="seller-hub-active-listings.html" class="block px-3 py-2 text-base font-medium text-white hover:bg-gray-700">Home</a>
+          <a href="seller-hub-active-listings.html" class="block px-3 py-2 text-base font-medium text-white hover:bg-gray-700">Active Listings</a>
           <a href="seller-hub-create-listing.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Create a Listing</a>
           <a href="seller-hub-pending-items.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Pending Rentals</a>
           <a href="seller-hub-inactive-listings.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Inactive Listings</a>
-          <a href="seller-hub-reviews.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Reviews</a>
+          <a href="seller-hub-reviews.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">My Reviews</a>
           <a href="AI.html" class="block px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
         </div>
       </header>
 
+    <!-- ================= PAGE LAYOUT SECTION ================= -->
     <div class="flex">
-        <!-- Sidebar -->
+        <!-- ================= SIDEBAR SECTION ================= -->
         <div id="sidebar" class="w-64 h-screen bg-gray-800 text-white p-10 hidden sm:block">
             <ul class="space-y-6">
                 <li>
@@ -84,8 +86,7 @@
                 </li>
             </ul>
         </div>
-
-        <!-- Main Content -->
+        <!-- ================= MAIN CONTENT SECTION ================= -->
         <div class="flex-auto">
             <div class="container mx-auto p-8">
                 <h2 class="text-3xl font-semibold text-gray-800 mb-6">Pending Rentals</h2>
