@@ -138,7 +138,6 @@ async function submitBuyerReview(rentalId, sellerId) {
             sellerId,
             listingId,    
             listingName,
-            name,
             reviewText,
             reviewBy: "buyer",
             timestamp: new Date(),

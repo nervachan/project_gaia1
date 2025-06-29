@@ -487,12 +487,26 @@ async function fetchAndDisplayReviews() {
     let reviewsHTML = '';
     querySnapshot.forEach(docSnap => {
       const review = docSnap.data();
+      // Format timestamp as date and time if available
+      let formattedTimestamp = '';
+      if (review.timestamp) {
+        let dateObj;
+        if (typeof review.timestamp === 'object' && review.timestamp.seconds) {
+          dateObj = new Date(review.timestamp.seconds * 1000);
+        } else {
+          dateObj = new Date(review.timestamp);
+        }
+        if (!isNaN(dateObj.getTime())) {
+          formattedTimestamp = dateObj.toLocaleString();
+        } else {
+          formattedTimestamp = review.timestamp;
+        }
+      }
+
       reviewsHTML += `
         <div class="mb-4 p-4 border rounded bg-gray-50">
-          <div class="font-semibold">${review.userName || 'Anonymous'}</div>
-          <div class="text-yellow-500">${'★'.repeat(review.rating || 0)}${'☆'.repeat(5 - (review.rating || 0))}</div>
-          <div class="text-gray-700 mt-1">${review.comment || ''}</div>
-          <div class="text-xs text-gray-400 mt-1">${review.createdAt ? new Date(review.createdAt.seconds * 1000).toLocaleString() : ''}</div>
+          <div class="text-lg text-gray-700 mt-1 ">${review.reviewText || ''}</div>
+          <div class="text-sm text-gray-400 mt-1">${formattedTimestamp}</div>
         </div>
       `;
     });
