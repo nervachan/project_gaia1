@@ -94,7 +94,7 @@ async function fetchListingDetails() {
       if (listing.images && listing.images.length > 0) {
         if (listing.images.length === 1) {
           // Display a single image with uniform size
-          imageContainer.innerHTML = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-cover rounded-md">`;
+          imageContainer.innerHTML = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-96 object-contain rounded-md">`;
           console.log("Displayed single image.");
         } else {
           // Create a carousel for multiple images with uniform size
@@ -102,7 +102,7 @@ async function fetchListingDetails() {
           listing.images.forEach((image, index) => {
             carouselHTML += `
               <div class="carousel-item ${index === 0 ? 'block' : 'hidden'}">
-                <img src="${image}" alt="${listing.productName}" class="w-full h-full object-cover rounded-md">
+                <img src="${image}" alt="${listing.productName}" class="w-full h-96 object-contain rounded-md">
               </div>`;
           });
           carouselHTML += `

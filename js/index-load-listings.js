@@ -78,10 +78,10 @@ async function loadListings() {
       let image = '';
       if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
         // Use the first image from the array
-        image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-100 object-cover rounded-md">`;
+        image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-64 object-contain rounded-md" style="object-position: center top;">`;
       } else {
         // Fallback if no images are available
-        image = `<div class="w-full h-full bg-gray-200 flex items-center justify-center rounded-md">
+        image = `<div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-md">
                     <p class="text-gray-500">No image available</p>
                  </div>`;
       }
