@@ -59,17 +59,22 @@ document.addEventListener("DOMContentLoaded", function () {
     modal.classList.add("hidden");
   });
 
+  // Set up profile icon click listener (if element exists)
+  const profileIcon = document.getElementById("profile-icon");
+  if (profileIcon) {
+    profileIcon.addEventListener("click", function (event) {
+      event.preventDefault();
+      if (auth.currentUser) {
+        openProfileModal(auth.currentUser.uid);
+      }
+    });
+  }
+
   // Listen for changes in the authentication state
   onAuthStateChanged(auth, (user) => {
     if (user) {
       // User is signed in
-      const loggedInUid = user.uid; // Use the logged-in user's uid
-
-      // Simulate opening the modal when the profile icon is clicked
-      document.getElementById("profile-icon").addEventListener("click", function (event) {
-        event.preventDefault(); // Prevent the default link behavior
-        openProfileModal(loggedInUid); // Pass the logged-in user's uid to the function
-      });
+      console.log("User signed in:", user.uid);
     } else {
       // No user is signed in
       console.log("No user is signed in");
