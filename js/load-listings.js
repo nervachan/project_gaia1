@@ -25,24 +25,26 @@ const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth();
 
-// Function to fetch the shop address
-async function getShopAddress(listing) {
-    let shopAddress = 'Not available';
-  
+// Function to fetch seller info (name and address)
+async function getSellerInfo(listing) {
+    let sellerName = 'N/A';
+    let shopAddress = 'N/A';
+
     if (listing.sellerId) {
-      const sellerDocRef = doc(db, 'user-seller', listing.sellerId);
-      const sellerDocSnap = await getDoc(sellerDocRef);
-  
-      if (sellerDocSnap.exists()) {
-        const sellerData = sellerDocSnap.data();
-        shopAddress = sellerData.shopaddress || 'Not available';
-      } else {
-        console.warn('Seller document not found for ID:', listing.sellerId);
-      }
+        const sellerDocRef = doc(db, 'user-seller', listing.sellerId);
+        const sellerDocSnap = await getDoc(sellerDocRef);
+
+        if (sellerDocSnap.exists()) {
+            const sellerData = sellerDocSnap.data();
+            sellerName = sellerData.shopname || 'N/A'; // Assuming the field is 'shopname'
+            shopAddress = sellerData.shopaddress || 'N/A';
+        } else {
+            console.warn('Seller document not found for ID:', listing.sellerId);
+        }
     }
-  
-    return shopAddress;
-  }
+
+    return { sellerName, shopAddress };
+}
   
   // Function to load and display listings from Firestore
 async function loadListings() {
@@ -73,20 +75,19 @@ async function loadListings() {
       const listingId = doc.id; // Get listingId (doc ID)
 
       const listingElement = document.createElement('div');
-      listingElement.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'flex', 'flex-col');
-      listingElement.style.height = '36rem';
+      listingElement.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'flex', 'flex-col', 'h-full');
 
-      // Fetch shop address using sellerId
-      const shopAddress = await getShopAddress(listing);
+      // Fetch seller info using sellerId
+      const { sellerName, shopAddress } = await getSellerInfo(listing);
 
       // Check if the "images" field exists and is an array
       let image = '';
       if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
         // Use the first image from the array
-        image = `<div class="w-full flex-shrink-0" style="height: 18rem;"><img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain rounded-t-lg"></div>`;
+        image = `<div class="w-full h-48 sm:h-56 md:h-64 flex-shrink-0"><img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain rounded-t-lg"></div>`;
       } else {
         // Fallback if no images are available
-        image = `<div class="w-full bg-gray-200 flex items-center justify-center flex-shrink-0 rounded-t-lg" style="height: 18rem;">
+        image = `<div class="w-full h-48 sm:h-56 md:h-64 bg-gray-200 flex items-center justify-center flex-shrink-0 rounded-t-lg">
                   <p class="text-gray-500">No image available</p>
                 </div>`;
       }
@@ -97,6 +98,7 @@ async function loadListings() {
           <h3 class="text-lg font-semibold truncate">${listing.productName}</h3>
           <p class="text-sm text-gray-600">Category: ${listing.category || 'N/A'}</p>
           <p class="text-sm text-gray-600">Size: ${listing.garmentSize || 'N/A'}</p>
+          <p class="text-sm text-gray-600">Seller: ${sellerName}</p>
           <div class="flex-grow"></div>
           <p class="text-lg font-bold text-right">${listing.rentPrice ? `Rent: ${listing.rentPrice}/day` : ''}</p>
         </div>

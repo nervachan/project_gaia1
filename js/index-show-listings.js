@@ -19,6 +19,22 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
+// Function to fetch seller name
+async function getSellerName(sellerId) {
+    let sellerName = 'N/A';
+    if (sellerId) {
+        const sellerDocRef = doc(db, 'user-seller', sellerId);
+        const sellerDocSnap = await getDoc(sellerDocRef);
+        if (sellerDocSnap.exists()) {
+            const sellerData = sellerDocSnap.data();
+            sellerName = sellerData.shopname || 'N/A';
+        } else {
+            console.warn('Seller document not found for ID:', sellerId);
+        }
+    }
+    return sellerName;
+}
+
 // Function to create action buttons based on listing condition
 function createActionButton(listing, listingId) {
     if (listing.condition === 'rent') {
@@ -43,11 +59,12 @@ async function loadListings() {
         const listingsQuery = query(collection(db, 'listed_items'), where('isActive', '==', true));
         const listingsSnapshot = await getDocs(listingsQuery);
 
-        listingsSnapshot.forEach(doc => {
+        for (const doc of listingsSnapshot.docs) {
             const listing = doc.data();
-            const listingElement = createListingElement(listing, doc.id);
+            const sellerName = await getSellerName(listing.sellerId);
+            const listingElement = createListingElement(listing, doc.id, sellerName);
             listingsContainer.appendChild(listingElement);
-        });
+        }
 
     } catch (error) {
         console.error("Error fetching listings: ", error);
@@ -55,7 +72,7 @@ async function loadListings() {
 }
 
 // Function to create a listing element
-function createListingElement(listing, listingId) {
+function createListingElement(listing, listingId, sellerName) {
     const listingElement = document.createElement('div');
     listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
 
@@ -66,6 +83,7 @@ function createListingElement(listing, listingId) {
         <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
         <p class="text-gray-600 mt-2">${listing.productDescription}</p>
         <p class="text-gray-700 mt-2">Category: ${listing.category}</p>
+        <p class="text-gray-700 mt-2">Seller: ${sellerName}</p>
         <p class="text-gray-700 mt-2">Terms: ${listing.condition}</p>
         ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ₱${listing.rentPrice}</p>` : ''}
         ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ₱${listing.sellPrice}</p>` : ''}
