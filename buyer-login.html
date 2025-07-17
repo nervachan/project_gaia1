@@ -22,7 +22,7 @@
     
 
 </head>
-<body class="bg-grey-100 pt-16"> <!-- Added padding to body to avoid overlap with fixed header -->
+<body class="bg-grey-100 pt-16 flex flex-col min-h-screen"> <!-- Added padding to body to avoid overlap with fixed header -->
   
 <!-- ================= HEADER SECTION ================= -->
 <!-- Fixed Header -->
@@ -50,6 +50,7 @@
           <a href="#" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
           <a href="History.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">History</a>
           <a href="AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
+          <a href="chat.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Chat</a>
         </div>
       </div>
 
@@ -122,7 +123,7 @@
         
 
 <!-- Listings Container -->
-<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8">
+<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8 flex-grow">
   <!-- Placeholder content will be replaced with listings -->
   <p class="text-center text-gray-500 mb-8">Loading your listings...</p>
 </div>

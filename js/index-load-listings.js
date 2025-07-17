@@ -69,7 +69,8 @@ async function loadListings() {
       const listingId = doc.id; // Get listingId (doc ID)
 
       const listingElement = document.createElement('div');
-      listingElement.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-lg');
+      listingElement.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'flex', 'flex-col');
+      listingElement.style.height = '36rem';
 
       // Fetch shop address using sellerId
       const shopAddress = await getShopAddress(listing);
@@ -78,23 +79,24 @@ async function loadListings() {
       let image = '';
       if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
         // Use the first image from the array
-        image = `<img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-64 object-contain rounded-md" style="object-position: center top;">`;
+        image = `<div class="w-full flex-shrink-0" style="height: 18rem;"><img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain rounded-t-lg"></div>`;
       } else {
         // Fallback if no images are available
-        image = `<div class="w-full h-64 bg-gray-200 flex items-center justify-center rounded-md">
+        image = `<div class="w-full bg-gray-200 flex items-center justify-center flex-shrink-0 rounded-t-lg" style="height: 18rem;">
                     <p class="text-gray-500">No image available</p>
                  </div>`;
       }
 
       listingElement.innerHTML = `
         ${image}
-        <h3 class="text-xl font-semibold text-gray-900 mt-4">${listing.productName}</h3>
-        <p class="text-gray-700 mt-2">Category: ${listing.category || 'N/A'}</p>
-        <p class="text-gray-700 mt-2">Size: ${listing.garmentSize || 'N/A'}</p>
-        ${listing.rentPrice ? `<p class="text-gray-700 mt-2">Rent Price: ${listing.rentPrice}/day</p>` : ''}
-        ${listing.sellPrice ? `<p class="text-gray-700 mt-2">Selling Price: ${listing.sellPrice}</p>` : ''}
-        <p class="text-gray-700 mt-2">Shop Address: ${shopAddress}</p>
-        <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 view-details-btn" data-listing-id="${listingId}">
+        <div class="p-4 flex flex-col flex-grow">
+            <h3 class="text-lg font-semibold truncate">${listing.productName}</h3>
+            <p class="text-sm text-gray-600">Category: ${listing.category || 'N/A'}</p>
+            <p class="text-sm text-gray-600">Size: ${listing.garmentSize || 'N/A'}</p>
+            <div class="flex-grow"></div>
+            <p class="text-lg font-bold text-right">${listing.rentPrice ? `Rent: ${listing.rentPrice}/day` : ''}</p>
+        </div>
+        <button class="bg-blue-500 text-white py-2 w-full flex-shrink-0 hover:bg-blue-600 rounded-b-lg view-details-btn" data-listing-id="${listingId}">
           View Details
         </button>
       `;

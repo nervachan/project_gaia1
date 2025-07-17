@@ -33,7 +33,7 @@
           </div>
     
           <!-- Navigation Links -->
-          <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block">
+          <div id="mobile-menu" class="hidden sm:flex sm:ml-6">
             <div class="flex flex-col sm:flex-row sm:space-x-4">
               <a href="seller-hub-main.html" class="rounded-md hover:bg-gray-700 px-3 py-2 text-sm font-medium text-white" aria-current="page">Home</a>
               <a href="AI.html" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">AI</a>
@@ -133,6 +133,24 @@
                             <option value="x-large">Extra Large (XL)</option>
                         </select>
 
+                        <div class="flex items-center justify-between mt-4">
+                            <label for="bust-chest" class="text-gray-700 text-lg">Bust/Chest (cm)</label>
+                            <span class="text-sm text-gray-500">Enter measurement in centimeters</span>
+                        </div>
+                        <input id="bust-chest" type="number" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 90" min="0">
+
+                        <div class="flex items-center justify-between mt-4">
+                            <label for="height" class="text-gray-700 text-lg">Height (cm)</label>
+                            <span class="text-sm text-gray-500">Enter height recommendation in centimeters</span>
+                        </div>
+                        <input id="height" type="number" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 165" min="0">
+
+                        <div class="flex items-center justify-between mt-4">
+                            <label for="waist" class="text-gray-700 text-lg">Waist (cm)</label>
+                            <span class="text-sm text-gray-500">Enter measurement in centimeters</span>
+                        </div>
+                        <input id="waist" type="number" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 70" min="0">
+
                         
 
                     <div id="rent-select">
@@ -168,7 +186,7 @@
                 </form>
             </div>
 
-            <div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex-auto justify-center items-center hidden flex">
+            <div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 justify-center items-center hidden flex">
                 <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
                     <h2 class="text-xl font-semibold text-gray-800">Confirm Your Listing</h2>
                     <p class="text-gray-600 mt-4">Are you sure you want to create this listing?</p>
@@ -198,7 +216,7 @@
     </script>
 
     <!--Profile Modal -->
-    <div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden z-20">
+    <div id="profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 justify-center items-center hidden z-20 flex">
         <div class="bg-white p-8 rounded-lg shadow-xl w-1/3">
             <h2 class="text-2xl font-semibold text-gray-800">User Profile</h2>
             <div id="user-profile-info" class="mt-4">

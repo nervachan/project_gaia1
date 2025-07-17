@@ -14,7 +14,7 @@
     <script type="module" src="js/loginHandler.js"></script>
     
 </head>
-<body class="bg-grey-100 pt-16">
+<body class="bg-grey-100 pt-16 flex flex-col min-h-screen">
 <!-- ================= HEADER SECTION ================= -->
 <!-- Fixed Header -->
 <header class="bg-gray-800 text-white fixed top-0 left-0 w-full z-10 shadow-md">
@@ -36,7 +36,7 @@
       </div>
 
       <!-- Navigation Links -->
-      <div id="mobile-menu" class="hidden sm:flex sm:ml-6 sm:block">
+      <div id="mobile-menu" class="hidden sm:flex sm:ml-6">
         <div class="flex flex-col sm:flex-row sm:space-x-4">
           <a href="howitworks.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">How It Works</a> 
           <a href="register.html" class="rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-700 text-gray-300 hover:text-white">Register</a> 
@@ -94,7 +94,7 @@
 </script>
 
 <!-- ================= SEARCH BOX SECTION ================= -->
-<div class="searchBox flex items-center bg-grey-200 p-4 rounded-lg shadow-lg mx-auto mt-8">
+<div class="searchBox flex items-center bg-grey-200 p-4 rounded-lg shadow-lg mx-64 mt-8">
   <input id="searchInput" class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" placeholder="Search something">
   <button id="searchButton" class="searchButton p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-r-lg flex items-center justify-center">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 29 29" fill="none">
@@ -132,7 +132,7 @@
 
 <!-- ================= MAIN CONTENT SECTION ================= -->
 <!-- Listings Container -->
-<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8">
+<div id="listing-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4 mb-8 flex-grow [grid-auto-rows:theme(height.80)]">
   <!-- Placeholder content will be replaced with listings -->
   <p class="text-center text-gray-500 mb-8">Loading your listings...</p>
 </div>
@@ -163,7 +163,7 @@
 </html>
 
 <!-- Login Modal Overlay -->
-<div id="login-modal-overlay" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+<div id="login-modal-overlay" class="fixed inset-0 bg-black bg-opacity-40 items-center justify-center z-50 hidden">
   <div class="relative">
     <form class="bg-white dark:bg-grey-800 shadow-2xl rounded-2xl overflow-hidden border-4 border-grey-800 dark:border-grey-800 " id="login-form">
       <div class="px-8 py-10 md:px-10">
