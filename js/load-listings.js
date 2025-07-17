@@ -73,7 +73,8 @@ async function loadListings() {
       const listingId = doc.id; // Get listingId (doc ID)
 
       const listingElement = document.createElement('div');
-      listingElement.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'flex', 'flex-col', 'h-80');
+      listingElement.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'flex', 'flex-col');
+      listingElement.style.height = '36rem';
 
       // Fetch shop address using sellerId
       const shopAddress = await getShopAddress(listing);
@@ -82,10 +83,10 @@ async function loadListings() {
       let image = '';
       if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
         // Use the first image from the array
-        image = `<div class="h-40 w-full flex-shrink-0"><img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-cover rounded-t-lg"></div>`;
+        image = `<div class="w-full flex-shrink-0" style="height: 18rem;"><img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain rounded-t-lg"></div>`;
       } else {
         // Fallback if no images are available
-        image = `<div class="h-40 w-full bg-gray-200 flex items-center justify-center flex-shrink-0 rounded-t-lg">
+        image = `<div class="w-full bg-gray-200 flex items-center justify-center flex-shrink-0 rounded-t-lg" style="height: 18rem;">
                   <p class="text-gray-500">No image available</p>
                 </div>`;
       }
