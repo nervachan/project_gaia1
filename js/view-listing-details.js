@@ -122,6 +122,10 @@ async function fetchListingDetails() {
 
       document.getElementById('listing-description').innerText = listing.productDescription || 'No description available';
       document.getElementById('listing-category').innerText = `Category: ${listing.category || 'N/A'}`;
+      document.getElementById('listing-garment-size').innerText = `Size: ${listing.garmentSize || 'N/A'}`;
+      document.getElementById('listing-bust-chest').innerText = listing.bustChest ? `Bust/Chest: ${listing.bustChest} cm` : 'Bust/Chest: N/A';
+      document.getElementById('listing-height').innerText = listing.height ? `Height: ${listing.height} cm` : 'Height: N/A';
+      document.getElementById('listing-waist').innerText = listing.waist ? `Waist: ${listing.waist} cm` : 'Waist: N/A';
       document.getElementById('listing-rent-price').innerText = listing.rentPrice ? `Rent Price: ${listing.rentPrice}/day` : 'No rent price available';
 
       document.getElementById('listing-shop-address').innerHTML = `

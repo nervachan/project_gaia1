@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const condition = document.getElementById('condition');
     const rentPrice = document.getElementById('rent-price');
     const size = document.getElementById('size'); // Garment size input field
+    const bustChest = document.getElementById('bust-chest');
+    const height = document.getElementById('height');
+    const waist = document.getElementById('waist');
 
     // Collect photo inputs
     const photoInputs = [
@@ -92,6 +95,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (!bustChest.value.trim() || parseFloat(bustChest.value) <= 0) {
+            alert('Bust/Chest measurement must be a positive number.');
+            return;
+        }
+
+        if (!height.value.trim() || parseFloat(height.value) <= 0) {
+            alert('Height must be a positive number.');
+            return;
+        }
+
+        if (!waist.value.trim() || parseFloat(waist.value) <= 0) {
+            alert('Waist measurement must be a positive number.');
+            return;
+        }
+
         const imageFiles = [];
         photoInputs.forEach((input) => {
             if (input.files.length > 0) {
@@ -114,6 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
             rentPrice: parseFloat(rentPrice.value),
             isActive: true, // Assuming you want to set the listing as active
             garmentSize: size.value.trim(), // Include the garment size
+            bustChest: parseFloat(bustChest.value),
+            height: parseFloat(height.value),
+            waist: parseFloat(waist.value),
             sellerId: userId // Add the user's ID to the listing data
         };
 

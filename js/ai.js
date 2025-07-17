@@ -62,53 +62,58 @@ const getImageDimensions = (aspectRatio, baseSize = 512) => {
 };
 
 // Replace loading spinner with the actual image
-const updateImageCard = (index, imageUrl) => {
-  const imgCard = document.getElementById(`img-card-${index}`);
-  if (!imgCard) return;
-
-  imgCard.classList.remove("loading");
+const updateImageCard = (cardIndex, imageUrl) => {
+  const imgCard = document.getElementById(`img-card-${cardIndex}`);
+  imgCard.classList.replace("loading", "generated");
   imgCard.innerHTML = `<img class="result-img" src="${imageUrl}" />
                 <div class="img-overlay">
-                  <a href="${imageUrl}" class="img-download-btn" title="Download Image" download>
-                    <i class="fa-solid fa-download"></i>
+                  <a href="${imageUrl}" class="img-download-btn text-white bg-black bg-opacity-50 rounded-lg px-4 py-2 text-lg font-semibold" title="Download Image" download>
+                    Download
                   </a>
                 </div>`;
 };
 
 // Send requests to Hugging Face API to create images
 const generateImages = async (selectedModel, imageCount, aspectRatio, promptText) => {
-  const MODEL_URL = `https://router.huggingface.co/hf-inference/models/${selectedModel}`;
+  const MODEL_URL = `https://api-inference.huggingface.co/models/${selectedModel}`;
   const { width, height } = getImageDimensions(aspectRatio);
   generateBtn.setAttribute("disabled", "true");
 
-  // Create an array of image generation promises
-  const imagePromises = Array.from({ length: imageCount }, async (_, i) => {
-    try {
-      // Send request to the AI model API
-      const response = await fetch(MODEL_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          "Content-Type": "application/json",
-          "x-use-cache": "false",
-        },
-        body: JSON.stringify({
-          inputs: promptText,
-          parameters: { width, height },
-        }),
-      });
+  const imagePromises = Array.from({ length: imageCount }, (_, i) => {
+    const imgCard = document.getElementById(`img-card-${i}`);
+    imgCard.classList.remove("error");
+    imgCard.classList.add("loading");
+    imgCard.querySelector(".status-text").textContent = "Generating...";
 
-      if (!response.ok) throw new Error((await response.json())?.error);
+    return (async () => {
+      try {
+        // Send request to the AI model API
+        const response = await fetch(MODEL_URL, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+            "x-use-cache": "false",
+          },
+          body: JSON.stringify({
+            inputs: promptText,
+            parameters: { width, height },
+          }),
+        });
 
-      // Convert response to an image URL and update the image card
-      const blob = await response.blob();
-      updateImageCard(i, URL.createObjectURL(blob));
-    } catch (error) {
-      console.error(error);
-      const imgCard = document.getElementById(`img-card-${i}`);
-      imgCard.classList.replace("loading", "error");
-      imgCard.querySelector(".status-text").textContent = "Generation failed! Check console for more details.";
-    }
+        if (!response.ok) throw new Error((await response.json())?.error);
+
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        updateImageCard(i, imageUrl);
+
+      } catch (error) {
+        console.error(error);
+        const imgCard = document.getElementById(`img-card-${i}`);
+        imgCard.classList.replace("loading", "error");
+        imgCard.querySelector(".status-text").textContent = "Generation failed! Check console for more details.";
+      }
+    })();
   });
 
   await Promise.allSettled(imagePromises);
@@ -176,5 +181,6 @@ promptBtn.addEventListener("click", () => {
   }, 10); // Speed of typing
 });
 
+// --- Firebase and Modal Logic ---
 themeToggle.addEventListener("click", toggleTheme);
 promptForm.addEventListener("submit", handleFormSubmit);
