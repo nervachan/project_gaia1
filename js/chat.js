@@ -32,6 +32,11 @@ const newMessageBtn = document.getElementById('new-message-btn');
 const modal = document.getElementById('new-message-modal');
 const closeModalBtn = document.getElementById('close-modal-btn');
 const modalUserList = document.getElementById('modal-user-list');
+const imageUploadBtn = document.getElementById('image-upload-btn');
+const imageUploadInput = document.createElement('input');
+imageUploadInput.type = 'file';
+imageUploadInput.accept = 'image/*';
+imageUploadInput.style.display = 'none';
 
 
 
@@ -95,17 +100,20 @@ function listenForMessages(chatId) {
     });
 }
 
-async function sendMessage() {
+async function sendMessage(imageData = null) {
     const messageText = messageInput.value.trim();
-    if (messageText && currentUser && currentChatId) {
+    if ((messageText || imageData) && currentUser && currentChatId) {
         const messagesRef = collection(db, 'chats', currentChatId, 'messages');
         try {
-            await addDoc(messagesRef, {
-                text: messageText,
+            const messageData = {
+                text: imageData || messageText,
                 uid: currentUser.uid,
                 displayName: currentUser.displayName || 'Anonymous',
-                timestamp: serverTimestamp()
-            });
+                timestamp: serverTimestamp(),
+                isImage: !!imageData
+            };
+            
+            await addDoc(messagesRef, messageData);
             messageInput.value = '';
         } catch (error) {
             console.error("Error sending message: ", error);
@@ -304,8 +312,44 @@ async function createNewChat(otherUserUid, otherUserName) {
     switchChat(chatId, otherUserName);
 }
 
+// --- IMAGE UPLOAD HANDLING ---
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        // Check if file is an image
+        if (!file.type.match('image.*')) {
+            alert('Please select an image file');
+            return;
+        }
+        
+        // Check file size (limit to 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should be less than 5MB');
+            return;
+        }
+        
+        // Send the image
+        sendMessage(e.target.result);
+    };
+    reader.readAsDataURL(file);
+    
+    // Reset the input to allow selecting the same file again
+    event.target.value = '';
+}
+
 // --- EVENT LISTENERS ---
-sendButton.addEventListener('click', sendMessage);
+sendButton.addEventListener('click', () => sendMessage());
+
+// Image upload button click handler
+imageUploadBtn.addEventListener('click', () => {
+    imageUploadInput.click();
+});
+
+// Handle file selection
+imageUploadInput.addEventListener('change', handleImageUpload);
 
 messageInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') sendMessage();
