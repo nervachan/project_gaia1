@@ -8,7 +8,7 @@ const modelSelect = document.getElementById("model-select");
 const countSelect = document.getElementById("count-select");
 const ratioSelect = document.getElementById("ratio-select");
 
-const API_KEY = "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"; // Hugging Face API Key
+
 
 // Example prompts
 const examplePrompts = [
@@ -88,7 +88,8 @@ const generateImages = async (selectedModel, imageCount, aspectRatio, promptText
     return (async () => {
       try {
         // Send request to the AI model API
-       const response = await fetch("http://localhost:3000/api/generate", {
+      const response = await fetch("https://project-gaia1.onrender.com/api/generate", {
+
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
