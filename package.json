@@ -1,7 +1,6 @@
 {
   "name": "project_gaia1",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,6 +18,10 @@
   },
   "homepage": "https://github.com/nervachan/project_gaia1#readme",
   "dependencies": {
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0"
-  }
+  },
+  "description": ""
 }

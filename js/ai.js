@@ -88,18 +88,23 @@ const generateImages = async (selectedModel, imageCount, aspectRatio, promptText
     return (async () => {
       try {
         // Send request to the AI model API
-        const response = await fetch(MODEL_URL, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${API_KEY}`,
-            "Content-Type": "application/json",
-            "x-use-cache": "false",
-          },
-          body: JSON.stringify({
-            inputs: promptText,
-            parameters: { width, height },
-          }),
-        });
+       const response = await fetch("http://localhost:3000/api/generate", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    promptText,
+    selectedModel,
+    width,
+    height
+  })
+});
+
+const result = await response.json();
+if (result.image) {
+  updateImageCard(i, result.image); // base64 image
+} else {
+  throw new Error(result.error || "No image returned");
+}
 
         if (!response.ok) throw new Error((await response.json())?.error);
 
