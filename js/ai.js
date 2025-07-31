@@ -8,7 +8,7 @@ const modelSelect = document.getElementById("model-select");
 const countSelect = document.getElementById("count-select");
 const ratioSelect = document.getElementById("ratio-select");
 
-
+const API_KEY = "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"; // Hugging Face API Key
 
 // Example prompts
 const examplePrompts = [
@@ -65,12 +65,16 @@ const getImageDimensions = (aspectRatio, baseSize = 512) => {
 const updateImageCard = (cardIndex, imageUrl) => {
   const imgCard = document.getElementById(`img-card-${cardIndex}`);
   imgCard.classList.replace("loading", "generated");
-  imgCard.innerHTML = `<img class="result-img" src="${imageUrl}" />
-                <div class="img-overlay">
-                  <a href="${imageUrl}" class="img-download-btn text-white bg-black bg-opacity-50 rounded-lg px-4 py-2 text-lg font-semibold" title="Download Image" download>
-                    Download
-                  </a>
-                </div>`;
+  imgCard.innerHTML = `
+    <div>
+      <img class="result-img" src="${imageUrl}" />
+      <div class="img-overlay">
+        <a href="${imageUrl}" class="img-download-btn text-white bg-black bg-opacity-50 rounded-lg px-4 py-2 text-lg font-semibold" title="Download Image" download>
+          Download
+        </a>
+      </div>
+    </div>
+  `;
 };
 
 // Send requests to Hugging Face API to create images
@@ -88,24 +92,18 @@ const generateImages = async (selectedModel, imageCount, aspectRatio, promptText
     return (async () => {
       try {
         // Send request to the AI model API
-      const response = await fetch("https://project-gaia1.onrender.com/api/generate", {
-
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    promptText,
-    selectedModel,
-    width,
-    height
-  })
-});
-
-const result = await response.json();
-if (result.image) {
-  updateImageCard(i, result.image); // base64 image
-} else {
-  throw new Error(result.error || "No image returned");
-}
+        const response = await fetch(MODEL_URL, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+            "x-use-cache": "false",
+          },
+          body: JSON.stringify({
+            inputs: promptText,
+            parameters: { width, height },
+          }),
+        });
 
         if (!response.ok) throw new Error((await response.json())?.error);
 
@@ -131,8 +129,8 @@ const createImageCards = (selectedModel, imageCount, aspectRatio, promptText) =>
   galleryGrid.innerHTML = "";
 
   for (let i = 0; i < imageCount; i++) {
-    galleryGrid.innerHTML += `
-      <div class="img-card loading" id="img-card-${i}" style="aspect-ratio: ${aspectRatio}">
+    galleryGrid.innerHTML += 
+      `<div class="img-card loading" id="img-card-${i}" style="aspect-ratio: ${aspectRatio}">
         <div class="status-container">
           <div class="spinner"></div>
           <i class="fa-solid fa-triangle-exclamation"></i>
@@ -188,5 +186,9 @@ promptBtn.addEventListener("click", () => {
 });
 
 // --- Firebase and Modal Logic ---
-themeToggle.addEventListener("click", toggleTheme);
-promptForm.addEventListener("submit", handleFormSubmit);
+if (themeToggle) {
+  themeToggle.addEventListener("click", toggleTheme);
+}
+if (promptForm) {
+  promptForm.addEventListener("submit", handleFormSubmit);
+}
