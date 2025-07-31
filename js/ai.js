@@ -8,7 +8,7 @@ const modelSelect = document.getElementById("model-select");
 const countSelect = document.getElementById("count-select");
 const ratioSelect = document.getElementById("ratio-select");
 
-const API_KEY = "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"; // Hugging Face API Key
+const API_KEY = "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"; // Hugging Face API Key
 
 // Example prompts
 const examplePrompts = [
