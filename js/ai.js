@@ -87,8 +87,10 @@ const generateImages = async (selectedModel, imageCount, aspectRatio, promptText
     const imgCard = document.getElementById(`img-card-${i}`);
     imgCard.classList.remove("error");
     imgCard.classList.add("loading");
-    imgCard.querySelector(".status-text").textContent = "Generating...";
-
+    const statusText = imgCard.querySelector(".status-text");
+    if (statusText) {
+      statusText.textContent = "Generating...";
+    }
     return (async () => {
       try {
         // Send request to the AI model API
