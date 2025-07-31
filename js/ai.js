@@ -8,7 +8,8 @@ const modelSelect = document.getElementById("model-select");
 const countSelect = document.getElementById("count-select");
 const ratioSelect = document.getElementById("ratio-select");
 
-const API_KEY = "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"; // Hugging Face API Key
+const BACKEND_URL = "https://ai-backend-server-dp2z.onrender.com/generate-image";
+
 
 // Example prompts
 const examplePrompts = [
@@ -79,7 +80,7 @@ const updateImageCard = (cardIndex, imageUrl) => {
 
 // Send requests to Hugging Face API to create images
 const generateImages = async (selectedModel, imageCount, aspectRatio, promptText) => {
-  const MODEL_URL = `https://api-inference.huggingface.co/models/${selectedModel}`;
+  
   const { width, height } = getImageDimensions(aspectRatio);
   generateBtn.setAttribute("disabled", "true");
 
@@ -94,18 +95,18 @@ const generateImages = async (selectedModel, imageCount, aspectRatio, promptText
     return (async () => {
       try {
         // Send request to the AI model API
-        const response = await fetch(MODEL_URL, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${API_KEY}`,
-            "Content-Type": "application/json",
-            "x-use-cache": "false",
-          },
-          body: JSON.stringify({
-            inputs: promptText,
-            parameters: { width, height },
-          }),
-        });
+        const response = await fetch(BACKEND_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    model: selectedModel,
+    prompt: promptText,
+    width,
+    height,
+  }),
+});
 
         if (!response.ok) throw new Error((await response.json())?.error);
 
