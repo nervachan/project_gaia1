@@ -91,14 +91,16 @@
             </div>
           </div>
         </div>
-      
-      
+      </nav>
 </header>
 
 
-<div class="searchBox flex items-center bg-gray-100 p-4 rounded-lg shadow-lg">
-  <input class="searchInput flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none" type="text" name="" placeholder="Search something">
-  <button class="searchButton p-2 bg-blue-500 hover:bg-blue-700 text-white rounded-r-lg flex items-center justify-center" href="#">
+<div class="searchBox flex flex-col sm:flex-row gap-2 sm:gap-0 items-stretch sm:items-center bg-gray-100 p-4 rounded-lg shadow-lg mx-4 mt-4">
+
+  <input class="searchInput w-full sm:flex-grow p-2 sm:rounded-l-lg rounded-lg border border-gray-300 focus:outline-none">
+
+ <button class="searchButton w-full sm:w-auto p-2 bg-blue-500 hover:bg-blue-700 text-white sm:rounded-r-lg rounded-lg flex items-center justify-center">
+
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 29 29" fill="none">
           <g clip-path="url(#clip0_2_17)">
               <g filter="url(#filter0_d_2_17)">
@@ -126,7 +128,7 @@
 
  <!-- Notification Modal -->
  <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-  <div class="bg-white rounded-lg w-96 p-6 shadow-lg">
+ <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
       <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-semibold text-gray-700">Notifications</h2>
           <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
@@ -196,7 +198,7 @@
 
   <!-- View Detils Modal Structure -->
 <div id="listing-modal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
-  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+<div id="listing-modal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
       <h3 id="modal-title" class="text-xl font-semibold text-gray-800 mb-4"></h3>
       <div id="modal-content" class="text-gray-600 mb-4"></div>
       <button id="close-modal" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Close</button>
