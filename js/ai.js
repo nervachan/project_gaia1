@@ -13,21 +13,21 @@ const BACKEND_URL = "https://ai-backend-server-dp2z.onrender.com/generate-image"
 
 // Example prompts
 const examplePrompts = [
-  "A magic forest with glowing plants and fairy homes among giant mushrooms",
-  "An old steampunk airship floating through golden clouds at sunset",
-  "A future Mars colony with glass domes and gardens against red mountains",
-  "A dragon sleeping on gold coins in a crystal cave",
-  "An underwater kingdom with merpeople and glowing coral buildings",
-  "A floating island with waterfalls pouring into clouds below",
-  "A witch's cottage in fall with magic herbs in the garden",
-  "A robot painting in a sunny studio with art supplies around it",
-  "A magical library with floating glowing books and spiral staircases",
-  "A Japanese shrine during cherry blossom season with lanterns and misty mountains",
-  "A cosmic beach with glowing sand and an aurora in the night sky",
-  "A medieval marketplace with colorful tents and street performers",
-  "A cyberpunk city with neon signs and flying cars at night",
-  "A peaceful bamboo forest with a hidden ancient temple",
-  "A giant turtle carrying a village on its back in the ocean",
+   "A sleek black tuxedo with modern silver lapels and a deep blue pocket square for an upscale evening event",
+  "A flowing rose gold gown with off-shoulder sleeves and embroidered floral patterns for a spring wedding",
+  "An all-white minimalist suit with a slim fit, perfect for a contemporary civil wedding",
+  "A royal blue ball gown with crystal embellishments and a dramatic trailing skirt designed for a debutante",
+  "A classic three-piece charcoal suit with a maroon tie and leather oxford shoes for a formal business gala",
+  "An emerald green satin gown with a plunging neckline and open back, ideal for an awards night",
+  "A vintage-inspired tuxedo with velvet fabric and rounded collars, reminiscent of 1950s Hollywood",
+  "A champagne-colored halter gown with high slits and shimmering details suited for a red carpet event",
+  "A bohemian-style lace gown with bell sleeves and soft beige tones for a garden wedding",
+  "A sharp double-breasted navy blue suit with gold buttons and tan loafers for a seaside wedding",
+  "A black and gold embroidered sherwani paired with cream trousers for a South Asian wedding ceremony",
+  "A high-slit maroon gown with one-shoulder design and gold jewelry accessories for a cocktail event",
+  "A crisp beige suit with pastel accents for a summer formal outdoor gathering",
+  "An asymmetrical couture gown with metallic fabric and structured shoulder pads for a fashion-forward gala",
+  "A traditional Filipiniana-inspired gown with modern embroidery and butterfly sleeves for cultural formal events",
 ];
 
 // Set theme based on saved preference or system default
