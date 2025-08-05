@@ -90,7 +90,7 @@ const generateImages = async (selectedModel, imageCount, aspectRatio, promptText
     imgCard.classList.add("loading");
     const statusText = imgCard.querySelector(".status-text");
     if (statusText) {
-      statusText.textContent = "Generating...";
+      statusText.textContent = "The first image generation may take a while...";
     }
     return (async () => {
       try {
