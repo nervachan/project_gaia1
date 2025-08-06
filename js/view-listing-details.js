@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { loader } from './loader.js';
 
 const firebaseConfig = {
     apiKey: "AIzaSyC7eaM6HrHalV-wcG-I9_RZJRwDNhin2R0",
@@ -17,6 +18,7 @@ console.log("Initializing Firebase...");
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
+let currentListingSellerId = null; // Store sellerId for use in form submission
 
 console.log("Extracting listingId from URL...");
 const urlParams = new URLSearchParams(window.location.search);
@@ -79,7 +81,10 @@ async function fetchListingDetails() {
   try {
     console.log("Fetching listing details for listingId:", listingId);
     const docRef = doc(db, 'listed_items', listingId);
-    const docSnap = await getDoc(docRef);
+    const docSnap = await loader.withLoader(
+      async () => await getDoc(docRef),
+      "Loading listing details..."
+    );
 
     if (docSnap.exists()) {
       const listing = docSnap.data();
@@ -326,8 +331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const rentalsQuery = query(
         collection(db, 'rentals'),
-        where('listingId', '==', listingId),
-        
+        where('listingId', '==', listingId)
       );
       const querySnapshot = await getDocs(rentalsQuery);
       querySnapshot.forEach(docSnap => {
@@ -389,74 +393,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     console.log('[Flatpickr] Initialized on rental-start-date and rental-end-date with pending dates:', pendingDates);
   }
+
+  // Rental form submission
+  const rentalForm = document.getElementById('rental-form');
+  if (rentalForm) {
+    rentalForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      await loader.withLoader(async () => {
+        try {
+          const user = auth.currentUser;
+          if (!user) {
+            alert('Please log in to submit a rental request.');
+            window.location.href = 'buyer-login.html';
+            return;
+          }
+
+          const rentalName = document.getElementById('rental-name').value;
+          const rentalStartDate = document.getElementById('rental-start-date').value;
+          const rentalEndDate = document.getElementById('rental-end-date').value;
+          const totalPrice = document.getElementById('rental-total').value;
+
+          if (!rentalName || !rentalStartDate || !rentalEndDate) {
+            alert('Please fill in all required fields.');
+            return;
+          }
+
+          // Create rental data with listingId
+          const rentalData = {
+            listingId: listingId,
+            renterId: user.uid,
+            renterName: rentalName,
+            startDate: rentalStartDate,
+            endDate: rentalEndDate,
+            totalPrice: totalPrice,
+            status: 'pending',
+            createdAt: new Date()
+          };
+
+          console.log('[Rental] Submitting rental data:', rentalData);
+
+          // Add rental to Firestore
+          await addDoc(collection(db, 'rentals'), rentalData);
+          
+          alert('Rental submitted successfully!');
+          console.log('[Rental] Rental submitted successfully:', rentalData);
+          
+          // Reset form and hide rental section
+          rentalForm.reset();
+          document.getElementById('rental-form-section').classList.add('hidden');
+          
+          // Refresh pending dates
+          highlightPendingRentalDates(listingId);
+          
+        } catch (error) {
+          console.error('[Rental] Error submitting rental:', error);
+          alert('Failed to submit rental. Please try again.');
+        }
+      }, "Processing rental request...");
+    });
+  }
 });
-
-// Fetch rental form data on submit
-const rentalForm = document.getElementById('rental-form');
-let currentListingSellerId = null; // Store sellerId for use in form submission
-
-if (rentalForm) {
-  rentalForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    // Fetch values from form inputs
-    const userName = document.getElementById('rental-name')?.value?.trim() || '';
-    const startDate = document.getElementById('rental-start-date')?.value?.trim() || '';
-    const endDate = document.getElementById('rental-end-date')?.value?.trim() || '';
-    const rentPrice = document.getElementById('rental-price')?.value?.trim() || '';
-    const totalPrice = document.getElementById('rental-total')?.value?.trim() || '';
-
-    // Get logged in user's UID
-    let userUid = null;
-    try {
-      userUid = auth.currentUser ? auth.currentUser.uid : null;
-    } catch (authErr) {
-      console.warn('[Auth] Could not get user UID:', authErr);
-    }
-
-    // Fetch listing name and image[0]
-    let listingName = '';
-    let listingImage = '';
-    try {
-      const docRef = doc(db, 'listed_items', listingId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const listing = docSnap.data();
-        listingName = listing.productName || '';
-        listingImage = (listing.images && listing.images.length > 0) ? listing.images[0] : '';
-      }
-    } catch (listingErr) {
-      console.warn('[Firestore] Could not fetch listing for rental form:', listingErr);
-    }
-
-    const rentalFormData = {
-      userName,
-      startDate,
-      endDate,
-      rentPrice,
-      totalPrice,
-      listingId, 
-      sellerId: currentListingSellerId,
-      userUid, // Add UID to Firestore
-      status:'for preparation', // Default status
-      listingName, // Add listing name
-      listingImage // Add listing image index 0
-    };
-
-    console.log('[Event] Rental form submitted. Data:', rentalFormData);
-
-    // Push to Firestore "rentals" collection
-    try {
-      await addDoc(collection(db, 'rentals'), rentalFormData);
-      console.log('[Firestore] Rental data added to rentals collection.');
-      alert('Rental submitted successfully!');
-      rentalForm.reset();
-      location.reload(); // Reload the page to reflect changes
-    } catch (error) {
-      console.error('[Firestore] Error adding rental:', error);
-      alert('Failed to submit rental.');
-    }
-  });
-}
 
 // Load listing details on page load
 console.log("Calling fetchListingDetails...");

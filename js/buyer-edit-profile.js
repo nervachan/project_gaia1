@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAuth, updateProfile, onAuthStateChanged, updateEmail } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { loader } from './loader.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -23,7 +24,10 @@ const db = getFirestore(app);
 const fetchAndInjectUserData = async (email) => {
     try {
         const q = query(collection(db, "user-buyer"), where("email", "==", email));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await loader.withLoader(
+            () => getDocs(q),
+            "Loading profile data..."
+        );
 
         if (!querySnapshot.empty) {
             const userDoc = querySnapshot.docs[0];
@@ -115,12 +119,18 @@ document.getElementById("save-edit-username").addEventListener("click", async (e
     if (user) {
         try {
             // Update the username in Firebase Authentication
-            await updateProfile(user, { displayName: newUsername });
+            await loader.withLoader(
+                () => updateProfile(user, { displayName: newUsername }),
+                "Updating username..."
+            );
             console.log("Username updated in Firebase Auth:", newUsername);
 
             // Query Firestore to find the document for the logged-in user
             const q = query(collection(db, "user-buyer"), where("email", "==", user.email));
-            const querySnapshot = await getDocs(q);
+            const querySnapshot = await loader.withLoader(
+                () => getDocs(q),
+                "Updating profile..."
+            );
 
             if (!querySnapshot.empty) {
                 // Get the first matched document
@@ -128,7 +138,10 @@ document.getElementById("save-edit-username").addEventListener("click", async (e
                 const userDocRef = userDoc.ref;
 
                 // Update the username in Firestore
-                await updateDoc(userDocRef, { username: newUsername });
+                await loader.withLoader(
+                    () => updateDoc(userDocRef, { username: newUsername }),
+                    "Finalizing update..."
+                );
                 console.log("Username updated in Firestore:", newUsername);
 
                 // Update the username in the UI

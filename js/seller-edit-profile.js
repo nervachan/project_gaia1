@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { loader } from './loader.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -23,7 +24,10 @@ const db = getFirestore(app);
 const fetchAndInjectUserData = async (email) => {
     try {
         const q = query(collection(db, "user-seller"), where("email", "==", email));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await loader.withLoader(
+            () => getDocs(q),
+            "Loading profile data..."
+        );
 
         if (!querySnapshot.empty) {
             const userDoc = querySnapshot.docs[0];
@@ -47,14 +51,20 @@ const fetchAndInjectUserData = async (email) => {
 const updateFieldByUID = async (uid, field, newValue) => {
     try {
         const q = query(collection(db, "user-seller"), where("uid", "==", uid));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await loader.withLoader(
+            () => getDocs(q),
+            "Loading profile..."
+        );
 
         if (!querySnapshot.empty) {
             const userDoc = querySnapshot.docs[0];
             const userDocRef = doc(db, "user-seller", userDoc.id);
 
             // Update the specified field
-            await updateDoc(userDocRef, { [field]: newValue });
+            await loader.withLoader(
+                () => updateDoc(userDocRef, { [field]: newValue }),
+                `Updating ${field}...`
+            );
             console.log(`${field} updated successfully in Firestore.`);
             alert(`${field} updated successfully!`);
             location.reload(); // Refresh the page after the alert

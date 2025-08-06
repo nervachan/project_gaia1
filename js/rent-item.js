@@ -2,6 +2,7 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { loader } from './loader.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -23,7 +24,10 @@ const auth = getAuth(app);
 // Utility to get listing data by listingId
 async function getListingById(listingId) {
     const docRef = doc(db, 'listed_items', listingId);
-    const docSnap = await getDoc(docRef);
+    const docSnap = await loader.withLoader(
+        () => getDoc(docRef),
+        "Loading listing data..."
+    );
     if (docSnap.exists()) {
         return { doc: docSnap.ref, data: docSnap.data(), id: docSnap.id };
     }
@@ -55,12 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchAndDisplayRentPrice() {
         if (!listingId) return;
         console.log('[Event] Fetching rent price for listingId:', listingId);
-        const listing = await getListingById(listingId);
-        if (listing && listing.data.rentPrice) {
-            rentPrice = listing.data.rentPrice;
-            if (rentalPriceInput) rentalPriceInput.value = `${rentPrice}/day`;
-            console.log('[Event] Rent price fetched:', rentPrice);
-        }
+        await loader.withLoader(async () => {
+            const listing = await getListingById(listingId);
+            if (listing && listing.data.rentPrice) {
+                rentPrice = listing.data.rentPrice;
+                if (rentalPriceInput) rentalPriceInput.value = `${rentPrice}/day`;
+                console.log('[Event] Rent price fetched:', rentPrice);
+            }
+        }, "Loading listing details...");
     }
 
     // Helper: Get all reserved dates for this listing
@@ -71,7 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
             collection(db, 'rentals'),
             where('listingId', '==', listingId)
         );
-        const querySnapshot = await getDocs(rentalsQuery);
+        const querySnapshot = await loader.withLoader(
+            () => getDocs(rentalsQuery),
+            "Loading reserved dates..."
+        );
         querySnapshot.forEach(docSnap => {
             const rental = docSnap.data();
             let start = rental.startDate;
@@ -149,79 +158,82 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         console.log('[Event] Rental form submitted');
 
-        // Validate required fields
-        const userName = userNameInput ? userNameInput.value.trim() : '';
-        const start = rentalStartDate ? rentalStartDate.value.trim() : '';
-        const end = rentalEndDate ? rentalEndDate.value.trim() : '';
-        const priceStr = rentalPriceInput ? rentalPriceInput.value.trim() : '';
-        const totalStr = totalPriceElement ? totalPriceElement.value.trim() : '';
+        await loader.withLoader(async () => {
+            // Validate required fields
+            const userName = userNameInput ? userNameInput.value.trim() : '';
+            const start = rentalStartDate ? rentalStartDate.value.trim() : '';
+            const end = rentalEndDate ? rentalEndDate.value.trim() : '';
+            const priceStr = rentalPriceInput ? rentalPriceInput.value.trim() : '';
+            const totalStr = totalPriceElement ? totalPriceElement.value.trim() : '';
 
-        if (!userName || !start || !end || !priceStr || !totalStr || !listingId) {
-            alert('Please fill in all required fields.');
-            console.log('[Error] Rental form validation failed');
-            return;
-        }
+            if (!userName || !start || !end || !priceStr || !totalStr || !listingId) {
+                alert('Please fill in all required fields.');
+                console.log('[Error] Rental form validation failed');
+                return;
+            }
 
-        // Get numeric values
-        const rentPriceNum = parseFloat(priceStr.replace(/[^0-9.]/g, ''));
-        const totalPriceNum = parseFloat(totalStr.replace(/[^0-9.]/g, ''));
+            // Get numeric values
+            const rentPriceNum = parseFloat(priceStr.replace(/[^0-9.]/g, ''));
+            const totalPriceNum = parseFloat(totalStr.replace(/[^0-9.]/g, ''));
 
-        // Get listing data by listingId
-        const listing = await getListingById(listingId);
-        if (!listing) {
-            alert('Listing not found.');
-            console.log('[Error] Listing not found for listingId:', listingId);
-            return;
-        }
+            // Get listing data by listingId
+            const listing = await getListingById(listingId);
+            if (!listing) {
+                alert('Listing not found.');
+                console.log('[Error] Listing not found for listingId:', listingId);
+                return;
+            }
 
-        // Get image and sellerId
-        const image = listing.data.images && listing.data.images.length > 0 ? listing.data.images[0] : '';
-        const sellerId = listing.data.sellerId || '';
-        if (!image || !sellerId) {
-            alert('Listing data incomplete.');
-            console.log('[Error] Listing data incomplete');
-            return;
-        }
+            // Get image and sellerId
+            const image = listing.data.images && listing.data.images.length > 0 ? listing.data.images[0] : '';
+            const sellerId = listing.data.sellerId || '';
+            if (!image || !sellerId) {
+                alert('Listing data incomplete.');
+                console.log('[Error] Listing data incomplete');
+                return;
+            }
 
-        // Get logged-in user
-        const user = auth.currentUser;
-        if (!user) {
-            alert('You must be logged in to rent an item.');
-            console.log('[Error] User not logged in');
-            return;
-        }
-        const userId = user.uid;
+            // Get logged-in user
+            const user = auth.currentUser;
+            if (!user) {
+                alert('You must be logged in to rent an item.');
+                console.log('[Error] User not logged in');
+                return;
+            }
+            const userId = user.uid;
 
-        // Prepare rental data
-        const rentalData = {
-            name: userName,
-            startDate: start,
-            endDate: end,
-            finalPrice: totalPriceNum,
-            rentPrice: rentPriceNum,
-            image: image,
-            status: 'for preparation',
-            listingName: listing.data.productName || '',
-            sellerId: sellerId,
-            buyerId: userId,
-            listingId: listing.id,
-            createdAt: new Date()
-        };
+            // Prepare rental data
+            const rentalData = {
+                name: userName,
+                startDate: start,
+                endDate: end,
+                finalPrice: totalPriceNum,
+                rentPrice: rentPriceNum,
+                image: image,
+                status: 'for preparation',
+                listingName: listing.data.productName || '',
+                sellerId: sellerId,
+                buyerId: userId,
+                listingId: listing.id,
+                createdAt: new Date()
+            };
 
-        try {
-            // Add rental to Firestore
-            await addDoc(collection(db, 'rentals'), rentalData);
-            // Set listing as inactive
-            await updateDoc(listing.doc, { isActive: false });
-            alert('Rental submitted successfully!');
-            console.log('[Success] Rental submitted:', rentalData);
-            rentalForm.reset();
-            if (totalPriceElement) totalPriceElement.value = "₱0.00";
-        } catch (error) {
-            console.error('Error submitting rental:', error);
-            alert('Failed to submit rental.');
-            console.log('[Error] Rental submission failed');
-        }
+            try {
+                // Add rental to Firestore
+                await addDoc(collection(db, 'rentals'), rentalData);
+                // Set listing as inactive
+                await updateDoc(listing.doc, { isActive: false });
+                
+                alert('Rental submitted successfully!');
+                console.log('[Success] Rental submitted:', rentalData);
+                rentalForm.reset();
+                if (totalPriceElement) totalPriceElement.value = "₱0.00";
+            } catch (error) {
+                console.error('Error submitting rental:', error);
+                alert('Failed to submit rental.');
+                console.log('[Error] Rental submission failed');
+            }
+        }, "Processing rental...");
     });
 
     // Initialize

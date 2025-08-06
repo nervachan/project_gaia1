@@ -3,6 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
 import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { loader } from './loader.js';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -147,59 +148,68 @@ document.addEventListener('DOMContentLoaded', () => {
         // Process each image and convert to base64
         const imageBase64Array = [];
 
-        for (const imageFile of imageFiles) {
-            const reader = new FileReader();
-            reader.onloadend = async function () {
-                const img = new Image();
-                img.src = reader.result;
+        try {
+            await loader.withLoader(async () => {
+                for (const imageFile of imageFiles) {
+                    const reader = new FileReader();
+                    
+                    const imagePromise = new Promise((resolve, reject) => {
+                        reader.onloadend = function () {
+                            const img = new Image();
+                            img.src = reader.result;
 
-                img.onload = async function () {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
+                            img.onload = function () {
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
 
-                    const maxWidth = 800;
-                    const maxHeight = 800;
-                    let width = img.width;
-                    let height = img.height;
+                                const maxWidth = 800;
+                                const maxHeight = 800;
+                                let width = img.width;
+                                let height = img.height;
 
-                    if (width > height) {
-                        if (width > maxWidth) {
-                            height *= maxWidth / width;
-                            width = maxWidth;
-                        }
-                    } else {
-                        if (height > maxHeight) {
-                            width *= maxHeight / height;
-                            height = maxHeight;
-                        }
-                    }
+                                if (width > height) {
+                                    if (width > maxWidth) {
+                                        height *= maxWidth / width;
+                                        width = maxWidth;
+                                    }
+                                } else {
+                                    if (height > maxHeight) {
+                                        width *= maxHeight / height;
+                                        height = maxHeight;
+                                    }
+                                }
 
-                    canvas.width = width;
-                    canvas.height = height;
+                                canvas.width = width;
+                                canvas.height = height;
 
-                    ctx.drawImage(img, 0, 0, width, height);
+                                ctx.drawImage(img, 0, 0, width, height);
 
-                    const downscaledImage = canvas.toDataURL('image/jpeg');
-                    imageBase64Array.push(downscaledImage);
+                                const downscaledImage = canvas.toDataURL('image/jpeg');
+                                imageBase64Array.push(downscaledImage);
+                                resolve();
+                            };
 
-                    if (imageBase64Array.length === imageFiles.length) {
-                        listingData.images = imageBase64Array;
+                            img.onerror = reject;
+                        };
+                        reader.onerror = reject;
+                    });
 
-                        try {
-                            // Add the document to Firestore with the generated ID
-                            await setDoc(newListingRef, listingData);
-                            console.log("Listing added successfully!");
+                    reader.readAsDataURL(imageFile);
+                    await imagePromise;
+                }
 
-                            confirmationModal.classList.add('hidden');
-                            window.location.href = 'seller-hub-main.html';
-                        } catch (error) {
-                            console.error("Error adding document: ", error);
-                        }
-                    }
-                };
-            };
+                listingData.images = imageBase64Array;
 
-            reader.readAsDataURL(imageFile);
+                // Add the document to Firestore with the generated ID
+                await setDoc(newListingRef, listingData);
+                console.log("Listing added successfully!");
+
+                confirmationModal.classList.add('hidden');
+                window.location.href = 'seller-hub-main.html';
+            }, "Creating listing...");
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            alert("Error creating listing. Please try again.");
         }
     });
 });

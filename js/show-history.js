@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getFirestore, getDoc, doc, setDoc, deleteDoc, updateDoc, query, collection, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { loader } from './loader.js';
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -24,7 +25,9 @@ window.onload = () => {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("User is logged in:", user);
-            showRentalHistory(user.uid); // Show history for the logged-in user
+            loader.withLoader(async () => {
+                await showRentalHistory(user.uid); // Show history for the logged-in user
+            }, "Loading rental history...");
         } else {
             console.log("No user is logged in.");
         }
@@ -101,10 +104,12 @@ function createRentalHistoryElement(rentalData) {
     // Add the event listener for the Submit Review button
     const submitReviewButton = rentalElement.querySelector('button');
     if (submitReviewButton) {
-        submitReviewButton.addEventListener('click', (e) => {
+        submitReviewButton.addEventListener('click', async (e) => {
             const rentalId = e.target.getAttribute('data-rental-id');
             const sellerId = e.target.getAttribute('data-seller-id');
-            submitBuyerReview(rentalId, sellerId);
+            loader.withLoader(async () => {
+                await submitBuyerReview(rentalId, sellerId);
+            }, "Submitting review...");
         });
     }
 
@@ -130,7 +135,7 @@ async function submitBuyerReview(rentalId, sellerId) {
         }
 
         const rentalData = rentalSnapshot.data();
-        const { listingName, name, listingId } = rentalData; // 👈 Destructure listingId as well
+        const { listingName, name, listingId } = rentalData; // 
 
         // Step 2: Store the review in the 'reviews' collection
         await setDoc(doc(db, "reviews", rentalId), {
@@ -151,7 +156,9 @@ async function submitBuyerReview(rentalId, sellerId) {
         // Step 4: Refresh rental history
         const user = auth.currentUser;
         if (user) {
-            showRentalHistory(user.uid);
+            loader.withLoader(async () => {
+                await showRentalHistory(user.uid);
+            }, "Refreshing rental history...");
         }
     } catch (error) {
         console.error("Error submitting buyer review:", error);

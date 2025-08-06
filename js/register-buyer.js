@@ -3,8 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
 import { getFirestore, collection, addDoc, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"; 
-
-
+import { loader } from './loader.js';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -30,34 +29,34 @@ const auth = getAuth(app);
 
 //registerhandler
 
-document.getElementById('buyerForm').addEventListener('submit', function(event) {
+document.getElementById('buyerForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
     const username = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    // Create user with email and password
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Signed up
+    try {
+        await loader.withLoader(async () => {
+            // Create user with email and password
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
             // Store user data in Firestore, including the auth UID
-            return setDoc(doc(db, "user-buyer", user.uid), {
+            await setDoc(doc(db, "user-buyer", user.uid), {
                 uid: user.uid, // Add the UID
                 username: username, // User's name
                 email: email, // Email address
-                role: "buyer" // Role
+                role: "buyer", // Role
+                createdAt: new Date()
             });
-        })
-        .then(() => {
+
             alert('User signed up successfully! Redirecting to login page...');
             document.getElementById('buyerForm').reset();
             window.location.href = "index.html"; // Redirect to login page
-        })
-        .catch((error) => {
-            console.error('Error signing up:', error.message);
-            alert('Error signing up: ' + error.message);
-        });
+        }, "Registering account...");
+    } catch (error) {
+        console.error('Error signing up:', error.message);
+        alert('Error signing up: ' + error.message);
+    }
 });

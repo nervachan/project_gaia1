@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { loader } from './loader.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -55,20 +56,26 @@ document.getElementById('login-form').addEventListener('submit', function(event)
             // Set persistence to LOCAL before signing in
             return setPersistence(auth, browserLocalPersistence)
               .then(() => {
-                // Sign in with email and password
-                return signInWithEmailAndPassword(auth, email, password);
-              })
-              .then((userCredential) => {
-                  console.log('User signed in:', userCredential.user);
+                try {
+                  loader.withLoader(async () => {
+                    // Sign in with email and password
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    console.log('User signed in:', user);
 
-                  // Redirect based on user type (buyer or seller)
-                  if (userType === "buyer") {
-                    window.location.href = 'buyer-login.html'; // Corrected redirect for buyer
-                  } else if (userType === "seller") {
-                    window.location.href = 'seller-hub-main.html'; // Corrected redirect for seller
-                  }
+                    // Redirect based on user type (buyer or seller)
+                    if (userType === "buyer") {
+                      window.location.href = 'buyer-login.html'; // Corrected redirect for buyer
+                    } else if (userType === "seller") {
+                      window.location.href = 'seller-hub-main.html'; // Corrected redirect for seller
+                    }
 
-                  alert('Sign-in successful!');
+                    alert('Sign-in successful!');
+                  }, "Signing in...");
+                } catch (error) {
+                  console.error('Error during sign-in:', error.message);
+                  alert('Sign-in failed: ' + error.message);
+                }
               })
               .catch((error) => {
                   console.error('Error during sign-in:', error.message);

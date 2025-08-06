@@ -2,7 +2,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
 import { getFirestore, collection, addDoc, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"; 
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { loader } from './loader.js'; 
 
 
 
@@ -29,38 +30,38 @@ const auth = getAuth(app);
 
 //registerhandler
 
-document.getElementById('sellerForm').addEventListener('submit', function(event) {
+document.getElementById('sellerForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const username = document.getElementById('shop-name').value.trim();
-    const loginname = document.getElementById('username').value.trim();
+    const username = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
-    const shopaddress = document.getElementById('shop-address').value.trim();
     const password = document.getElementById('password').value.trim();
+    const shopname = document.getElementById('shopname').value.trim();
+    const shopaddress = document.getElementById('shopaddress').value.trim();
 
-    // Create user with email and password
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Signed up
+    try {
+        await loader.withLoader(async () => {
+            // Create user with email and password
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
             // Store user data in Firestore, including the auth UID
-            return setDoc(doc(db, "user-seller", user.uid), {
+            await setDoc(doc(db, "user-seller", user.uid), {
                 uid: user.uid, // Add the UID
-                shopname: username,
-                username: loginname,
-                email: email,
-                shopaddress: shopaddress,
-                role: "seller"
+                username: username, // User's name
+                email: email, // Email address
+                shopname: shopname, // Shop name
+                shopaddress: shopaddress, // Shop address
+                role: "seller", // Role
+                createdAt: new Date()
             });
-        })
-        .then(() => {
-            alert('User signed up successfully! Redirecting to login page...');
+
+            alert('Seller signed up successfully! Redirecting to login page...');
             document.getElementById('sellerForm').reset();
             window.location.href = "index.html"; // Redirect to login page
-        })
-        .catch((error) => {
-            console.error('Error signing up:', error.message);
-            alert('Error signing up: ' + error.message);
-        });
+        }, "Registering seller account...");
+    } catch (error) {
+        console.error('Error signing up:', error.message);
+        alert('Error signing up: ' + error.message);
+    }
 });
