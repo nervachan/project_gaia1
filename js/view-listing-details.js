@@ -316,7 +316,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Calculate and inject total price
   function calculateTotalPrice() {
     if (startDateValue && endDateValue) {
-      const days = Math.ceil((endDateValue - startDateValue) / (1000 * 60 * 60 * 24));
+      const diffTime = endDateValue.getTime() - startDateValue.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+      const days = diffDays >= 0 ? diffDays + 1 : 0;
       rentPriceValue = getRentPrice();
       const total = days > 0 ? days * rentPriceValue : 0;
       if (totalPriceElement) totalPriceElement.value = `₱${total.toFixed(2)}`;
@@ -339,14 +341,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         let start = rental.startDate;
         let end = rental.endDate;
         if (start && end) {
-          if (typeof start === 'object' && start.seconds) start = new Date(start.seconds * 1000);
-          else start = new Date(start);
-          if (typeof end === 'object' && end.seconds) end = new Date(end.seconds * 1000);
-          else end = new Date(end);
-          let d = new Date(start);
-          while (d <= end) {
-            pendingDates.push(d.toISOString().split('T')[0]);
-            d.setDate(d.getDate() + 1);
+          let startStr, endStr;
+          if (typeof start === 'string') {
+              startStr = start;
+          } else { // Old format: Firestore Timestamp
+              startStr = flatpickr.formatDate(start.toDate(), "Y-m-d");
+          }
+          if (typeof end === 'string') {
+              endStr = end;
+          } else { // Old format: Firestore Timestamp
+              endStr = flatpickr.formatDate(end.toDate(), "Y-m-d");
+          }
+          let currentDate = flatpickr.parseDate(startStr, "Y-m-d");
+          const lastDate = flatpickr.parseDate(endStr, "Y-m-d");
+          if (currentDate && lastDate) {
+              while (currentDate <= lastDate) {
+                  pendingDates.push(flatpickr.formatDate(currentDate, "Y-m-d"));
+                  currentDate.setDate(currentDate.getDate() +1 );
+              }
           }
         }
       });
@@ -363,7 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       dateFormat: "Y-m-d",
       // Do not use disable, just color the days
       onDayCreate: function(dObj, dStr, fp, dayElem) {
-        const dateStr = dayElem.dateObj.toISOString().split('T')[0];
+        const dateStr = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
         if (pendingDates.includes(dateStr)) {
           dayElem.classList.add('bg-red-500', 'text-white');
           dayElem.style.pointerEvents = 'none'; // Prevent selection
@@ -379,7 +391,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       dateFormat: "Y-m-d",
      
       onDayCreate: function(dObj, dStr, fp, dayElem) {
-        const dateStr = dayElem.dateObj.toISOString().split('T')[0];
+        const dateStr = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
         if (pendingDates.includes(dateStr)) {
           dayElem.classList.add('bg-red-500', 'text-white');
           dayElem.style.pointerEvents = 'none'; // Prevent selection
@@ -424,8 +436,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             listingId: listingId,
             renterId: user.uid,
             renterName: rentalName,
-            startDate: rentalStartDate,
-            endDate: rentalEndDate,
+            startDate: flatpickr.formatDate(new Date(rentalStartDate), "Y-m-d"),
+            endDate: flatpickr.formatDate(new Date(rentalEndDate), "Y-m-d"),
             totalPrice: totalPrice,
             status: 'pending',
             createdAt: new Date()
@@ -440,7 +452,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           console.log('[Rental] Rental submitted successfully:', rentalData);
           
           // Reset form and hide rental section
-          rentalForm.reset();
+          window.location.href = 'buyer-login.html';
           document.getElementById('rental-form-section').classList.add('hidden');
           
           // Refresh pending dates

@@ -79,11 +79,12 @@ document.getElementById("buyer-username-edit").addEventListener("click", () => {
     showModal("edit-modal-username");
 });
 
+
+
+// Event listener for cancel button in the username modal
 document.getElementById("buyer-email-edit").addEventListener("click", () => {
     showModal("edit-modal-email");
 });
-
-// Event listener for cancel button in the username modal
 document.getElementById("cancel-edit-username").addEventListener("click", () => {
     hideModal("edit-modal-username");
 });

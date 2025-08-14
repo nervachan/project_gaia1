@@ -86,14 +86,29 @@ document.addEventListener('DOMContentLoaded', () => {
             let start = rental.startDate;
             let end = rental.endDate;
             if (start && end) {
-                if (typeof start === 'object' && start.seconds) start = new Date(start.seconds * 1000);
-                else start = new Date(start);
-                if (typeof end === 'object' && end.seconds) end = new Date(end.seconds * 1000);
-                else end = new Date(end);
-                let d = new Date(start);
-                while (d <= end) {
-                    reservedDates.push(d.toISOString().split('T')[0]);
-                    d.setDate(d.getDate() + 1);
+                let startStr, endStr;
+
+                // Handle both new string format and old Timestamp format for backward compatibility.
+                if (typeof start === 'string') {
+                    startStr = start;
+                } else { // Old format: Firestore Timestamp
+                    startStr = flatpickr.formatDate(start.toDate(), "Y-m-d");
+                }
+
+                if (typeof end === 'string') {
+                    endStr = end;
+                } else { // Old format: Firestore Timestamp
+                    endStr = flatpickr.formatDate(end.toDate(), "Y-m-d");
+                }
+
+                let currentDate = flatpickr.parseDate(startStr, "Y-m-d");
+                const lastDate = flatpickr.parseDate(endStr, "Y-m-d");
+
+                if (currentDate && lastDate) {
+                    while (currentDate <= lastDate) {
+                        reservedDates.push(flatpickr.formatDate(currentDate, "Y-m-d"));
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
                 }
             }
         });
@@ -101,40 +116,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Flatpickr initialization and total price calculation
-    async function setupDatePickers() {
-        if (!rentalStartDate || !rentalEndDate) return;
-        const reservedDates = await getReservedDates(listingId);
+    function setupDatePickers(reservedDates) {
+        console.log('[Function] setupDatePickers called with reserved dates:', reservedDates);
 
-        // Only initialize if not already initialized
-        if (!rentalStartDate._flatpickr) {
-            flatpickr(rentalStartDate, {
-                dateFormat: "Y-m-d",
-                disable: reservedDates,
-                onChange: (selectedDates) => {
-                    startDate = selectedDates[0];
-                    calculateTotalPrice();
-                    console.log('[Event] Start date selected:', startDate);
-                }
-            });
-            console.log('[Event] rentalStartDate flatpickr initialized');
+        // Destroy existing flatpickr instances to ensure a clean refresh
+        if (rentalStartDate._flatpickr) {
+            rentalStartDate._flatpickr.destroy();
         }
-        if (!rentalEndDate._flatpickr) {
-            flatpickr(rentalEndDate, {
-                dateFormat: "Y-m-d",
-                disable: reservedDates,
-                onChange: (selectedDates) => {
-                    endDate = selectedDates[0];
-                    calculateTotalPrice();
-                    console.log('[Event] End date selected:', endDate);
-                }
-            });
-            console.log('[Event] rentalEndDate flatpickr initialized');
+        if (rentalEndDate._flatpickr) {
+            rentalEndDate._flatpickr.destroy();
         }
+
+        const options = {
+            dateFormat: "Y-m-d",
+            disable: reservedDates,
+        };
+
+        flatpickr(rentalStartDate, {
+            ...options,
+            onChange: (selectedDates) => {
+                const selected = selectedDates[0];
+                // Use the date object directly from flatpickr to avoid timezone issues.
+                startDate = selectedDates[0];
+                calculateTotalPrice();
+                console.log('[Event] Start date selected:', startDate);
+            }
+        });
+
+        flatpickr(rentalEndDate, {
+            ...options,
+            onChange: (selectedDates) => {
+                const selected = selectedDates[0];
+                endDate = selectedDates[0];
+                calculateTotalPrice();
+                console.log('[Event] End date selected:', endDate);
+            }
+        });
+
+        console.log('[Event] Date pickers re-initialized');
     }
 
     function calculateTotalPrice() {
         if (startDate && endDate && rentPrice) {
-            const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            // Normalize dates to midnight local time to count full days
+            const startOfDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+            const endOfDay = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+            const diffTime = endOfDay.getTime() - startOfDay.getTime();
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+            const days = diffDays >= 0 ? diffDays + 1 : 0;
             const total = days > 0 ? days * rentPrice : 0;
             if (totalPriceElement) totalPriceElement.value = `₱${total.toFixed(2)}`;
         } else if (totalPriceElement) {
@@ -161,14 +190,19 @@ document.addEventListener('DOMContentLoaded', () => {
         await loader.withLoader(async () => {
             // Validate required fields
             const userName = userNameInput ? userNameInput.value.trim() : '';
-            const start = rentalStartDate ? rentalStartDate.value.trim() : '';
-            const end = rentalEndDate ? rentalEndDate.value.trim() : '';
             const priceStr = rentalPriceInput ? rentalPriceInput.value.trim() : '';
             const totalStr = totalPriceElement ? totalPriceElement.value.trim() : '';
 
-            if (!userName || !start || !end || !priceStr || !totalStr || !listingId) {
-                alert('Please fill in all required fields.');
+            if (!userName || !startDate || !endDate || !priceStr || !totalStr || !listingId) {
+                alert('Please fill in all required fields, including start and end dates.');
                 console.log('[Error] Rental form validation failed');
+                return;
+            }
+
+            // Validate that start date is not after end date
+            if (startDate > endDate) {
+                alert('Start date cannot be after the end date.');
+                console.log('[Error] Start date is after end date');
                 return;
             }
 
@@ -176,22 +210,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const rentPriceNum = parseFloat(priceStr.replace(/[^0-9.]/g, ''));
             const totalPriceNum = parseFloat(totalStr.replace(/[^0-9.]/g, ''));
 
-            // Get listing data by listingId
             const listing = await getListingById(listingId);
-            if (!listing) {
-                alert('Listing not found.');
-                console.log('[Error] Listing not found for listingId:', listingId);
+            if (!listing || !listing.data) {
+                alert('Listing not found or data is missing.');
                 return;
             }
-
-            // Get image and sellerId
             const image = listing.data.images && listing.data.images.length > 0 ? listing.data.images[0] : '';
             const sellerId = listing.data.sellerId || '';
-            if (!image || !sellerId) {
-                alert('Listing data incomplete.');
-                console.log('[Error] Listing data incomplete');
-                return;
-            }
 
             // Get logged-in user
             const user = auth.currentUser;
@@ -205,8 +230,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Prepare rental data
             const rentalData = {
                 name: userName,
-                startDate: start,
-                endDate: end,
+                // Format dates as 'YYYY-MM-DD' strings for timezone-agnostic storage.
+                startDate: flatpickr.formatDate(startDate, "Y-m-d"),
+                endDate: flatpickr.formatDate(endDate, "Y-m-d"),
                 finalPrice: totalPriceNum,
                 rentPrice: rentPriceNum,
                 image: image,
