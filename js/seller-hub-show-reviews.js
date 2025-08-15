@@ -42,7 +42,7 @@ async function fetchUserReviews(userId) {
 
             reviewDiv.innerHTML = `
                 <h3 class="text-xl font-semibold text-gray-800">${reviewData.listingName}</h3>
-                <p class="text-gray-600">Ordered By: ${reviewData.name}</p>
+                <p class="text-gray-600">Ordered By: ${reviewData.reviewBy}</p>
                 <p class="text-gray-600">${reviewData.reviewText}</p>
             `;
 
