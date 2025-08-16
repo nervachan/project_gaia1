@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"; // Import Firebase Authentication
+import { loader } from './loader.js';
 
 // Wait for the DOM to be fully loaded
 document.addEventListener("DOMContentLoaded", function () {
@@ -24,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 window.openProfileModal=async function () {
   const modal = document.getElementById("profile-modal");
   const userProfileInfo = document.getElementById("user-profile-info");
-
+  // Loader already shown above
   try {
     const user = auth.currentUser;
     if (!user) {
@@ -43,18 +44,20 @@ window.openProfileModal=async function () {
     if (!querySnapshot.empty) {
       const userDoc = querySnapshot.docs[0]; // assuming only one match
       const userData = userDoc.data();
-
       userProfileInfo.innerHTML = `
         <p><strong>Name:</strong> ${userData.username}</p>
         <p><strong>Email:</strong> ${userData.email}</p>
         <p><strong>Account Type:</strong> ${userData.role}</p>
       `;
-
-      modal.classList.remove("hidden");
+      if (modal) modal.classList.remove("hidden");
     } else {
+      userProfileInfo.innerHTML = '<p class="text-red-500">User document not found.</p>';
+      if (modal) modal.classList.remove("hidden");
       console.error("User document not found for UID:", loggedInUid);
     }
   } catch (error) {
+    userProfileInfo.innerHTML = '<p class="text-red-500">Error loading profile.</p>';
+    if (modal) modal.classList.remove("hidden");
     console.error("Error fetching user data: ", error);
   }
 }
@@ -72,9 +75,11 @@ window.openProfileModal=async function () {
       const loggedInEmail = user.email; // Use the logged-in user's email
 
       // Simulate opening the modal when the profile icon is clicked
-      document.getElementById("profile-icon").addEventListener("click", function (event) {
+      document.getElementById("profile-icon").addEventListener("click", async function (event) {
         event.preventDefault(); // Prevent the default link behavior
-        openProfileModal(loggedInEmail); // Pass the logged-in user's email to the function
+        loader.show();
+        await openProfileModal();
+        loader.hide();
       });
     } else {
       // No user is signed in
