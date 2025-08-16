@@ -132,38 +132,48 @@ async function fetchUserPendingItems(userId) {
     pendingItemsContainer.innerHTML = "<p>Loading...</p>";
 
     try {
-        // Query the "rentals" collection where sellerId matches the logged-in user's ID
-        const pendingItemsQuery = query(collection(db, "rentals"), where("sellerId", "==", userId));
+        // Query the "rentals" collection for all documents
+        const pendingItemsQuery = query(collection(db, "rentals"));
         const pendingItemsSnapshot = await getDocs(pendingItemsQuery);
         pendingItemsContainer.innerHTML = ""; // Clear loading text
 
-        if (pendingItemsSnapshot.empty) {
-            pendingItemsContainer.innerHTML = "<p>No pending items found for this seller.</p>";
-            return;
-        }
-
+        let found = false;
         // Loop through the documents and display each pending item, excluding "relisted" items
         for (const docSnapshot of pendingItemsSnapshot.docs) {
             const itemData = docSnapshot.data();
+            const listingId = itemData.listingId;
+            if (!listingId) continue;
+
+            // Check listed_items for sellerId == userId
+            const listedItemRef = doc(db, "listed_items", listingId);
+            const listedItemSnap = await getDoc(listedItemRef);
+            if (!listedItemSnap.exists()) continue;
+            const listedItemData = listedItemSnap.data();
+            if (listedItemData.sellerId !== userId) continue;
+
+            // Get listingName and listingImage from listed_items
+            const listingName = listedItemData.productName || "";
+            const listingImage = (listedItemData.images && listedItemData.images.length > 0) ? listedItemData.images[0] : "";
 
             // Skip the item if its status is "relisted"
             if (itemData.status === "relisted") {
                 continue;
             }
 
+            found = true;
             const itemDiv = document.createElement("div");
             itemDiv.className = "bg-white shadow-md rounded p-6 mb-4";
 
-            // Use the "image" field directly from the rentals collection
-            const imageUrl = itemData.listingImage || "";
+            // Use the listingImage from listed_items
+            const imageUrl = listingImage;
 
             // Populate item HTML
             itemDiv.innerHTML = `
-                <h3 class="text-xl font-semibold text-gray-800">${itemData.listingName}</h3>
+                <h3 class="text-xl font-semibold text-gray-800">${listingName}</h3>
                 <p class="text-gray-600">Price:${itemData.totalPrice}</p>
                 <p class="text-gray-600">Start Day of Rental: ${itemData.startDate}</p>
                 <p class="text-gray-600">End Day of Rental: ${itemData.endDate}</p>
-                <p class="text-gray-600">Name of Reserver: ${itemData.userName}</p>
+                <p class="text-gray-600">Name of Reserver: ${itemData.renterName}</p>
                 <p class="text-gray-600">Status: ${itemData.status}</p>
                 ${imageUrl ? `<img src="${imageUrl}" alt="Product Image" class="w-full h-auto mt-4 rounded">` : ""}
             `;
@@ -253,6 +263,9 @@ async function fetchUserPendingItems(userId) {
             itemDiv.appendChild(button);
             itemDiv.appendChild(cancelButton);
             pendingItemsContainer.appendChild(itemDiv);
+        }
+        if (!found) {
+            pendingItemsContainer.innerHTML = "<p>No pending items found for this seller.</p>";
         }
     } catch (error) {
         console.error("Error fetching user pending items:", error);

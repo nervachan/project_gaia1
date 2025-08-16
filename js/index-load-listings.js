@@ -71,38 +71,37 @@ async function loadListings() {
       const listingId = doc.id; // Get listingId (doc ID)
 
       const listingElement = document.createElement('div');
-      listingElement.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'flex', 'flex-col');
-      listingElement.style.height = '36rem';
+      listingElement.classList.add('bg-white', 'rounded-lg', 'shadow-lg', 'flex', 'flex-col', 'mb-8', 'mx-2', 'overflow-hidden');
+      // Remove fixed height
+      // listingElement.style.height = '36rem';
 
       // Fetch seller info using sellerId
       const { sellerName, shopAddress } = await getSellerInfo(listing);
 
-      // Check if the "images" field exists and is an array
-      let image = '';
+      // Image section
+      let imageSection = '';
       if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
-        // Use the first image from the array
-        image = `<div class="w-full flex-shrink-0" style="height: 18rem;"><img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain rounded-t-lg"></div>`;
+        imageSection = `<div class="w-full h-72 flex items-center justify-center bg-gray-100 border-b"><img src="${listing.images[0]}" alt="${listing.productName}" class="w-full h-full object-contain rounded-t-lg"></div>`;
       } else {
-        // Fallback if no images are available
-        image = `<div class="w-full bg-gray-200 flex items-center justify-center flex-shrink-0 rounded-t-lg" style="height: 18rem;">
-                    <p class="text-gray-500">No image available</p>
-                 </div>`;
+        imageSection = `<div class="w-full h-72 flex items-center justify-center bg-gray-200 border-b"><p class="text-gray-500">No image available</p></div>`;
       }
 
-      listingElement.innerHTML = `
-        ${image}
+      // Content section
+      let contentSection = `
         <div class="p-4 flex flex-col flex-grow">
-            <h3 class="text-lg font-semibold truncate">${listing.productName}</h3>
-            <p class="text-sm text-gray-600">Category: ${listing.category || 'N/A'}</p>
-            <p class="text-sm text-gray-600">Size: ${listing.garmentSize || 'N/A'}</p>
-            <p class="text-sm text-gray-600">Seller: ${sellerName}</p>
+            <h3 class="text-lg font-semibold truncate mb-2">${listing.productName}</h3>
+            <p class="text-sm text-gray-600 mb-1">Category: ${listing.category || 'N/A'}</p>
+            <p class="text-sm text-gray-600 mb-1">Size: ${listing.garmentSize || 'N/A'}</p>
+            <p class="text-sm text-gray-600 mb-1">Seller: ${sellerName}</p>
             <div class="flex-grow"></div>
-            <p class="text-lg font-bold text-right">${listing.rentPrice ? `Rent: ${listing.rentPrice}/day` : ''}</p>
+            <p class="text-lg font-bold text-right mt-2">${listing.rentPrice ? `Rent: ${listing.rentPrice}/day` : ''}</p>
         </div>
-        <button class="bg-blue-500 text-white py-2 w-full flex-shrink-0 hover:bg-blue-600 rounded-b-lg view-details-btn" data-listing-id="${listingId}">
-          View Details
-        </button>
       `;
+
+      // Button section
+      let buttonSection = `<button class="bg-blue-500 text-white py-2 w-full flex-shrink-0 hover:bg-blue-600 rounded-b-lg view-details-btn" data-listing-id="${listingId}">View Details</button>`;
+
+      listingElement.innerHTML = `${imageSection}${contentSection}${buttonSection}`;
 
       listingsContainer.appendChild(listingElement);
 
