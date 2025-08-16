@@ -431,13 +431,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
           }
 
+          // Validation: start date should not be after end date
+          const startDateObj = new Date(rentalStartDate);
+          const endDateObj = new Date(rentalEndDate);
+          if (startDateObj > endDateObj) {
+            alert('Start date cannot be after end date.');
+            return;
+          }
+
           // Create rental data with listingId
           const rentalData = {
             listingId: listingId,
             renterId: user.uid,
             renterName: rentalName,
-            startDate: flatpickr.formatDate(new Date(rentalStartDate), "Y-m-d"),
-            endDate: flatpickr.formatDate(new Date(rentalEndDate), "Y-m-d"),
+            startDate: flatpickr.formatDate(startDateObj, "Y-m-d"),
+            endDate: flatpickr.formatDate(endDateObj, "Y-m-d"),
             totalPrice: totalPrice,
             status: 'pending',
             createdAt: new Date()
