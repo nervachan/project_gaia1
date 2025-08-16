@@ -370,31 +370,54 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (window.flatpickr && rentalStartDate && rentalEndDate) {
     const pendingDates = await getPendingDates();
+    const today = new Date();
+    const minDateStr = flatpickr.formatDate(today, "Y-m-d");
+    let selectedStartDate = null;
 
     flatpickr(rentalStartDate, {
       dateFormat: "Y-m-d",
-      // Do not use disable, just color the days
+      minDate: minDateStr,
       onDayCreate: function(dObj, dStr, fp, dayElem) {
         const dateStr = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
         if (pendingDates.includes(dateStr)) {
           dayElem.classList.add('bg-red-500', 'text-white');
           dayElem.style.pointerEvents = 'none'; // Prevent selection
         }
+        // Only grey out days before today, not today itself
+        if (dayElem.dateObj < today.setHours(0,0,0,0)) {
+          dayElem.classList.add('bg-gray-300', 'text-gray-400');
+          dayElem.style.pointerEvents = 'none';
+        }
       },
       onChange: function(selectedDates, dateStr, instance) {
         startDateValue = selectedDates[0];
+        selectedStartDate = selectedDates[0];
         calculateTotalPrice();
+        // Redraw end date picker to grey out days before selected start date
+        if (rentalEndDate._flatpickr) {
+          rentalEndDate._flatpickr.redraw();
+        }
         console.log('[Flatpickr] Start date selected:', dateStr);
       }
     });
     flatpickr(rentalEndDate, {
       dateFormat: "Y-m-d",
-     
+      minDate: minDateStr,
       onDayCreate: function(dObj, dStr, fp, dayElem) {
         const dateStr = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
         if (pendingDates.includes(dateStr)) {
           dayElem.classList.add('bg-red-500', 'text-white');
           dayElem.style.pointerEvents = 'none'; // Prevent selection
+        }
+        // Only grey out days before today, not today itself
+        if (dayElem.dateObj < today.setHours(0,0,0,0)) {
+          dayElem.classList.add('bg-gray-300', 'text-gray-400');
+          dayElem.style.pointerEvents = 'none';
+        }
+        // Grey out days before selected start date
+        if (selectedStartDate && dayElem.dateObj < selectedStartDate) {
+          dayElem.classList.add('bg-gray-300', 'text-gray-400');
+          dayElem.style.pointerEvents = 'none';
         }
       },
       onChange: function(selectedDates, dateStr, instance) {
