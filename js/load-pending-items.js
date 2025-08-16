@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getFirestore, collection, getDocs, query, where, doc, getDoc, updateDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { loader } from './loader.js';
 
 // Firebase configuration and initialization
 const firebaseConfig = {
@@ -60,20 +61,24 @@ async function updateItemStatus(docId, newStatus) {
             await deleteDoc(itemRef);
 
             // Query the listed_items collection using the listingName from the rentals collection
-            const listedItemsQuery = query(
-                collection(db, "listed_items"),
-                where("productName", "==", itemData.listingName)
-            );
-            const listedItemsSnapshot = await getDocs(listedItemsQuery);
+            if (itemData.listingName) {
+                const listedItemsQuery = query(
+                    collection(db, "listed_items"),
+                    where("productName", "==", itemData.listingName)
+                );
+                const listedItemsSnapshot = await getDocs(listedItemsQuery);
 
-            if (!listedItemsSnapshot.empty) {
-                // Update the isActive status to true for the matching document
-                listedItemsSnapshot.forEach(async (docSnapshot) => {
-                    const listingRef = doc(db, "listed_items", docSnapshot.id);
-                    await updateDoc(listingRef, { isActive: true });
-                });
+                if (!listedItemsSnapshot.empty) {
+                    // Update the isActive status to true for the matching document
+                    listedItemsSnapshot.forEach(async (docSnapshot) => {
+                        const listingRef = doc(db, "listed_items", docSnapshot.id);
+                        await updateDoc(listingRef, { isActive: true });
+                    });
+                } else {
+                    console.warn("No matching document found in listed_items collection.");
+                }
             } else {
-                console.warn("No matching document found in listed_items collection.");
+                console.warn("Cannot query listed_items: itemData.listingName is undefined.");
             }
 
             alert("Item has been cancelled and moved to rental history!");
@@ -86,20 +91,24 @@ async function updateItemStatus(docId, newStatus) {
             await updateDoc(itemRef, { status: "relisted" });
 
             // Query the listed_items collection using the listingName from the rentals collection
-            const listedItemsQuery = query(
-                collection(db, "listed_items"),
-                where("productName", "==", itemData.listingName)
-            );
-            const listedItemsSnapshot = await getDocs(listedItemsQuery);
+            if (itemData.listingName) {
+                const listedItemsQuery = query(
+                    collection(db, "listed_items"),
+                    where("productName", "==", itemData.listingName)
+                );
+                const listedItemsSnapshot = await getDocs(listedItemsQuery);
 
-            if (!listedItemsSnapshot.empty) {
-                // Update the isActive status to true for the matching document
-                listedItemsSnapshot.forEach(async (docSnapshot) => {
-                    const listingRef = doc(db, "listed_items", docSnapshot.id);
-                    await updateDoc(listingRef, { isActive: true });
-                });
+                if (!listedItemsSnapshot.empty) {
+                    // Update the isActive status to true for the matching document
+                    listedItemsSnapshot.forEach(async (docSnapshot) => {
+                        const listingRef = doc(db, "listed_items", docSnapshot.id);
+                        await updateDoc(listingRef, { isActive: true });
+                    });
+                } else {
+                    console.warn("No matching document found in listed_items collection.");
+                }
             } else {
-                console.warn("No matching document found in listed_items collection.");
+                console.warn("Cannot query listed_items: itemData.listingName is undefined.");
             }
 
             alert("Item has been relisted and moved to rental history!");
@@ -194,19 +203,49 @@ async function fetchUserPendingItems(userId) {
             // Set button text and functionality based on the current status
             if (itemData.status === "picked up") {
                 button.textContent = "Mark as Returned";
-                button.onclick = () => updateItemStatus(docSnapshot.id, "returned");
+                button.onclick = async () => {
+                    loader.show();
+                    try {
+                        // Move the document to the rental_history collection with status 'returned'
+                        const historyRef = doc(db, "rental_history", docSnapshot.id);
+                        await setDoc(historyRef, { ...itemData, status: "returned" });
+                        // Delete the document from the rentals collection
+                        const rentalRef = doc(db, "rentals", docSnapshot.id);
+                        await deleteDoc(rentalRef);
+                        alert("Item marked as returned and moved to rental history!");
+                        location.reload();
+                    } catch (error) {
+                        console.error("Error marking item as returned:", error);
+                        alert("Failed to mark item as returned. Please try again.");
+                    } finally {
+                        loader.hide();
+                    }
+                };
             } else if (itemData.status === "returned") {
                 button.textContent = "Relist Item";
                 button.onclick = () => updateItemStatus(docSnapshot.id, "relisted");
             } else {
                 button.textContent = "Mark as Picked Up";
-                button.onclick = () => updateItemStatus(docSnapshot.id, "picked up");
+                button.onclick = async () => {
+                    loader.show();
+                    try {
+                        await updateItemStatus(docSnapshot.id, "picked up");
+                    } finally {
+                        loader.hide();
+                    }
+                };
             }
 
             // Add a "Cancel Item" button
             const cancelButton = document.createElement("button");
             cancelButton.className = "bg-red-500 text-white px-4 py-2 rounded";
             cancelButton.textContent = "Cancel Item";
+            // If status is 'picked up', disable and grey out the cancel button
+            if (itemData.status === "picked up") {
+                cancelButton.disabled = true;
+                cancelButton.classList.add("opacity-50", "cursor-not-allowed");
+                cancelButton.title = "Cannot cancel after item is picked up";
+            }
 
             // Push the button container to the bottom of the card
             buttonContainer.style.marginTop = "auto";
@@ -236,20 +275,23 @@ async function fetchUserPendingItems(userId) {
                     await deleteDoc(rentalRef);
 
                     // Query the listed_items collection using the listingName from the rentals collection
-                    const listedItemsQuery = query(
-                        collection(db, "listed_items"),
-                        where("productName", "==", itemData.listingName)
-                    );
-                    const listedItemsSnapshot = await getDocs(listedItemsQuery);
-
-                    if (!listedItemsSnapshot.empty) {
-                        // Update the isActive status to true for the matching document
-                        listedItemsSnapshot.forEach(async (docSnapshot) => {
-                            const listingRef = doc(db, "listed_items", docSnapshot.id);
-                            await updateDoc(listingRef, { isActive: true });
-                        });
+                    if (itemData.listingName) {
+                        const listedItemsQuery = query(
+                            collection(db, "listed_items"),
+                            where("productName", "==", itemData.listingName)
+                        );
+                        const listedItemsSnapshot = await getDocs(listedItemsQuery);
+                        if (!listedItemsSnapshot.empty) {
+                            // Update the isActive status to true for the matching document
+                            listedItemsSnapshot.forEach(async (docSnapshot) => {
+                                const listingRef = doc(db, "listed_items", docSnapshot.id);
+                                await updateDoc(listingRef, { isActive: true });
+                            });
+                        } else {
+                            console.warn("No matching document found in listed_items collection.");
+                        }
                     } else {
-                        console.warn("No matching document found in listed_items collection.");
+                        console.warn("Cannot query listed_items: itemData.listingName is undefined.");
                     }
 
                     alert("Item has been cancelled and moved to rental history!");
