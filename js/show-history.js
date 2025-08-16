@@ -40,7 +40,7 @@ async function showRentalHistory(userId) {
     rentalHistoryContainer.innerHTML = ''; // Clear previous content
 
     try {
-        const rentalsQuery = query(collection(db, "rentals"), where('userUid', '==', userId));
+        const rentalsQuery = query(collection(db, "rentals"), where('renterId', '==', userId));
         const rentalsSnapshot = await getDocs(rentalsQuery);
 
         if (rentalsSnapshot.empty) {
@@ -58,6 +58,28 @@ async function showRentalHistory(userId) {
         for (const docSnapshot of sortedDocs) {
             const rentalData = docSnapshot.data();
             rentalData.id = docSnapshot.id; // Attach doc ID for cancellation
+
+            // Fetch listing details using listingId
+            if (rentalData.listingId) {
+                try {
+                    const listingDocRef = doc(db, 'listed_items', rentalData.listingId);
+                    const listingDocSnap = await getDoc(listingDocRef);
+
+                    if (listingDocSnap.exists()) {
+                        const listingData = listingDocSnap.data();
+                        rentalData.listingName = listingData.productName || 'N/A';
+                        rentalData.listingImage = (listingData.images && listingData.images.length > 0) ? listingData.images[0] : '';
+                    } else {
+                        rentalData.listingName = 'Listing not found';
+                        rentalData.listingImage = ''; // No image available
+                    }
+                } catch (error) {
+                    console.error(`Error fetching listing details for ${rentalData.listingId}:`, error);
+                    rentalData.listingName = 'Error loading name';
+                    rentalData.listingImage = '';
+                }
+            }
+
             const rentalElement = createRentalHistoryElement(rentalData);
             rentalHistoryContainer.appendChild(rentalElement);
         }
@@ -85,7 +107,6 @@ function createRentalHistoryElement(rentalData) {
                 <h3 class="text-xl font-semibold text-gray-900">${rentalData.listingName}</h3>
                 <p class="text-gray-700 mt-2">Start Date: ${rentalData.startDate}</p>
                 <p class="text-gray-700 mt-2">End Date: ${rentalData.endDate}</p>
-                <p class="text-gray-700 mt-2">Rent Price: ₱${rentalData.rentPrice}</p>
                 <p class="text-gray-700 mt-2">Total Price: ${rentalData.totalPrice}</p>
                 <p class="text-gray-700 mt-2">Status: ${rentalData.status}</p>
 
