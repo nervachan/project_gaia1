@@ -171,6 +171,12 @@ function updateConversationsList() {
     const q = query(chatsRef, where('members', 'array-contains', currentUser.uid));
 
     onSnapshot(q, async (snapshot) => {
+        // Hide loading placeholder
+        const loadingPlaceholder = document.getElementById('user-list-loading');
+        if (loadingPlaceholder) {
+            loadingPlaceholder.style.display = 'none';
+        }
+        
         const conversations = [];
         const filteredDocs = snapshot.docs.filter(doc => {
             const data = doc.data();
