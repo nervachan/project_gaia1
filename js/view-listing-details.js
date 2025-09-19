@@ -462,9 +462,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
           }
 
-          // Create rental data with listingId
+          // Fetch sellerId using listingId
+          let sellerId = null;
+          try {
+            const listingDocRef = doc(db, 'listed_items', listingId);
+            const listingDocSnap = await getDoc(listingDocRef);
+            if (listingDocSnap.exists()) {
+              const listingData = listingDocSnap.data();
+              sellerId = listingData.sellerId || null;
+            }
+          } catch (err) {
+            console.warn('Could not fetch sellerId for listingId:', listingId, err);
+          }
+
+          // Create rental data with listingId and sellerId
           const rentalData = {
             listingId: listingId,
+            sellerId: sellerId,
             renterId: user.uid,
             renterName: rentalName,
             startDate: flatpickr.formatDate(startDateObj, "Y-m-d"),

@@ -230,21 +230,43 @@ async function fetchRentalHistory() {
             return;
         }
 
+        // Helper to fetch productName from listed_items or inactive_listings
+        async function fetchProductName(listingId) {
+            if (!listingId) return '';
+            // Try listed_items first
+            let docSnap = await getDocs(query(collection(db, "listed_items"), where("listingId", "==", listingId)));
+            if (!docSnap.empty) {
+                const data = docSnap.docs[0].data();
+                return data.productName || '';
+            }
+            // Try inactive_listings
+            docSnap = await getDocs(query(collection(db, "inactive_listings"), where("listingId", "==", listingId)));
+            if (!docSnap.empty) {
+                const data = docSnap.docs[0].data();
+                return data.productName || '';
+            }
+            return '';
+        }
+
         // Loop through the rental history and display each item
-        historySnapshot.forEach((docSnapshot) => {
+        for (const docSnapshot of historySnapshot.docs) {
             const historyData = docSnapshot.data();
+            // Fetch productName if missing
+            if (!historyData.listingName || historyData.listingName === 'undefined') {
+                historyData.listingName = await fetchProductName(historyData.listingId);
+            }
             const historyItem = document.createElement("div");
             historyItem.className = "p-4 bg-gray-100 rounded-lg shadow-sm";
 
             historyItem.innerHTML = `
-                <h4 class="text-lg font-semibold text-gray-800">${historyData.listingName}</h4>
-                <p class="text-gray-700">Rent Price: ${historyData.finalPrice}</p>
+                <h4 class="text-lg font-semibold text-gray-800">${historyData.listingName || 'N/A'}</h4>
+                <p class="text-gray-700">Rent Price: ${historyData.totalPrice}</p>
                 <p class="text-gray-700">Status: <span class="font-semibold">${historyData.status}</span></p>
-                <p class="text-gray-700">Rented To: ${historyData.name}</p>
+                <p class="text-gray-700">Rented To: ${historyData.renterName}</p>
             `;
 
             rentalHistoryContainer.appendChild(historyItem);
-        });
+        }
     } catch (error) {
         console.error("Error fetching rental history:", error);
         rentalHistoryContainer.innerHTML = "<p>Error loading rental history. Please try again later.</p>";
