@@ -27,12 +27,68 @@ window.onload = () => {
             console.log("User is logged in:", user);
             loader.withLoader(async () => {
                 await showRentalHistory(user.uid); // Show history for the logged-in user
+                await showRentalHistoryV2(user.uid); // Show history from rental_history collection
             }, "Loading rental history...");
         } else {
             console.log("No user is logged in.");
         }
     });
 };
+// Show rental history from the 'rental_history' collection (V2)
+async function showRentalHistoryV2(userId) {
+    const rentalHistoryV2Container = document.getElementById('rentalHistoryV2Container');
+    if (!rentalHistoryV2Container) return;
+    rentalHistoryV2Container.innerHTML = '';
+
+    try {
+        const rentalsQuery = query(collection(db, "rental_history"), where('renterId', '==', userId));
+        const rentalsSnapshot = await getDocs(rentalsQuery);
+
+        if (rentalsSnapshot.empty) {
+            rentalHistoryV2Container.innerHTML = '<p class="text-gray-500 text-center">No rental history found in new system.</p>';
+            return;
+        }
+
+        // Sort by timestamp descending if createdAt exists
+        const sortedDocs = rentalsSnapshot.docs.sort((a, b) => {
+            const aTime = a.data().createdAt?.toDate?.() || new Date(0);
+            const bTime = b.data().createdAt?.toDate?.() || new Date(0);
+            return bTime - aTime; // Newest first
+        });
+
+        for (const docSnapshot of sortedDocs) {
+            const rentalData = docSnapshot.data();
+            rentalData.id = docSnapshot.id; // Attach doc ID for cancellation
+
+            // Fetch listing details using listingId
+            if (rentalData.listingId) {
+                try {
+                    const listingDocRef = doc(db, 'listed_items', rentalData.listingId);
+                    const listingDocSnap = await getDoc(listingDocRef);
+
+                    if (listingDocSnap.exists()) {
+                        const listingData = listingDocSnap.data();
+                        rentalData.listingName = listingData.productName || 'N/A';
+                        rentalData.listingImage = (listingData.images && listingData.images.length > 0) ? listingData.images[0] : '';
+                    } else {
+                        rentalData.listingName = 'Listing not found';
+                        rentalData.listingImage = '';
+                    }
+                } catch (error) {
+                    console.error(`Error fetching listing details for ${rentalData.listingId}:`, error);
+                    rentalData.listingName = 'Error loading name';
+                    rentalData.listingImage = '';
+                }
+            }
+
+            const rentalElement = createRentalHistoryElement(rentalData);
+            rentalHistoryV2Container.appendChild(rentalElement);
+        }
+    } catch (error) {
+        console.error("Error fetching rental history (v2): ", error);
+        rentalHistoryV2Container.innerHTML = '<p class="text-red-500 text-center">Failed to load rental history (v2). Please try again later.</p>';
+    }
+}
 
 // Show rental history for the logged-in user
 async function showRentalHistory(userId) {
