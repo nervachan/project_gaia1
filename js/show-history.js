@@ -202,26 +202,68 @@ async function submitBuyerReview(rentalId, sellerId) {
     }
 
     try {
-        // Step 1: Fetch the rental document
-        const rentalRef = doc(db, "rentals", rentalId);
-        const rentalSnapshot = await getDoc(rentalRef);
+        // Step 1: Fetch the rental document from 'rentals' or 'rental_history'
+        let rentalRef = doc(db, "rentals", rentalId);
+        let rentalSnapshot = await getDoc(rentalRef);
+        let collectionUsed = "rentals";
+        if (!rentalSnapshot.exists()) {
+            // Try rental_history if not found in rentals
+            rentalRef = doc(db, "rental_history", rentalId);
+            rentalSnapshot = await getDoc(rentalRef);
+            collectionUsed = "rental_history";
+        }
 
         if (!rentalSnapshot.exists()) {
             alert("Rental document not found!");
             return;
         }
 
+
         const rentalData = rentalSnapshot.data();
-        const { listingName, name, listingId } = rentalData; // 
+        let { listingName, name, listingId, renterId } = rentalData;
+
+        // Ensure listingName is not undefined
+        if (!listingName && listingId) {
+            // Try to fetch from listed_items or inactive_listings
+            let docSnap = await getDoc(doc(db, 'listed_items', listingId));
+            if (docSnap.exists()) {
+                const listing = docSnap.data();
+                listingName = listing.productName || 'N/A';
+            } else {
+                docSnap = await getDoc(doc(db, 'inactive_listings', listingId));
+                if (docSnap.exists()) {
+                    const listing = docSnap.data();
+                    listingName = listing.productName || 'N/A';
+                } else {
+                    listingName = 'N/A';
+                }
+            }
+        }
+
+        // Fetch logged-in user's username for reviewByName
+        let reviewByName = '';
+        try {
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    reviewByName = userData.name || '';
+                }
+            }
+        } catch (e) {
+            // fallback: leave blank
+        }
 
         // Step 2: Store the review in the 'reviews' collection
         await setDoc(doc(db, "reviews", rentalId), {
             rentalId,
             sellerId,
-            listingId,    
-            listingName,
+            listingId,
+            listingName: listingName || 'N/A',
             reviewText,
             reviewBy: "buyer",
+            reviewByName,
             timestamp: new Date(),
         });
 
