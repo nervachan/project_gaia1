@@ -374,6 +374,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const minDateStr = flatpickr.formatDate(today, "Y-m-d");
     let selectedStartDate = null;
 
+    // Helper: Check if any reserved date is within selected range
+    function hasReservedInRange(start, end) {
+      if (!start || !end) return false;
+      const startStr = flatpickr.formatDate(start, "Y-m-d");
+      const endStr = flatpickr.formatDate(end, "Y-m-d");
+      const startDateObj = flatpickr.parseDate(startStr, "Y-m-d");
+      const endDateObj = flatpickr.parseDate(endStr, "Y-m-d");
+      for (const reserved of pendingDates) {
+        const reservedDateObj = flatpickr.parseDate(reserved, "Y-m-d");
+        if (reservedDateObj >= startDateObj && reservedDateObj <= endDateObj) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     flatpickr(rentalStartDate, {
       dateFormat: "Y-m-d",
       minDate: minDateStr,
@@ -422,6 +438,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       },
       onChange: function(selectedDates, dateStr, instance) {
         endDateValue = selectedDates[0];
+        // Check for reserved dates in the selected range after end date is picked
+        if (startDateValue && endDateValue) {
+          if (hasReservedInRange(startDateValue, endDateValue)) {
+            alert('Selected date range includes a reserved date. Please choose another range.');
+            endDateValue = null;
+            instance.clear();
+            calculateTotalPrice();
+            return;
+          }
+        }
         calculateTotalPrice();
         console.log('[Flatpickr] End date selected:', dateStr);
       }

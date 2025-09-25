@@ -1,6 +1,8 @@
 // Import the necessary Firebase functions
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { 
+    getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc 
+} from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 import { loader } from './loader.js';
 
@@ -21,6 +23,24 @@ console.log('[Firebase] Initialized app:', app.name || app.options.projectId);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+/* -------------------- 📅 DATE HELPERS -------------------- */
+
+// Format JS Date → "MM-DD-YY"
+function formatDateMMDDYY(date) {
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const yy = String(date.getFullYear()).slice(-2);
+    return `${mm}-${dd}-${yy}`;
+}
+
+// Parse "MM-DD-YY" → JS Date
+function parseDateMMDDYY(dateStr) {
+    const [mm, dd, yy] = dateStr.split("-").map(v => parseInt(v, 10));
+    return new Date(2000 + yy, mm - 1, dd);
+}
+
+/* -------------------- 🔍 FIRESTORE HELPERS -------------------- */
+
 // Utility to get listing data by listingId
 async function getListingById(listingId) {
     const docRef = doc(db, 'listed_items', listingId);
@@ -34,10 +54,39 @@ async function getListingById(listingId) {
     return null;
 }
 
-// Only run rental form logic if the form exists
+// Get reserved dates for flatpickr
+async function getReservedDates(listingId) {
+    const rentalsQuery = query(
+        collection(db, "rentals"),
+        where("listingId", "==", listingId)
+    );
+    const querySnapshot = await loader.withLoader(
+        () => getDocs(rentalsQuery),
+        "Loading reserved dates..."
+    );
+
+    const reservedDates = [];
+    querySnapshot.forEach(docSnap => {
+        const rental = docSnap.data();
+        if (!rental.startDate || !rental.endDate) return;
+
+        const start = parseDateMMDDYY(rental.startDate);
+        const end = parseDateMMDDYY(rental.endDate);
+
+        let cur = new Date(start);
+        while (cur <= end) {
+            reservedDates.push(formatDateMMDDYY(cur));
+            cur.setDate(cur.getDate() + 1);
+        }
+    });
+
+    return reservedDates;
+}
+
+/* -------------------- 📑 RENTAL FORM LOGIC -------------------- */
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('[Event] DOMContentLoaded');
-    // Scope: Only rental form
     const rentalFormSection = document.getElementById('rental-form-section');
     const rentalForm = document.getElementById('rental-form');
     if (!rentalFormSection || !rentalForm) return;
@@ -47,136 +96,65 @@ document.addEventListener('DOMContentLoaded', () => {
     const rentalEndDate = document.getElementById('rental-end-date');
     const totalPriceElement = document.getElementById('rental-total');
     const userNameInput = document.getElementById('rental-name');
+    const rentButton = document.getElementById('rent-button');
 
-    // Get listingId from URL
     const urlParams = new URLSearchParams(window.location.search);
     const listingId = urlParams.get('listingId');
+
     let rentPrice = 0;
     let startDate = null;
     let endDate = null;
 
-    // Fetch and display rent price using listingId
+    // Fetch and display rent price
     async function fetchAndDisplayRentPrice() {
         if (!listingId) return;
-        console.log('[Event] Fetching rent price for listingId:', listingId);
         await loader.withLoader(async () => {
             const listing = await getListingById(listingId);
             if (listing && listing.data.rentPrice) {
                 rentPrice = listing.data.rentPrice;
-                if (rentalPriceInput) rentalPriceInput.value = `${rentPrice}/day`;
-                console.log('[Event] Rent price fetched:', rentPrice);
+                rentalPriceInput.value = `${rentPrice}/day`;
             }
         }, "Loading listing details...");
     }
 
-    // Helper: Get all reserved dates for this listing
-    async function getReservedDates(listingId) {
-        console.log('[Event] Fetching reserved dates for listingId:', listingId);
-        const reservedDates = [];
-        const rentalsQuery = query(
-            collection(db, 'rentals'),
-            where('listingId', '==', listingId)
-        );
-        const querySnapshot = await loader.withLoader(
-            () => getDocs(rentalsQuery),
-            "Loading reserved dates..."
-        );
-        querySnapshot.forEach(docSnap => {
-            const rental = docSnap.data();
-            let start = rental.startDate;
-            let end = rental.endDate;
-            if (start && end) {
-                let startStr, endStr;
-
-                // Handle both new string format and old Timestamp format for backward compatibility.
-                if (typeof start === 'string') {
-                    startStr = start;
-                } else { // Old format: Firestore Timestamp
-                    startStr = flatpickr.formatDate(start.toDate(), "Y-m-d");
-                }
-
-                if (typeof end === 'string') {
-                    endStr = end;
-                } else { // Old format: Firestore Timestamp
-                    endStr = flatpickr.formatDate(end.toDate(), "Y-m-d");
-                }
-
-                let currentDate = flatpickr.parseDate(startStr, "Y-m-d");
-                const lastDate = flatpickr.parseDate(endStr, "Y-m-d");
-
-                if (currentDate && lastDate) {
-                    while (currentDate <= lastDate) {
-                        reservedDates.push(flatpickr.formatDate(currentDate, "Y-m-d"));
-                        currentDate.setDate(currentDate.getDate() + 1);
-                    }
-                }
-            }
-        });
-        return reservedDates;
+    // Check if range overlaps reserved
+    function rangeHasReserved(start, end, reservedDates) {
+        let cur = new Date(start);
+        while (cur <= end) {
+            const curStr = formatDateMMDDYY(cur);
+            if (reservedDates.includes(curStr)) return true;
+            cur.setDate(cur.getDate() + 1);
+        }
+        return false;
     }
 
-    // Flatpickr initialization and total price calculation
+    // Setup flatpickr with reserved date blocking
     async function setupDatePickers() {
-        // Fetch reserved dates before initializing pickers
         const reservedDates = listingId ? await getReservedDates(listingId) : [];
-        console.log('[Function] setupDatePickers called with reserved dates:', reservedDates);
 
-        // Destroy existing flatpickr instances to ensure a clean refresh
-        if (rentalStartDate._flatpickr) {
-            rentalStartDate._flatpickr.destroy();
-        }
-        if (rentalEndDate._flatpickr) {
-            rentalEndDate._flatpickr.destroy();
-        }
+        if (rentalStartDate._flatpickr) rentalStartDate._flatpickr.destroy();
+        if (rentalEndDate._flatpickr) rentalEndDate._flatpickr.destroy();
 
-        const options = {
-            dateFormat: "Y-m-d",
-            disable: reservedDates,
-        };
-
-        // Helper to check if any reserved date is within selected range
-        function hasReservedInRange(start, end) {
-            if (!start || !end) return false;
-            const startStr = flatpickr.formatDate(start, "Y-m-d");
-            const endStr = flatpickr.formatDate(end, "Y-m-d");
-            const startDateObj = flatpickr.parseDate(startStr, "Y-m-d");
-            const endDateObj = flatpickr.parseDate(endStr, "Y-m-d");
-            for (const reserved of reservedDates) {
-                const reservedDateObj = flatpickr.parseDate(reserved, "Y-m-d");
-                if (reservedDateObj >= startDateObj && reservedDateObj <= endDateObj) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        const disabled = reservedDates.map(d => parseDateMMDDYY(d));
 
         flatpickr(rentalStartDate, {
-            ...options,
+            dateFormat: "Y-m-d",
+            disable: disabled,
             onChange: (selectedDates) => {
-                startDate = selectedDates[0];
-                // If both dates selected, validate range
-                if (startDate && endDate) {
-                    if (hasReservedInRange(startDate, endDate)) {
-                        alert('Selected date range includes a reserved date. Please choose another range.');
-                        startDate = null;
-                        rentalStartDate._flatpickr.clear();
-                        calculateTotalPrice();
-                        return;
-                    }
-                }
+                startDate = selectedDates[0] || null;
                 calculateTotalPrice();
-                console.log('[Event] Start date selected:', startDate);
             }
         });
 
         flatpickr(rentalEndDate, {
-            ...options,
+            dateFormat: "Y-m-d",
+            disable: disabled,
             onChange: (selectedDates) => {
-                endDate = selectedDates[0];
-                // If both dates selected, validate range
+                endDate = selectedDates[0] || null;
+
                 if (startDate && endDate) {
-                    if (hasReservedInRange(startDate, endDate)) {
-                        alert('Selected date range includes a reserved date. Please choose another range.');
+                    if (rangeHasReserved(startDate, endDate, reservedDates)) {
+                        alert("❌ Selected range includes reserved dates. Please choose another.");
                         endDate = null;
                         rentalEndDate._flatpickr.clear();
                         calculateTotalPrice();
@@ -184,90 +162,80 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 calculateTotalPrice();
-                console.log('[Event] End date selected:', endDate);
             }
         });
-
-        console.log('[Event] Date pickers re-initialized');
     }
 
+    // Calculate total
     function calculateTotalPrice() {
         if (startDate && endDate && rentPrice) {
-            // Normalize dates to midnight local time to count full days
             const startOfDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
             const endOfDay = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
             const diffTime = endOfDay.getTime() - startOfDay.getTime();
             const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
             const days = diffDays >= 0 ? diffDays + 1 : 0;
             const total = days > 0 ? days * rentPrice : 0;
-            if (totalPriceElement) totalPriceElement.value = `₱${total.toFixed(2)}`;
-        } else if (totalPriceElement) {
+            totalPriceElement.value = `₱${total.toFixed(2)}`;
+        } else {
             totalPriceElement.value = "₱0.00";
         }
     }
 
-    // Rental button toggle functionality (handled in main page, but safe to keep)
-    const rentButton = document.getElementById('rent-button');
+    // Toggle rental form
     if (rentButton) {
         rentButton.addEventListener('click', () => {
-            if (rentalFormSection) {
-                rentalFormSection.classList.toggle('hidden');
-                console.log('[Event] Rent button clicked. Form section toggled.');
-            }
+            rentalFormSection.classList.toggle('hidden');
         });
     }
 
-    // Rental form submission
+    // Handle rental form submission
     rentalForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        console.log('[Event] Rental form submitted');
 
         await loader.withLoader(async () => {
-            // Validate required fields
-            const userName = userNameInput ? userNameInput.value.trim() : '';
-            const priceStr = rentalPriceInput ? rentalPriceInput.value.trim() : '';
-            const totalStr = totalPriceElement ? totalPriceElement.value.trim() : '';
+            const userName = userNameInput.value.trim();
+            const priceStr = rentalPriceInput.value.trim();
+            const totalStr = totalPriceElement.value.trim();
 
             if (!userName || !startDate || !endDate || !priceStr || !totalStr || !listingId) {
-                alert('Please fill in all required fields, including start and end dates.');
-                console.log('[Error] Rental form validation failed');
+                alert('⚠️ Please fill in all required fields.');
                 return;
             }
 
-            // Validate that start date is not after end date
             if (startDate > endDate) {
-                alert('Start date cannot be after the end date.');
-                console.log('[Error] Start date is after end date');
+                alert('⚠️ Start date cannot be after end date.');
                 return;
             }
 
-            // Get numeric values
             const rentPriceNum = parseFloat(priceStr.replace(/[^0-9.]/g, ''));
             const totalPriceNum = parseFloat(totalStr.replace(/[^0-9.]/g, ''));
 
             const listing = await getListingById(listingId);
             if (!listing || !listing.data) {
-                alert('Listing not found or data is missing.');
+                alert('⚠️ Listing not found.');
                 return;
             }
-            const image = listing.data.images && listing.data.images.length > 0 ? listing.data.images[0] : '';
+            const image = listing.data.images?.[0] || '';
             const sellerId = listing.data.sellerId || '';
 
-            // Get logged-in user
             const user = auth.currentUser;
             if (!user) {
-                alert('You must be logged in to rent an item.');
-                console.log('[Error] User not logged in');
+                alert('⚠️ You must be logged in to rent.');
                 return;
             }
             const userId = user.uid;
 
-            // Prepare rental data
+            // Final check for reserved dates
+            const reservedDates = await getReservedDates(listingId);
+            if (rangeHasReserved(startDate, endDate, reservedDates)) {
+                alert("❌ These dates are no longer available. Try another range.");
+                return;
+            }
+
             const rentalData = {
                 name: userName,
-                // Format dates as 'YYYY-MM-DD' strings for timezone-agnostic storage.
-                startDate: flatpickr.formatDate(startDate, "Y-m-d"),
-                endDate: flatpickr.formatDate(endDate, "Y-m-d"),
+                startDate: formatDateMMDDYY(startDate),
+                endDate: formatDateMMDDYY(endDate),
                 finalPrice: totalPriceNum,
                 rentPrice: rentPriceNum,
                 image: image,
@@ -280,19 +248,15 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                // Add rental to Firestore
                 await addDoc(collection(db, 'rentals'), rentalData);
-                // Set listing as inactive
                 await updateDoc(listing.doc, { isActive: false });
-                
-                alert('Rental submitted successfully!');
-                console.log('[Success] Rental submitted:', rentalData);
+
+                alert('✅ Rental submitted successfully!');
                 rentalForm.reset();
-                if (totalPriceElement) totalPriceElement.value = "₱0.00";
+                totalPriceElement.value = "₱0.00";
             } catch (error) {
                 console.error('Error submitting rental:', error);
-                alert('Failed to submit rental.');
-                console.log('[Error] Rental submission failed');
+                alert('❌ Failed to submit rental.');
             }
         }, "Processing rental...");
     });
@@ -300,14 +264,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize
     fetchAndDisplayRentPrice();
     setupDatePickers();
-    console.log('[Event] Rent form logic initialized');
 });
 
-// Ensure the user is authenticated
+/* -------------------- 👤 AUTH WATCH -------------------- */
+
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         console.warn('No user is logged in.');
-        console.log('[Auth] No user logged in');
     } else {
         console.log('[Auth] User logged in:', user.uid);
     }
