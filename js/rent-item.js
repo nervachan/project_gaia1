@@ -116,7 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Flatpickr initialization and total price calculation
-    function setupDatePickers(reservedDates) {
+    async function setupDatePickers() {
+        // Fetch reserved dates before initializing pickers
+        const reservedDates = listingId ? await getReservedDates(listingId) : [];
         console.log('[Function] setupDatePickers called with reserved dates:', reservedDates);
 
         // Destroy existing flatpickr instances to ensure a clean refresh
@@ -132,12 +134,36 @@ document.addEventListener('DOMContentLoaded', () => {
             disable: reservedDates,
         };
 
+        // Helper to check if any reserved date is within selected range
+        function hasReservedInRange(start, end) {
+            if (!start || !end) return false;
+            const startStr = flatpickr.formatDate(start, "Y-m-d");
+            const endStr = flatpickr.formatDate(end, "Y-m-d");
+            const startDateObj = flatpickr.parseDate(startStr, "Y-m-d");
+            const endDateObj = flatpickr.parseDate(endStr, "Y-m-d");
+            for (const reserved of reservedDates) {
+                const reservedDateObj = flatpickr.parseDate(reserved, "Y-m-d");
+                if (reservedDateObj >= startDateObj && reservedDateObj <= endDateObj) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         flatpickr(rentalStartDate, {
             ...options,
             onChange: (selectedDates) => {
-                const selected = selectedDates[0];
-                // Use the date object directly from flatpickr to avoid timezone issues.
                 startDate = selectedDates[0];
+                // If both dates selected, validate range
+                if (startDate && endDate) {
+                    if (hasReservedInRange(startDate, endDate)) {
+                        alert('Selected date range includes a reserved date. Please choose another range.');
+                        startDate = null;
+                        rentalStartDate._flatpickr.clear();
+                        calculateTotalPrice();
+                        return;
+                    }
+                }
                 calculateTotalPrice();
                 console.log('[Event] Start date selected:', startDate);
             }
@@ -146,8 +172,17 @@ document.addEventListener('DOMContentLoaded', () => {
         flatpickr(rentalEndDate, {
             ...options,
             onChange: (selectedDates) => {
-                const selected = selectedDates[0];
                 endDate = selectedDates[0];
+                // If both dates selected, validate range
+                if (startDate && endDate) {
+                    if (hasReservedInRange(startDate, endDate)) {
+                        alert('Selected date range includes a reserved date. Please choose another range.');
+                        endDate = null;
+                        rentalEndDate._flatpickr.clear();
+                        calculateTotalPrice();
+                        return;
+                    }
+                }
                 calculateTotalPrice();
                 console.log('[Event] End date selected:', endDate);
             }
