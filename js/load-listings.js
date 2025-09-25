@@ -355,9 +355,34 @@ document.querySelectorAll('.filter-btn').forEach(button => {
 
     let found = false;
 
+    // Expanded mapping for gender and children filters
+    const genderMap = {
+      'male': ['for men', 'for male'],
+      'female': ['for women', 'for female'],
+      'children-male': ['children (male)', 'for boys', 'boys', 'child male', 'children male'],
+      'children-female': ['children (female)', 'for girls', 'girls', 'child female', 'children female']
+    };
+
     allCards.forEach(card => {
-      const categoryText = card.querySelector('p.text-gray-700.mt-2');
-      if (category === 'all' || (categoryText && categoryText.textContent.includes(category))) {
+      // Find the category text in the card
+      let categoryElem = card.querySelector('p.text-gray-600.mb-1');
+      if (!categoryElem) {
+        categoryElem = card.querySelector('p.text-gray-700.mt-2');
+      }
+      const categoryText = categoryElem ? categoryElem.textContent.toLowerCase() : '';
+
+      let show = false;
+      if (category === 'all') {
+        show = true;
+      } else if (genderMap[category]) {
+        // If filtering by gender/children, match any mapped keyword
+        show = genderMap[category].some(keyword => categoryText.includes(keyword));
+      } else {
+        // Otherwise, match the category directly
+        show = categoryText.includes(category.toLowerCase());
+      }
+
+      if (show) {
         card.style.display = '';
         found = true;
       } else {
@@ -379,4 +404,5 @@ document.querySelectorAll('.filter-btn').forEach(button => {
     }
   });
 });
+
 
