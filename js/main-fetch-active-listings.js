@@ -237,13 +237,13 @@ async function fetchRentalHistory() {
             let docSnap = await getDocs(query(collection(db, "listed_items"), where("listingId", "==", listingId)));
             if (!docSnap.empty) {
                 const data = docSnap.docs[0].data();
-                return data.productName || '';
+                if (data.productName) return data.productName;
             }
             // Try inactive_listings
             docSnap = await getDocs(query(collection(db, "inactive_listings"), where("listingId", "==", listingId)));
             if (!docSnap.empty) {
                 const data = docSnap.docs[0].data();
-                return data.productName || '';
+                if (data.productName) return data.productName;
             }
             return '';
         }
@@ -251,15 +251,18 @@ async function fetchRentalHistory() {
         // Loop through the rental history and display each item
         for (const docSnapshot of historySnapshot.docs) {
             const historyData = docSnapshot.data();
-            // Fetch productName if missing
-            if (!historyData.listingName || historyData.listingName === 'undefined') {
-                historyData.listingName = await fetchProductName(historyData.listingId);
+            // Fetch productName if missing or invalid
+            let listingName = historyData.listingName;
+            if (!listingName || listingName === 'undefined' || listingName === 'N/A') {
+                listingName = await fetchProductName(historyData.listingId);
             }
+            if (!listingName) listingName = 'Unknown';
+
             const historyItem = document.createElement("div");
             historyItem.className = "p-4 bg-gray-100 rounded-lg shadow-sm";
 
             historyItem.innerHTML = `
-                <h4 class="text-lg font-semibold text-gray-800">${historyData.listingName || 'N/A'}</h4>
+                <h4 class="text-lg font-semibold text-gray-800">${listingName}</h4>
                 <p class="text-gray-700">Rent Price: ${historyData.totalPrice}</p>
                 <p class="text-gray-700">Status: <span class="font-semibold">${historyData.status}</span></p>
                 <p class="text-gray-700">Rented To: ${historyData.renterName}</p>
