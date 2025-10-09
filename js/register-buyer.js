@@ -37,6 +37,7 @@ document.getElementById('buyerForm').addEventListener('submit', async function(e
     const password = document.getElementById('password').value.trim();
 
     try {
+        // Show loader before starting registration
         await loader.withLoader(async () => {
             // Create user with email and password
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -55,7 +56,9 @@ document.getElementById('buyerForm').addEventListener('submit', async function(e
             document.getElementById('buyerForm').reset();
             window.location.href = "index.html"; // Redirect to login page
         }, "Registering account...");
+        // Loader will hide automatically after withLoader finishes
     } catch (error) {
+        // Hide loader if error occurs (withLoader handles this)
         console.error('Error signing up:', error.message);
         alert('Error signing up: ' + error.message);
     }

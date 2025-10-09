@@ -40,6 +40,7 @@ document.getElementById('sellerForm').addEventListener('submit', async function(
     const shopaddress = document.getElementById('shopaddress').value.trim();
 
     try {
+        // Show loader before starting registration
         await loader.withLoader(async () => {
             // Create user with email and password
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -60,7 +61,9 @@ document.getElementById('sellerForm').addEventListener('submit', async function(
             document.getElementById('sellerForm').reset();
             window.location.href = "index.html"; // Redirect to login page
         }, "Registering seller account...");
+        // Loader will hide automatically after withLoader finishes
     } catch (error) {
+        // Hide loader if error occurs (withLoader handles this)
         console.error('Error signing up:', error.message);
         alert('Error signing up: ' + error.message);
     }
