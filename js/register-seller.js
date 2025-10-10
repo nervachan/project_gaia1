@@ -33,11 +33,30 @@ const auth = getAuth(app);
 document.getElementById('sellerForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const username = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const shopname = document.getElementById('shopname').value.trim();
-    const shopaddress = document.getElementById('shopaddress').value.trim();
+    // Read values from the form (IDs must match the HTML)
+    const shopname = document.getElementById('shop-name')?.value.trim() || '';
+    const username = document.getElementById('username')?.value.trim() || '';
+    const email = document.getElementById('email')?.value.trim() || '';
+    const password = document.getElementById('password')?.value.trim() || '';
+    const shopaddress = document.getElementById('shop-address')?.value.trim() || '';
+
+    // Basic validation
+    if (!shopname || !username || !email || !password || !shopaddress) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+
+    // Simple email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+
+    if (password.length < 6) {
+        alert('Password should be at least 6 characters long.');
+        return;
+    }
 
     try {
         // Show loader before starting registration
@@ -48,12 +67,12 @@ document.getElementById('sellerForm').addEventListener('submit', async function(
 
             // Store user data in Firestore, including the auth UID
             await setDoc(doc(db, "user-seller", user.uid), {
-                uid: user.uid, // Add the UID
-                username: username, // User's name
-                email: email, // Email address
-                shopname: shopname, // Shop name
-                shopaddress: shopaddress, // Shop address
-                role: "seller", // Role
+                uid: user.uid,
+                username: username,
+                email: email,
+                shopname: shopname,
+                shopaddress: shopaddress,
+                role: "seller",
                 createdAt: new Date()
             });
 
