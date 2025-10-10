@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs, getDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 // Firebase configuration
@@ -230,32 +230,106 @@ async function fetchRentalHistory() {
             return;
         }
 
-        // Helper to fetch productName from listed_items or inactive_listings
-        async function fetchProductName(listingId) {
-            if (!listingId) return '';
-            // Try listed_items first
-            let docSnap = await getDocs(query(collection(db, "listed_items"), where("listingId", "==", listingId)));
-            if (!docSnap.empty) {
-                const data = docSnap.docs[0].data();
-                if (data.productName) return data.productName;
+        // Helper to fetch productName from listed_items or inactive_listings (robust)
+        async function fetchProductName(listingId, historyData) {
+            // Build candidate ids from common fields in historyData and the provided listingId
+            const candidateIdFields = [
+                'listingId', 'listingID', 'listing_id', 'productId', 'productID', 'product_id', 'id'
+            ];
+
+            const ids = new Set();
+            if (listingId) ids.add(String(listingId));
+            if (historyData) {
+                for (const f of candidateIdFields) {
+                    if (historyData[f]) ids.add(String(historyData[f]));
+                }
+                // nested listing object
+                if (historyData.listing && typeof historyData.listing === 'object') {
+                    for (const f of candidateIdFields) {
+                        if (historyData.listing[f]) ids.add(String(historyData.listing[f]));
+                    }
+                }
             }
-            // Try inactive_listings
-            docSnap = await getDocs(query(collection(db, "inactive_listings"), where("listingId", "==", listingId)));
-            if (!docSnap.empty) {
-                const data = docSnap.docs[0].data();
-                if (data.productName) return data.productName;
+
+            const candidateNameFields = ['productName', 'productname', 'name', 'title', 'listingName'];
+
+            // Try direct document lookup by id (common when listingId is doc id)
+            for (const id of ids) {
+                try {
+                    const listedRef = doc(db, 'listed_items', id);
+                    const listedSnap = await getDoc(listedRef);
+                    if (listedSnap.exists()) {
+                        const data = listedSnap.data();
+                        for (const nf of candidateNameFields) if (data[nf]) return data[nf];
+                    }
+                } catch (e) {
+                    // ignore and continue
+                }
+
+                try {
+                    const inactiveRef = doc(db, 'inactive_listings', id);
+                    const inactiveSnap = await getDoc(inactiveRef);
+                    if (inactiveSnap.exists()) {
+                        const data = inactiveSnap.data();
+                        for (const nf of candidateNameFields) if (data[nf]) return data[nf];
+                    }
+                } catch (e) {
+                    // ignore and continue
+                }
             }
+
+            // Try querying fields other than doc id (e.g., listingId field, productId, etc.)
+            const searchFields = ['listingId', 'listingID', 'id', 'productId', 'productID', 'product_id'];
+            for (const collectionName of ['listed_items', 'inactive_listings']) {
+                for (const searchField of searchFields) {
+                    for (const id of ids) {
+                        try {
+                            const q = query(collection(db, collectionName), where(searchField, '==', id));
+                            const snap = await getDocs(q);
+                            if (!snap.empty) {
+                                const data = snap.docs[0].data();
+                                for (const nf of candidateNameFields) if (data[nf]) return data[nf];
+                            }
+                        } catch (e) {
+                            // ignore and continue
+                        }
+                    }
+                }
+            }
+
+            // As a last resort, check the historyData itself for common name fields
+            if (historyData) {
+                for (const nf of candidateNameFields) {
+                    if (historyData[nf]) return historyData[nf];
+                }
+                if (historyData.listing && typeof historyData.listing === 'object') {
+                    for (const nf of candidateNameFields) {
+                        if (historyData.listing[nf]) return historyData.listing[nf];
+                    }
+                }
+            }
+
             return '';
         }
 
         // Loop through the rental history and display each item
         for (const docSnapshot of historySnapshot.docs) {
             const historyData = docSnapshot.data();
-            // Fetch productName if missing or invalid
-            let listingName = historyData.listingName;
-            if (!listingName || listingName === 'undefined' || listingName === 'N/A') {
-                listingName = await fetchProductName(historyData.listingId);
+            // Determine listing name using several fallbacks
+            const possibleNameFields = ['listingName', 'productName', 'productname', 'name', 'title', 'listing_name'];
+            let listingName = '';
+            for (const nf of possibleNameFields) {
+                if (historyData[nf] && historyData[nf] !== 'undefined' && historyData[nf] !== 'N/A') {
+                    listingName = historyData[nf];
+                    break;
+                }
             }
+
+            // If still missing, try fetching by id(s)
+            if (!listingName) {
+                listingName = await fetchProductName(historyData.listingId, historyData);
+            }
+
             if (!listingName) listingName = 'Unknown';
 
             const historyItem = document.createElement("div");
